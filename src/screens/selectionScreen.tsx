@@ -33,7 +33,7 @@ const SelectionScreen: React.FC = () => {
                         cursor-pointer
                     "
                     onClick={() => {
-                        window.location.href = '/searchAnime';
+                        window.location.href = '/searchScreen';
                     }}
                 >
                     <BackgroundImage
