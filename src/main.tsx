@@ -10,8 +10,8 @@ import '@mantine/core/styles.css';
 import '@mantine/carousel/styles.css';
 
 // Importação das telas
-import SelectionScreen from './screens/ selectionScreen.tsx'
-import SearchScreen from './screens/searchAnime.tsx'
+import SelectionScreen from './screens/selectionScreen.tsx'
+import SearchScreen from './screens/searchScreen.tsx'
 
 createRoot(document.getElementById('root')!).render(
 
@@ -25,7 +25,6 @@ createRoot(document.getElementById('root')!).render(
 			<BrowserRouter basename="/searchScreen">
 				<SearchScreen />
 			</BrowserRouter>
-
 
 		</MantineProvider>
 
