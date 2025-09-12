@@ -12,3 +12,7 @@
     outline: none;
     transition: 0.3s;
 }
+
+.inputTextInput::placeholder {
+    color: var(--color1-shadow);
+}

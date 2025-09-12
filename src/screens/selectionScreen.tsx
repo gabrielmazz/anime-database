@@ -1,8 +1,8 @@
 import React from "react";
 
 // Importação dos assets da tela
-import imgCard01 from '../assets/imgSelectionScreen/imgCard01.png';
-import imgCard02 from '../assets/imgSelectionScreen/imgCard02.png';
+import imgCard01 from '../assets/images/imgSelectionScreen/imgCard01.png';
+import imgCard02 from '../assets/images/imgSelectionScreen/imgCard02.png';
 
 // Importação dos componentes do mantine
 import { Card } from '@mantine/core';
