@@ -32,6 +32,13 @@ import Autoplay from 'embla-carousel-autoplay';
 // Utilidades
 import { getRandomWallpaper } from '../utils/wallpaper';
 import { applyPaletteToCssVariables, extractPaletteFromImage } from '../utils/palette';
+import {
+    searchAnimeByName,
+    getAnimePictures,
+    getAnimeCharacters,
+    type Anime,
+    type AnimeApiSearchResponse
+} from '../assets/API/jikan';
 
 // Importação das API's
 
@@ -54,57 +61,52 @@ const SearchScreen: React.FC = () => {
     // API Jikan para procurar anime pelo nome
     // https://api.jikan.moe/v4/anime?q={nome do anime}
 
-    // Define um tipo para o anime retornado pela API, ficando mais simples
-    // para manipular os dados depois
-    type Anime = {
-        mal_id: number;             // MyAnimeList ID  
-        title: string;              // Título do anime
-        synopsis: string;           // Sinopse do anime
-        episodes: number;           // Número de episódios
-        status: string;             // Status do anime
-        score: number;              // Nota do anime
-        images: {
-            jpg: {
-                image_url: string;  // URL da imagem do anime
-            };
-        };
-    };
-
-    // Define a struct em formato de lista para abrigar os animes retornados
-    type AnimeApiResponse = {
-        data: Anime[];
-    };
-
     // Data Base que armazenará os animes retornados pela API
-    const [animeDatabase, setAnimeDatabase] = useState<AnimeApiResponse | null>(null);
+    const [animeDatabase, setAnimeDatabase] = useState<AnimeApiSearchResponse | null>(null);
     const [animeSelectedPictures, setAnimeSelectedPictures] = useState<any>(null);
     const [animeSelectedCharacters, setAnimeSelectedCharacters] = useState<any>(null);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [revealCount, setRevealCount] = useState<number>(0);
 
     // API para buscar os animes com base no input do usuário
     const searchAnime = async () => {
-        const response = await fetch(`https://api.jikan.moe/v4/anime?q=${nameAnimerSearch}`);
-        const data = await response.json();
-
-        // Passa para a variável global
-        setAnimeDatabase(data);
+        setIsLoading(true);
+        try {
+            const data = await searchAnimeByName(nameAnimerSearch);
+            setAnimeDatabase(data);
+        } finally {
+            setIsLoading(false);
+        }
     };
+
+    // Efeito de "stagger reveal" para os cards quando a lista é atualizada
+    useEffect(() => {
+        if (!animeDatabase || !animeDatabase.data) return;
+        setRevealCount(0);
+        const total = animeDatabase.data.length;
+        const stepMs = 70; // atraso entre itens
+        const id = window.setInterval(() => {
+            setRevealCount((prev) => {
+                if (prev >= total) {
+                    window.clearInterval(id);
+                    return prev;
+                }
+                return prev + 1;
+            });
+        }, stepMs);
+        return () => window.clearInterval(id);
+    }, [animeDatabase]);
 
     // API para buscar as imagens do anime selecionado com base do ID do anime
     const searchAnimePictures = async (idAnime: number) => {
-        const response = await fetch(`https://api.jikan.moe/v4/anime/${idAnime}/pictures`);
-        const data = await response.json();
-
-        // Passa para a variável global
+        const data = await getAnimePictures(idAnime);
         setAnimeSelectedPictures(data);
         console.log(data);
     };
 
     // API para buscar os personagens do anime selecionado com base do ID do anime
     const searchAnimeCharacters = async (idAnime: number) => {
-        const response = await fetch(`https://api.jikan.moe/v4/anime/${idAnime}/characters`);
-        const data = await response.json();
-
-        // Passa para a variável global
+        const data = await getAnimeCharacters(idAnime);
         setAnimeSelectedCharacters(data);
         console.log("Personagens do anime: ", data);
     }
@@ -195,12 +197,15 @@ const SearchScreen: React.FC = () => {
                     {
                         // Verifica se a dataBase não está nula, se não estiver
                         // percorre o array de animes mostrando eles em tela
-                        animeDatabase && animeDatabase.data.map((anime: Anime) => (
+                        animeDatabase && animeDatabase.data.map((anime: Anime, index: number) => (
                             <div
                                 key={anime.mal_id}
-                                className="
-                                    border-2 border-white rounded-lg
-                                "
+                                style={{ transitionDelay: `${index * 40}ms` }}
+                                className={`
+                                    border-2 border-white/60 rounded-lg shadow-lg/30 overflow-hidden cursor-pointer
+                                    transform transition-all duration-500 ease-out
+                                    ${index < revealCount ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-2 scale-95'}
+                                `}
                             >
                                 <BackgroundImage
                                     src={anime.images.jpg.image_url}
@@ -243,11 +248,7 @@ const SearchScreen: React.FC = () => {
                                             uppercase
                                             tracking-(--title-letter-spacing)
                                         "
-                                        style={
-                                            { 
-                                                fontFamily: 'Arimo, sans-serif',
-                                            }
-                                        }
+                                        style={{ fontFamily: 'Arimo, sans-serif' }}
                                     >
                                         {anime.title}
                                     </Text>
@@ -278,7 +279,7 @@ const SearchScreen: React.FC = () => {
                         className="
                             font-bold
                             text-shadow-lg/20
-                            text-(--color1)
+                            text-(--colorTextWhite)
                             uppercase
                             tracking-(--title-letter-spacing)
                         "
@@ -289,6 +290,9 @@ const SearchScreen: React.FC = () => {
                 }
                 position="right"
                 size="35%"
+                overlayProps={{
+                    backgroundOpacity: 0.5, blur: 4 
+                }}
                 classNames={{
                     header: DrawerModule.headerDrawer,
                     title: DrawerModule.titleDrawer,
@@ -315,11 +319,11 @@ const SearchScreen: React.FC = () => {
                             <Title
                                 size="xl"
                                 className="
-                                font-bold text-center
-                                text-shadow-lg/20
-                                text-(--color1)
-                                uppercase
-                                tracking-(--title-letter-spacing)
+                                    font-bold text-center
+                                    text-shadow-lg/20
+                                    text-(--colorTextWhite)
+                                    uppercase
+                                    tracking-(--title-letter-spacing)
                                 "
                                 style={{
                                     fontSize: 32,
@@ -335,14 +339,14 @@ const SearchScreen: React.FC = () => {
                                 <Text
                                     component="span"
                                     className="
-                                font-bold
-                                uppercase
-                                tracking-(--title-letter-spacing)
+                                    font-bold
+                                    uppercase
+                                    tracking-(--title-letter-spacing)
                                 "
                                     style={{
                                         fontSize: 16,
                                         fontFamily: 'Raleway, sans-serif',
-                                        color: 'var(--color1)',
+                                        color: 'var(--colorTextWhite)',
                                         marginRight: 6
                                     }}
                                 >
@@ -351,7 +355,7 @@ const SearchScreen: React.FC = () => {
 
                                 <Text
                                     component="span"
-                                    style={{ color: 'var(--color1)' }}>
+                                    style={{ color: 'var(--colorTextWhite)' }}>
                                     {selectedAnime.synopsis}
                                 </Text>
 
@@ -373,7 +377,7 @@ const SearchScreen: React.FC = () => {
                                 style={{
                                     fontSize: 16,
                                     fontFamily: 'Raleway, sans-serif',
-                                    color: 'var(--color1)',
+                                    color: 'var(--colorTextWhite)',
                                     marginRight: 6
                                 }}
                             >
@@ -382,7 +386,7 @@ const SearchScreen: React.FC = () => {
 
                             <Text
                                 component="span"
-                                style={{ color: 'var(--color1)' }}>
+                                style={{ color: 'var(--colorTextWhite)' }}>
                                 {selectedAnime.episodes}
                             </Text>
 
@@ -403,7 +407,7 @@ const SearchScreen: React.FC = () => {
                                 style={{
                                     fontSize: 16,
                                     fontFamily: 'Raleway, sans-serif',
-                                    color: 'var(--color1)',
+                                    color: 'var(--colorTextWhite)',
                                     marginRight: 6
                                 }}
                             >
@@ -412,7 +416,7 @@ const SearchScreen: React.FC = () => {
 
                             <Text
                                 component="span"
-                                style={{ color: 'var(--color1)' }}>
+                                style={{ color: 'var(--colorTextWhite)' }}>
                                 {selectedAnime.status}
                             </Text>
 
@@ -432,7 +436,7 @@ const SearchScreen: React.FC = () => {
                                 style={{
                                     fontSize: 16,
                                     fontFamily: 'Raleway, sans-serif',
-                                    color: 'var(--color1)',
+                                    color: 'var(--colorTextWhite)',
                                     marginRight: 6
                                 }}
                             >
@@ -441,7 +445,7 @@ const SearchScreen: React.FC = () => {
 
                             <Text
                                 component="span"
-                                style={{ color: 'var(--color1)' }}>
+                                style={{ color: 'var(--colorTextWhite)' }}>
                                 {selectedAnime.score}
                             </Text>
 
@@ -460,7 +464,7 @@ const SearchScreen: React.FC = () => {
                                     style={{
                                         fontSize: 16,
                                         fontFamily: 'Raleway, sans-serif',
-                                        color: 'var(--color1)',
+                                        color: 'var(--colorTextWhite)',
                                         marginRight: 6
                                     }}
                                 >
@@ -511,7 +515,7 @@ const SearchScreen: React.FC = () => {
                                     style={{
                                         fontSize: 16,
                                         fontFamily: 'Raleway, sans-serif',
-                                        color: 'var(--color1)',
+                                        color: 'var(--colorTextWhite)',
                                         marginRight: 6
                                     }}
                                 >
@@ -566,7 +570,7 @@ const SearchScreen: React.FC = () => {
                                     style={{
                                         fontSize: 16,
                                         fontFamily: 'Raleway, sans-serif',
-                                        color: 'var(--color1)',
+                                        color: 'var(--colorTextWhite)',
                                         marginRight: 6
                                     }}
                                 >
@@ -597,7 +601,7 @@ const SearchScreen: React.FC = () => {
                                                                 w={80}
                                                                 alt={character.character.name}
                                                             />
-                                                            <Text style={{ color: '#E8D4B7', fontWeight: 600 }}>
+                                                            <Text style={{ color: 'var(--colorTextWhite)', fontWeight: 600 }}>
                                                                 {character.character.name}
                                                             </Text>
                                                         </Group>
