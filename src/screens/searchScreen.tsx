@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useState } from 'react';
 
 // Componentes principais
@@ -29,12 +29,27 @@ import TextInputModule from './../assets/inputInfos/TextInput.module.css';
 
 import Autoplay from 'embla-carousel-autoplay';
 
+// Utilidades
+import { getRandomWallpaper } from '../utils/wallpaper';
+import { applyPaletteToCssVariables, extractPaletteFromImage } from '../utils/palette';
+
 // Importação das API's
+
+// Importação dinâmica via util (remove import direto de imagem)
 
 
 const SearchScreen: React.FC = () => {
 
     const [nameAnimerSearch, setNameAnimeSearch] = useState('');
+    const [wallpaper, setWallpaper] = useState<string>(() => getRandomWallpaper());
+
+    // Extrai paleta baseada no wallpaper e aplica nas CSS variables
+    useEffect(() => {
+        if (!wallpaper) return;
+        extractPaletteFromImage(wallpaper)
+            .then(applyPaletteToCssVariables)
+            .catch(() => { /* silenciosamente ignora erros de leitura */ });
+    }, [wallpaper]);
 
     // API Jikan para procurar anime pelo nome
     // https://api.jikan.moe/v4/anime?q={nome do anime}
@@ -100,17 +115,23 @@ const SearchScreen: React.FC = () => {
     // Estado para armazenar o anime selecionado
     const [selectedAnime, setSelectedAnime] = useState<Anime | null>(null);
 
+
+
     return (
 
-        <div
-            className="
-                bg-(--color5) text-white
-            "
+        // BackgroundImage fara a estilização por tras da tela, sempre
+        // aleatorizando uma imagem do fundo conforme a função getRandomWallpaper
+        <BackgroundImage
+            src={wallpaper}
+            className="relative text-white w-screen min-h-screen bg-cover bg-no-repeat bg-center bg-fixed"
         >
+            {/* Overlay escurecedor */}
+            <div className="absolute inset-0 bg-black/60 pointer-events-none" />
 
             <div
                 // Div principal que abrigará toda a listagem de animes
                 className="
+                relative z-10
                 w-screen min-h-screen             
                 max-w-7xl mx-auto
                 align-top
@@ -592,7 +613,7 @@ const SearchScreen: React.FC = () => {
                 )}
             </Drawer>
 
-        </div >
+        </BackgroundImage>
 
     );
 

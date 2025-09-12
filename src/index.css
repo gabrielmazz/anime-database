@@ -24,3 +24,14 @@
 	--subtitle-letter-spacing: 0.03em;
 	--text-letter-spacing: 0.15em;
 }
+
+/* Remove margens padrão do body e assegura ocupação total da tela */
+html, body, #root {
+  height: 100%;
+  width: 100%;
+}
+body {
+  margin: 0;
+  background-color: #000;
+  overflow-x: hidden;
+}

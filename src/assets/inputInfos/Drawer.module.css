@@ -1,8 +1,9 @@
 .headerDrawer {
-    background-color: var(--color4);
+    background-color: var(--panel-bg);
+    color: var(--color1);
 }
 
 .bodyDrawer {
-    background-color: var(--color4);
+    background-color: var(--panel-bg);
+    color: var(--color1);
 }
-
