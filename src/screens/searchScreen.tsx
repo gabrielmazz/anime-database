@@ -32,6 +32,7 @@ import Autoplay from 'embla-carousel-autoplay';
 // Utilidades
 import { getRandomWallpaper } from '../utils/wallpaper';
 import { applyPaletteToCssVariables, extractPaletteFromImage } from '../utils/palette';
+import LoadingOverlayFullscreen from '../assets/components/overlay.tsx';
 import {
     searchAnimeByName,
     getAnimePictures,
@@ -130,6 +131,9 @@ const SearchScreen: React.FC = () => {
             {/* Overlay escurecedor */}
             <div className="absolute inset-0 bg-black/60 pointer-events-none" />
 
+            {/* Loading overlay durante chamadas à API */}
+            <LoadingOverlayFullscreen visible={isLoading} message="Buscando animes..." />
+
             <div
                 // Div principal que abrigará toda a listagem de animes
                 className="
@@ -172,10 +176,17 @@ const SearchScreen: React.FC = () => {
                         classNames={{
                             input: TextInputModule.inputTextInput
                         }}
-                        onChange={
-                            (event) => setNameAnimeSearch(event.currentTarget.value)
+                        onBlur={() => {
+                            
+                            // Limpa o animeDatabase para não mostrar resultados antigos
+                            setAnimeDatabase(null);
 
-                        }
+                        }}
+                        onChange={(event) => {
+
+                            // Atualiza o estado do input com o nome que será buscado
+                            setNameAnimeSearch(event.currentTarget.value);
+                        }}
                         onKeyDown={
                             (event) => {
                                 if (event.key === 'Enter') {
