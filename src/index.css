@@ -1,6 +1,26 @@
+/* Importação das fontes personalizadas diretamente do Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Arimo:ital,wght@0,400..700;1,400..700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Arimo:ital,wght@0,400..700;1,400..700&family=Raleway:ital,wght@0,100..900;1,100..900&display=swap');
+
 @import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 :root {
 	background-color: #000;
 	color: #fff;
+
+
+	--color1: #f7f3cf;
+	--color1-shadow: #f7f3cf80;
+	--color2: #c2e4cb;
+	--color3: #36cecc;
+	--color4: #27b1bf;
+	--color5: #176585;
+
+	/* Espaçamento das letras */
+	--title-letter-spacing: 0.07em;
+	--subtitle-letter-spacing: 0.03em;
+	--text-letter-spacing: 0.15em;
 }

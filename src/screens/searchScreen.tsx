@@ -1,24 +1,31 @@
 import React from 'react';
 import { useState } from 'react';
 
-// Importação dos componentes do mantine
-import { TextInput } from '@mantine/core';
-import { BackgroundImage } from '@mantine/core';
-import { Image } from '@mantine/core';
-
-import { Text } from '@mantine/core';
-import { Title } from '@mantine/core';
-
-
+// Componentes principais
 import { Drawer } from '@mantine/core';
 import DrawerModule from './../assets/inputInfos/Drawer.module.css';
 
+// Componente de carrossel
 import { Carousel } from '@mantine/carousel';
-import { Space } from '@mantine/core';
-import { Divider } from '@mantine/core';
-import { Grid } from '@mantine/core';
-import { Group } from '@mantine/core';
 
+// Componentes de layout
+import { Grid } from '@mantine/core';
+import { Container } from '@mantine/core';
+import { Flex } from '@mantine/core';
+import { Box } from '@mantine/core';
+import { Group } from '@mantine/core';
+import { Divider } from '@mantine/core';
+import { Space } from '@mantine/core';
+import { BackgroundImage } from '@mantine/core';
+import { Image } from '@mantine/core';
+
+// Componentes de texto
+import { Text } from '@mantine/core';
+import { Title } from '@mantine/core';
+
+// Componentes de input
+import { TextInput } from '@mantine/core';
+import TextInputModule from './../assets/inputInfos/TextInput.module.css';
 
 import Autoplay from 'embla-carousel-autoplay';
 
@@ -95,42 +102,66 @@ const SearchScreen: React.FC = () => {
 
     return (
 
-        <div className="
-            bg-black text-white
-        ">
+        <div
+            className="
+                bg-(--color5) text-white
+            "
+        >
 
             <div
+                // Div principal que abrigará toda a listagem de animes
                 className="
-                w-screen h-screen
+                w-screen min-h-screen             
                 max-w-7xl mx-auto
                 align-top
-                border-2 border-red-500
             "
             >
-                <h1 className="
-                text-4xl
-                flex justify-center
-                "
+                <Title
+                    className="
+                        flex justify-center
+                        pt-8
+                        text-shadow-lg/20
+                        text-(--color2)
+                        uppercase
+                        tracking-(--title-letter-spacing)
+                    "
+                    style={{
+                        fontSize: 42,
+                        fontFamily: 'Arimo, sans-serif',
+                    }}
                 >
-                    Procurar Anime
-                </h1>
+                    Anime Database - Pesquise seu anime
+                </Title>
 
-                <TextInput
-                    value={nameAnimerSearch}
-                    placeholder="Nome do anime"
-                    onChange={
+                <Space h="md" />
 
-                        (event) => setNameAnimeSearch(event.currentTarget.value)
+                <Group
+                    grow
+                    className="
+                        px-12
+                    "
+                >
+                    <TextInput
+                        value={nameAnimerSearch}
+                        radius="lg"
+                        placeholder="Digite o nome do anime"
+                        size="md"
+                        classNames={{
+                            input: TextInputModule.inputTextInput
+                        }}
+                        onChange={
+                            (event) => setNameAnimeSearch(event.currentTarget.value)
 
-                    }
-                    onKeyDown={
-                        (event) => {
-                            if (event.key === 'Enter') {
-                                searchAnime();
+                        }
+                        onKeyDown={
+                            (event) => {
+                                if (event.key === 'Enter') {
+                                    searchAnime();
+                                }
                             }
                         }
-                    }
-                />
+                    />
+                </Group>
 
                 {/* Seção dos cards que mostraram os animes voltados da
                     consulta na API */}
@@ -154,6 +185,7 @@ const SearchScreen: React.FC = () => {
                                     src={anime.images.jpg.image_url}
                                     h={600}
                                     w="auto"
+                                    radius="md"
                                     className="
                                         w-full h-full flex
                                         brightness-60
@@ -174,6 +206,7 @@ const SearchScreen: React.FC = () => {
 
                                         // Abre o drawer
                                         setOpenedCardInformation(true);
+
                                     }}
                                 >
                                     <Text
@@ -184,7 +217,16 @@ const SearchScreen: React.FC = () => {
                                             h-full w-full
                                             text-center
                                             text-shadow-lg/60
+                                            text-(--color1)
+                                            font-bold
+                                            uppercase
+                                            tracking-(--title-letter-spacing)
                                         "
+                                        style={
+                                            { 
+                                                fontFamily: 'Arimo, sans-serif',
+                                            }
+                                        }
                                     >
                                         {anime.title}
                                     </Text>
@@ -215,11 +257,13 @@ const SearchScreen: React.FC = () => {
                         className="
                             font-bold
                             text-shadow-lg/20
-                            text-[#E8D4B7]
+                            text-(--color1)
+                            uppercase
+                            tracking-(--title-letter-spacing)
                         "
                         style={{ fontSize: 32 }}
                     >
-                        Informações do Anime - {selectedAnime?.title}
+                        Informações do Anime
                     </Title>
                 }
                 position="right"
@@ -231,88 +275,172 @@ const SearchScreen: React.FC = () => {
                 }}
             >
                 {selectedAnime && (
-                    <div>
-                        <Image
-                            src={selectedAnime.images.jpg.image_url}
-                            radius="md"
-                            h={600}
-                            w="auto"
-                            className="
-                                mb-4
-                                flex items-center justify-center justify-self-center
-                                shadow-lg/40
-                            "
-                        />
-                        <Title
-                            size="xl"
-                            className="
+                    <>
+                        <Box>
+                            <Image
+                                src={selectedAnime.images.jpg.image_url}
+                                radius="md"
+                                h={600}
+                                w="auto"
+                                className="
+                                    mb-4
+                                    flex items-center justify-center justify-self-center
+                                    shadow-lg/40
+                                "
+                            />
+
+                            <Space h="md" />
+
+                            <Title
+                                size="xl"
+                                className="
                                 font-bold text-center
                                 text-shadow-lg/20
-                            "
-                            style={{
-                                fontSize: 42,
-                                color: '#E8D4B7'
-                            }}
-                        >
-                            {selectedAnime.title}
-                        </Title>
+                                text-(--color1)
+                                uppercase
+                                tracking-(--title-letter-spacing)
+                                "
+                                style={{
+                                    fontSize: 32,
+                                    fontFamily: 'Arimo, sans-serif',
+                                }}
+                            >
+                                {selectedAnime.title}
+                            </Title>
 
-                        <Text
-                            mt="md"
-                            className="
-                                text-justify
-                            "
-                            style={{
-                                fontSize: 16,
-                                color: '#E8D4B7'
-                            }}
-                        >
-                            <strong>Sinopse:</strong> {selectedAnime.synopsis}
-                        </Text>
+                            <Space h="md" />
 
-                        <Space h="xs" />
+                            <Box>
+                                <Text
+                                    component="span"
+                                    className="
+                                font-bold
+                                uppercase
+                                tracking-(--title-letter-spacing)
+                                "
+                                    style={{
+                                        fontSize: 16,
+                                        fontFamily: 'Raleway, sans-serif',
+                                        color: 'var(--color1)',
+                                        marginRight: 6
+                                    }}
+                                >
+                                    Sinopse:
+                                </Text>
 
-                        <Text
-                            mt="md"
-                            style={{
-                                fontSize: 16,
-                                color: '#E8D4B7'
-                            }}
-                        >
-                            <strong>Número de episódios:</strong> {selectedAnime.episodes}
-                        </Text>
+                                <Text
+                                    component="span"
+                                    style={{ color: 'var(--color1)' }}>
+                                    {selectedAnime.synopsis}
+                                </Text>
 
-                        <Space h="xs" />
+                            </Box>
 
-                        <Text
-                            mt="md"
-                            style={{
-                                fontSize: 16,
-                                color: '#E8D4B7'
-                            }}
-                        >
-                            <strong>Status:</strong> {selectedAnime.status}
-                        </Text>
+                        </Box>
 
-                        <Space h="xs" />
+                        <Space h="lg" />
 
-                        <Text
-                            mt="md"
-                            style={{
-                                fontSize: 16,
-                                color: '#E8D4B7'
-                            }}
-                        >
-                            <strong>Nota:</strong> {selectedAnime.score}
-                        </Text>
+                        <Box>
+
+                            <Text
+                                component="span"
+                                className="
+                                    font-bold
+                                    uppercase
+                                    tracking-(--title-letter-spacing)
+                                "
+                                style={{
+                                    fontSize: 16,
+                                    fontFamily: 'Raleway, sans-serif',
+                                    color: 'var(--color1)',
+                                    marginRight: 6
+                                }}
+                            >
+                                Numero de Episódios:
+                            </Text>
+
+                            <Text
+                                component="span"
+                                style={{ color: 'var(--color1)' }}>
+                                {selectedAnime.episodes}
+                            </Text>
+
+
+                        </Box>
+
+                        <Space h="lg" />
+
+                        <Box>
+
+                            <Text
+                                component="span"
+                                className="
+                                    font-bold
+                                    uppercase
+                                    tracking-(--title-letter-spacing)
+                                "
+                                style={{
+                                    fontSize: 16,
+                                    fontFamily: 'Raleway, sans-serif',
+                                    color: 'var(--color1)',
+                                    marginRight: 6
+                                }}
+                            >
+                                Status do Anime:
+                            </Text>
+
+                            <Text
+                                component="span"
+                                style={{ color: 'var(--color1)' }}>
+                                {selectedAnime.status}
+                            </Text>
+
+                        </Box>
+
+                        <Space h="lg" />
+
+                        <Box>
+
+                            <Text
+                                component="span"
+                                className="
+                                    font-bold
+                                    uppercase
+                                    tracking-(--title-letter-spacing)
+                                "
+                                style={{
+                                    fontSize: 16,
+                                    fontFamily: 'Raleway, sans-serif',
+                                    color: 'var(--color1)',
+                                    marginRight: 6
+                                }}
+                            >
+                                Nota do Anime:
+                            </Text>
+
+                            <Text
+                                component="span"
+                                style={{ color: 'var(--color1)' }}>
+                                {selectedAnime.score}
+                            </Text>
+
+                        </Box>
 
                         <Divider
                             my="xl"
                             label={
                                 <Text
+                                    component="span"
+                                    className="
+                                        font-bold
+                                        uppercase
+                                        tracking-(--title-letter-spacing)
+                                    "
                                     style={{
                                         fontSize: 16,
-                                        color: '#E8D4B7'
+                                        fontFamily: 'Raleway, sans-serif',
+                                        color: 'var(--color1)',
+                                        marginRight: 6
                                     }}
                                 >
                                     Imagens do Anime
@@ -353,9 +481,17 @@ const SearchScreen: React.FC = () => {
                             my="xl"
                             label={
                                 <Text
+                                    component="span"
+                                    className="
+                                        font-bold
+                                        uppercase
+                                        tracking-(--title-letter-spacing)
+                                    "
                                     style={{
                                         fontSize: 16,
-                                        color: '#E8D4B7'
+                                        fontFamily: 'Raleway, sans-serif',
+                                        color: 'var(--color1)',
+                                        marginRight: 6
                                     }}
                                 >
                                     Personagens Principais
@@ -400,9 +536,17 @@ const SearchScreen: React.FC = () => {
                             my="xl"
                             label={
                                 <Text
+                                    component="span"
+                                    className="
+                                        font-bold
+                                        uppercase
+                                        tracking-(--title-letter-spacing)
+                                    "
                                     style={{
                                         fontSize: 16,
-                                        color: '#E8D4B7'
+                                        fontFamily: 'Raleway, sans-serif',
+                                        color: 'var(--color1)',
+                                        marginRight: 6
                                     }}
                                 >
                                     Outros Personagens
@@ -444,12 +588,11 @@ const SearchScreen: React.FC = () => {
                                 )}
                             </>
                         )}
-
-                    </div>
+                    </>
                 )}
             </Drawer>
 
-        </div>
+        </div >
 
     );
 
