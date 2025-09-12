@@ -1,0 +1,14 @@
+.inputTextInput {
+    font-family: 'Raleway', sans-serif;
+    background-color: transparent;
+    border: 1px solid var(--color1-shadow);
+    transition: 0.3s;
+    color: var(--color1);
+    letter-spacing: var(--text-letter-spacing);
+}
+
+.inputTextInput:focus {
+    border: 1px solid var(--color1);
+    outline: none;
+    transition: 0.3s;
+}
