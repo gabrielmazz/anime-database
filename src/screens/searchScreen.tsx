@@ -7,6 +7,9 @@ import DrawerModule from './../assets/inputInfos/Drawer.module.css';
 
 import LoadingOverlayFullscreen from '../assets/components/overlay.tsx';
 import Sidebar from '../assets/components/sidebar.tsx'
+import LoaderBox from '../assets/components/loaderBox.tsx';
+import AlertBox from '../assets/components/alert.tsx';
+import InfoDrawer from '../assets/components/infoDrawer.tsx';
 
 // Componente de carrossel
 import { Carousel } from '@mantine/carousel';
@@ -37,7 +40,7 @@ import { applyPaletteToCssVariables, extractPaletteFromImage } from '../utils/pa
 
 // Importação das API's
 import { searchAnimeByName, getAnimePictures, getAnimeCharacters, type Anime, type AnimeApiSearchResponse } from '../assets/API/jikan';
-import { translateText } from '../assets/API/translate';
+import { translateText, translateTextDetailed } from '../assets/API/translate';
 
 
 
@@ -114,6 +117,9 @@ const SearchScreen: React.FC = () => {
     const [selectedAnime, setSelectedAnime] = useState<Anime | null>(null);
     const [translatedSynopsis, setTranslatedSynopsis] = useState<string | null>(null);
     const [translateStatus, setTranslateStatus] = useState<string | null>(null);
+    const [alertVisible, setAlertVisible] = useState(false);
+    const [alertMessage, setAlertMessage] = useState("");
+    const [alertType, setAlertType] = useState<'info' | 'warning' | 'error' | 'success'>('info');
 
     // Traduz a sinopse automaticamente quando um anime é selecionado
     useEffect(() => {
@@ -124,15 +130,37 @@ const SearchScreen: React.FC = () => {
                 return;
             }
             try {
-                const t = await translateText(selectedAnime.synopsis, 'en', 'pt-BR');
-                if (!cancelled) setTranslatedSynopsis(t);
+                const { text, translated, provider } = await translateTextDetailed(selectedAnime.synopsis, 'en', 'pt-BR');
+                if (!cancelled) {
+                    setTranslatedSynopsis(text);
+                    if (translated) {
+                        setAlertType('success');
+                        setAlertMessage('Sinopse traduzida com sucesso!');
+                    } else {
+                        setAlertType('warning');
+                        setAlertMessage('Não foi possível traduzir. Mostrando o texto original.');
+                    }
+                    setAlertVisible(true);
+                }
             } catch {
-                if (!cancelled) setTranslatedSynopsis(selectedAnime.synopsis);
+                if (!cancelled) {
+                    setTranslatedSynopsis(selectedAnime.synopsis);
+                    setAlertType('error');
+                    setAlertMessage('Falha ao traduzir a sinopse.');
+                    setAlertVisible(true);
+                }
             }
         };
         run();
         return () => { cancelled = true; };
     }, [selectedAnime]);
+
+    // Auto esconde o alerta após alguns segundos
+    useEffect(() => {
+        if (!alertVisible) return;
+        const id = window.setTimeout(() => setAlertVisible(false), 2500);
+        return () => window.clearTimeout(id);
+    }, [alertVisible]);
 
     // Traduz o status do anime (ex: "Finished Airing", "Currently Airing", etc)
     useEffect(() => {
@@ -166,6 +194,9 @@ const SearchScreen: React.FC = () => {
 
             {/* Loading overlay durante chamadas à API */}
             <LoadingOverlayFullscreen visible={isLoading} message="Buscando animes..." />
+
+            {/* Alerta flutuante */}
+            <AlertBox visible={alertVisible} message={alertMessage} type={alertType} />
 
             {/* Sidebar fixa inspirada no design */}
             <Sidebar />
@@ -301,17 +332,15 @@ const SearchScreen: React.FC = () => {
 
             </div>
     
-            {/* Componentes Drawer's que serão rederizados */}
-            <Drawer
+            {/* Drawer genérico: conteúdo passado via prop `content` */}
+            <InfoDrawer
                 opened={openedCardInformation}
-                onClose={
-                    () => {
-                        setOpenedCardInformation(false);
-                        setSelectedAnime(null);
-                        setAnimeSelectedPictures(null);
-                        setAnimeSelectedCharacters(null);
-                    }
-                }
+                onClose={() => {
+                    setOpenedCardInformation(false);
+                    setSelectedAnime(null);
+                    setAnimeSelectedPictures(null);
+                    setAnimeSelectedCharacters(null);
+                }}
                 title={
                     <Title
                         order={2}
@@ -322,29 +351,20 @@ const SearchScreen: React.FC = () => {
                             uppercase
                             tracking-(--title-letter-spacing)
                         "
-                        style={
-                            {
-                                fontSize: 32,
-                                fontFamily: 'var(--text-font-mono)',
-                            }
-                        }
+                        style={{ fontSize: 32, fontFamily: 'var(--text-font-mono)' }}
                     >
                         Informações do Anime
                     </Title>
                 }
                 position="right"
                 size="35%"
-                radius="md"
-                overlayProps={{
-                    backgroundOpacity: 0.5, blur: 4
-                }}
+                overlayProps={{ backgroundOpacity: 0.5, blur: 4 }}
                 classNames={{
                     root: DrawerModule.rootDrawer,
                     header: DrawerModule.headerDrawer,
                     body: DrawerModule.bodyDrawer,
                 }}
-            >
-                {selectedAnime && (
+                content={selectedAnime && (
                     <>
                         <Box>
                             <Image
@@ -370,10 +390,7 @@ const SearchScreen: React.FC = () => {
                                     uppercase
                                     tracking-(--title-letter-spacing)
                                 "
-                                style={{
-                                    fontSize: 32,
-                                    fontFamily: 'var(--text-font-mono)',
-                                }}
+                                style={{ fontSize: 32, fontFamily: 'var(--text-font-mono)' }}
                             >
                                 {selectedAnime.title}
                             </Title>
@@ -397,21 +414,19 @@ const SearchScreen: React.FC = () => {
                                 >
                                     Sinopse:
                                 </Text>
-
-                                <Text
-                                    component="span"
-                                    style={{ color: 'var(--colorTextWhite)' }}>
-                                    {translatedSynopsis ?? selectedAnime.synopsis}
-                                </Text>
-
+                                {translatedSynopsis === null && selectedAnime?.synopsis ? (
+                                    <LoaderBox message="Traduzindo sinopse..." />
+                                ) : (
+                                    <Text component="span" style={{ color: 'var(--colorTextWhite)' }}>
+                                        {translatedSynopsis ?? selectedAnime?.synopsis}
+                                    </Text>
+                                )}
                             </Box>
-
                         </Box>
 
                         <Space h="lg" />
 
                         <Box>
-
                             <Text
                                 component="span"
                                 className="
@@ -428,20 +443,14 @@ const SearchScreen: React.FC = () => {
                             >
                                 Numero de Episódios:
                             </Text>
-
-                            <Text
-                                component="span"
-                                style={{ color: 'var(--colorTextWhite)' }}>
+                            <Text component="span" style={{ color: 'var(--colorTextWhite)' }}>
                                 {selectedAnime.episodes}
                             </Text>
-
-
                         </Box>
 
                         <Space h="lg" />
 
                         <Box>
-
                             <Text
                                 component="span"
                                 className="
@@ -458,19 +467,18 @@ const SearchScreen: React.FC = () => {
                             >
                                 Status do Anime:
                             </Text>
-
-                            <Text
-                                component="span"
-                                style={{ color: 'var(--colorTextWhite)' }}>
-                                {translateStatus ?? selectedAnime.status}
-                            </Text>
-
+                            {translateStatus === null && selectedAnime?.status ? (
+                                <LoaderBox message="Traduzindo status..." />
+                            ) : (
+                                <Text component="span" style={{ color: 'var(--colorTextWhite)' }}>
+                                    {translateStatus ?? selectedAnime.status}
+                                </Text>
+                            )}
                         </Box>
 
                         <Space h="lg" />
 
                         <Box>
-
                             <Text
                                 component="span"
                                 className="
@@ -487,13 +495,9 @@ const SearchScreen: React.FC = () => {
                             >
                                 Nota do Anime:
                             </Text>
-
-                            <Text
-                                component="span"
-                                style={{ color: 'var(--colorTextWhite)' }}>
+                            <Text component="span" style={{ color: 'var(--colorTextWhite)' }}>
                                 {selectedAnime.score}
                             </Text>
-
                         </Box>
 
                         <Divider
@@ -531,23 +535,15 @@ const SearchScreen: React.FC = () => {
                                 align: 'center',
                                 slidesToScroll: 1,
                             }}
-                            plugins={[
-                                Autoplay({ delay: 2500 }),
-                            ]}
+                            plugins={[Autoplay({ delay: 2500 })]}
                         >
                             {animeSelectedPictures && animeSelectedPictures.data.map((picture: any, index: number) => (
                                 <Carousel.Slide key={index}>
-                                    <Image
-                                        src={picture.jpg.large_image_url}
-                                        radius="md"
-                                        h={600}
-                                        w="auto"
-                                    />
+                                    <Image src={picture.jpg.large_image_url} radius="md" h={600} w="auto" />
                                 </Carousel.Slide>
                             ))}
                         </Carousel>
 
-                        {/* Renderiza "Personagens Principais" somente se houver pelo menos 1 com role === 'Main' */}
                         {animeSelectedCharacters && Array.isArray(animeSelectedCharacters.data) &&
                          animeSelectedCharacters.data.some((character: any) => character.role === 'Main') && (
                             <>
@@ -573,7 +569,6 @@ const SearchScreen: React.FC = () => {
                                     }
                                     labelPosition="center"
                                 />
-
                                 {Array.from(
                                     { length: Math.ceil(animeSelectedCharacters.data.filter((character: any) => character.role === 'Main').length / 2) },
                                     (_, rowIndex) => {
@@ -604,7 +599,6 @@ const SearchScreen: React.FC = () => {
                             </>
                         )}
 
-                        {/* Renderiza "Outros Personagens" somente se houver pelo menos 1 personagem com role !== 'Main' */}
                         {animeSelectedCharacters && Array.isArray(animeSelectedCharacters.data) &&
                          animeSelectedCharacters.data.some((character: any) => character.role !== 'Main') && (
                             <>
@@ -630,7 +624,6 @@ const SearchScreen: React.FC = () => {
                                     }
                                     labelPosition="center"
                                 />
-
                                 {Array.from(
                                     { length: Math.ceil(animeSelectedCharacters.data.filter((character: any) => character.role !== 'Main').length / 2) },
                                     (_, rowIndex) => {
@@ -662,7 +655,7 @@ const SearchScreen: React.FC = () => {
                         )}
                     </>
                 )}
-            </Drawer>
+            />
 
 
 

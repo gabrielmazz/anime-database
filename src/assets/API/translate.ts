@@ -15,9 +15,9 @@
  * @param to   Idioma de destino (ex.: 'pt-BR')
  */
 export async function translateText(
-	text: string,
-	from: string = 'en',
-	to: string = 'pt-BR',
+  text: string,
+  from: string = 'en',
+  to: string = 'pt-BR',
 ): Promise<string> {
 	// Curto‑circuito: nada para traduzir
 	if (!text || !text.trim()) return text;
@@ -69,17 +69,83 @@ export async function translateText(
 		// Falha total: devolve o original para manter a app estável
 	}
 
-	return text;
+  return text;
 }
 
 /**
  * Normaliza códigos de idioma com região (ex.: 'pt-BR'/'en-US') para o código base ('pt'/'en').
  */
 function normalizeLang(code: string): string {
-	return code.split('-')[0].toLowerCase();
+  return code.split('-')[0].toLowerCase();
 }
 
 export default translateText;
+
+/**
+ * Versão detalhada: retorna também se houve tradução (diferença do texto)
+ * e qual provedor respondeu.
+ */
+export async function translateTextDetailed(
+  text: string,
+  from: string = 'en',
+  to: string = 'pt-BR',
+): Promise<{ text: string; translated: boolean; provider: 'mymemory' | 'libre' | null }> {
+  const original = text ?? '';
+  if (!original.trim()) return { text: original, translated: false, provider: null };
+
+  const MAX_CHARS = 480;
+  const chunks = splitIntoChunks(original, MAX_CHARS);
+
+  // Try MyMemory
+  try {
+    const outChunks: string[] = [];
+    for (const part of chunks) {
+      const url = new URL('https://api.mymemory.translated.net/get');
+      url.searchParams.set('q', part);
+      url.searchParams.set('langpair', `${from}|${to}`);
+      const res = await fetch(url.toString());
+      if (!res.ok) throw new Error('mymemory failed');
+      const data = await res.json();
+      const out = (data?.responseData?.translatedText as string | undefined) ?? part;
+      outChunks.push(out);
+    }
+    const joined = joinChunks(outChunks);
+    return {
+      text: joined,
+      translated: normalizeForCompare(joined) !== normalizeForCompare(original),
+      provider: 'mymemory',
+    };
+  } catch (_) {}
+
+  // Fallback LibreTranslate
+  try {
+    const outChunks: string[] = [];
+    for (const part of chunks) {
+      const res = await fetch('https://libretranslate.de/translate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          q: part,
+          source: normalizeLang(from),
+          target: normalizeLang(to),
+          format: 'text',
+        }),
+      });
+      if (!res.ok) throw new Error('libretranslate failed');
+      const data = await res.json();
+      const out = (data?.translatedText as string | undefined) ?? part;
+      outChunks.push(out);
+    }
+    const joined = joinChunks(outChunks);
+    return {
+      text: joined,
+      translated: normalizeForCompare(joined) !== normalizeForCompare(original),
+      provider: 'libre',
+    };
+  } catch (_) {}
+
+  return { text: original, translated: false, provider: null };
+}
 
 // ============ Funções auxiliares ============
 
@@ -125,5 +191,9 @@ function findBreakPosition(chunk: string): number {
  * e aparando extremidades para manter a formatação limpa.
  */
 function joinChunks(chunks: string[]): string {
-	return chunks.join(' ').replace(/\s+/g, ' ').trim();
+  return chunks.join(' ').replace(/\s+/g, ' ').trim();
+}
+
+function normalizeForCompare(s: string): string {
+  return (s ?? '').replace(/\s+/g, ' ').trim();
 }
