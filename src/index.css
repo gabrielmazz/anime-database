@@ -26,6 +26,9 @@
 	--subtitle-letter-spacing: 0.03em;
 	--text-letter-spacing: 0.15em;
   --text-letter-spacing: 0.1em;
+
+  --text-font-title: 'Arimo', sans-serif;
+  --text-font-body: 'Raleway', sans-serif;
 }
 
 /* Remove margens padrão do body e assegura ocupação total da tela */
