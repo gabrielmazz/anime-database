@@ -226,7 +226,7 @@ const Sidebar: React.FC = () => {
 							}
 						}
 					>
-						AniDex é um projeto pessoal desenvolvido por Gabriel Mazzuco, com o objetivo de criar uma aplicação leve e eficiente para busca e seleção de animes.
+						AniDex é um projeto pessoal desenvolvido por Gabriel Mazzuco, com o objetivo de criar uma aplicação para buscar, explorar e conhecer animes
 					</Text>
 
 					<Space h="md" />

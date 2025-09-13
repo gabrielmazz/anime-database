@@ -37,6 +37,7 @@ import { applyPaletteToCssVariables, extractPaletteFromImage } from '../utils/pa
 
 // Importação das API's
 import { searchAnimeByName, getAnimePictures, getAnimeCharacters, type Anime, type AnimeApiSearchResponse } from '../assets/API/jikan';
+import { translateText } from '../assets/API/translate';
 
 
 
@@ -111,6 +112,46 @@ const SearchScreen: React.FC = () => {
 
     // Estado para armazenar o anime selecionado
     const [selectedAnime, setSelectedAnime] = useState<Anime | null>(null);
+    const [translatedSynopsis, setTranslatedSynopsis] = useState<string | null>(null);
+    const [translateStatus, setTranslateStatus] = useState<string | null>(null);
+
+    // Traduz a sinopse automaticamente quando um anime é selecionado
+    useEffect(() => {
+        let cancelled = false;
+        const run = async () => {
+            if (!selectedAnime || !selectedAnime.synopsis) {
+                setTranslatedSynopsis(null);
+                return;
+            }
+            try {
+                const t = await translateText(selectedAnime.synopsis, 'en', 'pt-BR');
+                if (!cancelled) setTranslatedSynopsis(t);
+            } catch {
+                if (!cancelled) setTranslatedSynopsis(selectedAnime.synopsis);
+            }
+        };
+        run();
+        return () => { cancelled = true; };
+    }, [selectedAnime]);
+
+    // Traduz o status do anime (ex: "Finished Airing", "Currently Airing", etc)
+    useEffect(() => {
+        let cancelled = false;
+        const run = async () => {
+            if (!selectedAnime || !selectedAnime.status) {
+                setTranslateStatus(null);
+                return;
+            }
+            try {
+                const t = await translateText(selectedAnime.status, 'en', 'pt-BR');
+                if (!cancelled) setTranslateStatus(t);
+            } catch {
+                if (!cancelled) setTranslateStatus(selectedAnime.status);
+            }
+        };
+        run();
+        return () => { cancelled = true; };
+    }, [selectedAnime]);
 
     return (
 
@@ -118,7 +159,7 @@ const SearchScreen: React.FC = () => {
         // aleatorizando uma imagem do fundo conforme a função getRandomWallpaper
         <BackgroundImage
             src={wallpaper}
-            className="relative"
+            className="relative text-white w-full min-h-screen bg-cover bg-no-repeat bg-center bg-fixed"
         >
             {/* Overlay escurecedor colocado por cima do BackgroundImage */}
             <div className="absolute inset-0 bg-black/60 pointer-events-none" />
@@ -149,7 +190,7 @@ const SearchScreen: React.FC = () => {
                     "
                     style={{
                         fontSize: 42,
-                        fontFamily: 'Arimo, sans-serif',
+                        fontFamily: 'var(--text-font-mono)',
                     }}
                 >
                     AniDex - Pesquise seu anime
@@ -203,12 +244,15 @@ const SearchScreen: React.FC = () => {
                         animeDatabase && animeDatabase.data.map((anime: Anime, index: number) => (
                             <div
                                 key={anime.mal_id}
-                                style={{ transitionDelay: `${index * 40}ms` }}
                                 className={`
-                                    border-2 border-white/60 rounded-lg shadow-lg/30 overflow-hidden cursor-pointer
-                                    transform transition-all duration-500 ease-out
-                                    
+                                    border-2 rounded-lg shadow-lg/30 overflow-hidden cursor-pointer
+                                    transition-all duration-500 ease-out
+                                    ${index < revealCount ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3'}
                                 `}
+                                style={{
+                                    willChange: 'opacity, transform',
+                                    borderColor: 'var(--color1)', // Usa a cor dinâmica da paleta
+                                }}
                             >
                                 <BackgroundImage
                                     src={anime.images.jpg.image_url}
@@ -222,20 +266,10 @@ const SearchScreen: React.FC = () => {
                                         transition duration-300
                                     "
                                     onClick={() => {
-
-                                        // Ao clicar no card, será aberto o Drawer do anime aonde será indicado
-                                        // todas as informações do anime
                                         setSelectedAnime(anime);
-
-                                        // Antes de abrir o drawer, busca as imagens do anime
                                         searchAnimePictures(anime.mal_id);
-
-                                        // Busca os personagens do anime
                                         searchAnimeCharacters(anime.mal_id);
-
-                                        // Abre o drawer
                                         setOpenedCardInformation(true);
-
                                     }}
                                 >
                                     <Text
@@ -251,7 +285,7 @@ const SearchScreen: React.FC = () => {
                                             tracking-(--title-letter-spacing)
                                         "
                                         style={{ 
-                                            fontFamily: 'Arimo, sans-serif',
+                                            fontFamily: 'var(--text-font-mono)',
                                             color: 'var(--colorTextWhite)'
                                         }}
                                     >
@@ -288,7 +322,12 @@ const SearchScreen: React.FC = () => {
                             uppercase
                             tracking-(--title-letter-spacing)
                         "
-                        style={{ fontSize: 32 }}
+                        style={
+                            {
+                                fontSize: 32,
+                                fontFamily: 'var(--text-font-mono)',
+                            }
+                        }
                     >
                         Informações do Anime
                     </Title>
@@ -333,7 +372,7 @@ const SearchScreen: React.FC = () => {
                                 "
                                 style={{
                                     fontSize: 32,
-                                    fontFamily: 'Arimo, sans-serif',
+                                    fontFamily: 'var(--text-font-mono)',
                                 }}
                             >
                                 {selectedAnime.title}
@@ -362,7 +401,7 @@ const SearchScreen: React.FC = () => {
                                 <Text
                                     component="span"
                                     style={{ color: 'var(--colorTextWhite)' }}>
-                                    {selectedAnime.synopsis}
+                                    {translatedSynopsis ?? selectedAnime.synopsis}
                                 </Text>
 
                             </Box>
@@ -423,7 +462,7 @@ const SearchScreen: React.FC = () => {
                             <Text
                                 component="span"
                                 style={{ color: 'var(--colorTextWhite)' }}>
-                                {selectedAnime.status}
+                                {translateStatus ?? selectedAnime.status}
                             </Text>
 
                         </Box>
@@ -508,35 +547,37 @@ const SearchScreen: React.FC = () => {
                             ))}
                         </Carousel>
 
-                        <Divider
-                            my="xl"
-                            label={
-                                <Text
-                                    component="span"
-                                    className="
-                                        font-bold
-                                        uppercase
-                                        tracking-(--title-letter-spacing)
-                                    "
-                                    style={{
-                                        fontSize: 16,
-                                        fontFamily: 'Raleway, sans-serif',
-                                        color: 'var(--colorTextWhite)',
-                                        marginRight: 6
-                                    }}
-                                >
-                                    Personagens Principais
-                                </Text>
-                            }
-                            labelPosition="center"
-                        />
-
-                        {animeSelectedCharacters && (
+                        {/* Renderiza "Personagens Principais" somente se houver pelo menos 1 com role === 'Main' */}
+                        {animeSelectedCharacters && Array.isArray(animeSelectedCharacters.data) &&
+                         animeSelectedCharacters.data.some((character: any) => character.role === 'Main') && (
                             <>
+                                <Divider
+                                    my="xl"
+                                    label={
+                                        <Text
+                                            component="span"
+                                            className="
+                                                font-bold
+                                                uppercase
+                                                tracking-(--title-letter-spacing)
+                                            "
+                                            style={{
+                                                fontSize: 16,
+                                                fontFamily: 'Raleway, sans-serif',
+                                                color: 'var(--colorTextWhite)',
+                                                marginRight: 6
+                                            }}
+                                        >
+                                            Personagens Principais
+                                        </Text>
+                                    }
+                                    labelPosition="center"
+                                />
+
                                 {Array.from(
-                                    { length: Math.ceil(animeSelectedCharacters.data.filter((character: any) => character.role === "Main").length / 2) },
+                                    { length: Math.ceil(animeSelectedCharacters.data.filter((character: any) => character.role === 'Main').length / 2) },
                                     (_, rowIndex) => {
-                                        const mainCharacters = animeSelectedCharacters.data.filter((character: any) => character.role === "Main");
+                                        const mainCharacters = animeSelectedCharacters.data.filter((character: any) => character.role === 'Main');
                                         const rowCharacters = mainCharacters.slice(rowIndex * 2, rowIndex * 2 + 2);
                                         return (
                                             <Grid key={rowIndex} gutter="md" mb="md">
@@ -563,37 +604,37 @@ const SearchScreen: React.FC = () => {
                             </>
                         )}
 
-                        {/* Verifica se existe personagens na listagem, para assim
-                            mostrar a seção de "Outros Personagens" */}
-                        <Divider
-                            my="xl"
-                            label={
-                                <Text
-                                    component="span"
-                                    className="
-                                        font-bold
-                                        uppercase
-                                        tracking-(--title-letter-spacing)
-                                    "
-                                    style={{
-                                        fontSize: 16,
-                                        fontFamily: 'Raleway, sans-serif',
-                                        color: 'var(--colorTextWhite)',
-                                        marginRight: 6
-                                    }}
-                                >
-                                    Outros Personagens
-                                </Text>
-                            }
-                            labelPosition="center"
-                        />
-
-                        {animeSelectedCharacters && (
+                        {/* Renderiza "Outros Personagens" somente se houver pelo menos 1 personagem com role !== 'Main' */}
+                        {animeSelectedCharacters && Array.isArray(animeSelectedCharacters.data) &&
+                         animeSelectedCharacters.data.some((character: any) => character.role !== 'Main') && (
                             <>
+                                <Divider
+                                    my="xl"
+                                    label={
+                                        <Text
+                                            component="span"
+                                            className="
+                                                font-bold
+                                                uppercase
+                                                tracking-(--title-letter-spacing)
+                                            "
+                                            style={{
+                                                fontSize: 16,
+                                                fontFamily: 'Raleway, sans-serif',
+                                                color: 'var(--colorTextWhite)',
+                                                marginRight: 6
+                                            }}
+                                        >
+                                            Outros Personagens
+                                        </Text>
+                                    }
+                                    labelPosition="center"
+                                />
+
                                 {Array.from(
-                                    { length: Math.ceil(animeSelectedCharacters.data.filter((character: any) => character.role !== "Main").length / 2) },
+                                    { length: Math.ceil(animeSelectedCharacters.data.filter((character: any) => character.role !== 'Main').length / 2) },
                                     (_, rowIndex) => {
-                                        const otherCharacters = animeSelectedCharacters.data.filter((character: any) => character.role !== "Main");
+                                        const otherCharacters = animeSelectedCharacters.data.filter((character: any) => character.role !== 'Main');
                                         const rowCharacters = otherCharacters.slice(rowIndex * 2, rowIndex * 2 + 2);
                                         return (
                                             <Grid key={rowIndex} gutter="md" mb="md">
