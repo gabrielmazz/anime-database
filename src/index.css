@@ -25,6 +25,7 @@
 	--title-letter-spacing: 0.07em;
 	--subtitle-letter-spacing: 0.03em;
 	--text-letter-spacing: 0.15em;
+  --text-letter-spacing: 0.1em;
 }
 
 /* Remove margens padrão do body e assegura ocupação total da tela */
@@ -36,4 +37,37 @@ body {
   margin: 0;
   background-color: #000;
   overflow-x: hidden;
+}
+
+/* Global scrollbar styling (WebKit + Firefox) */
+html {
+  /* Reserve gutter only on the scrollbar side to avoid a left black strip */
+  scrollbar-gutter: stable;
+}
+/* Firefox */
+* {
+  scrollbar-width: thin; /* auto | thin | none */
+  scrollbar-color: var(--accent) transparent; /* thumb | track */
+}
+/* WebKit */
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+::-webkit-scrollbar-track {
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--accent);
+  border-radius: 999px;
+  border: 2px solid var(--panel-bg);
+  box-shadow: inset 0 0 0 1px var(--panel-border);
+}
+::-webkit-scrollbar-thumb:hover {
+  filter: brightness(1.1);
+}
+::-webkit-scrollbar-corner {
+  background: transparent;
 }
