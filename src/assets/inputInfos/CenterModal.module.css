@@ -1,0 +1,22 @@
+.rootCenterModal {
+    background-color: var(--panel-bg);
+    color: var(--color1);
+    border: 2px solid var(--color1);
+}
+
+.headerCenterModal {
+    background-color: var(--panel-bg);
+    color: var(--color1);
+}
+
+.contentCenterModal {
+    background-color: var(--panel-bg);
+    color: var(--color1);
+}
+
+.titleCenterModal {
+    color: var(--color1);
+    font-family: var(--text-font-title);
+    letter-spacing: var(--title-letter-spacing);
+    text-transform: uppercase;
+}

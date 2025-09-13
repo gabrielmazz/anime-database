@@ -7,7 +7,6 @@ import DrawerModule from './../assets/inputInfos/Drawer.module.css';
 
 import LoadingOverlayFullscreen from '../assets/components/overlay.tsx';
 import Sidebar from '../assets/components/sidebar.tsx'
-import LogoBaseboard from '../assets/components/logoBaseboard.tsx'
 
 // Componente de carrossel
 import { Carousel } from '@mantine/carousel';
@@ -119,7 +118,7 @@ const SearchScreen: React.FC = () => {
         // aleatorizando uma imagem do fundo conforme a função getRandomWallpaper
         <BackgroundImage
             src={wallpaper}
-            className="relative text-white w-full min-h-screen bg-cover bg-no-repeat bg-center bg-fixed"
+            className="relative"
         >
             {/* Overlay escurecedor colocado por cima do BackgroundImage */}
             <div className="absolute inset-0 bg-black/60 pointer-events-none" />
@@ -136,8 +135,6 @@ const SearchScreen: React.FC = () => {
                 relative z-10
                 w-full min-h-screen             
                 max-w-7xl mx-auto
-                pl-24 md:pl-28
-                pb-28
                 align-top
             "
             >
@@ -193,7 +190,7 @@ const SearchScreen: React.FC = () => {
                     />
                 </Group>
 
-                {/* Seção dos cards que mostraram os animes voltados da
+                {/* Seção dos cards que mostrarão os animes voltados da
                     consulta na API */}
                 <div className="
                     grid grid-cols-3 gap-4
@@ -210,7 +207,7 @@ const SearchScreen: React.FC = () => {
                                 className={`
                                     border-2 border-white/60 rounded-lg shadow-lg/30 overflow-hidden cursor-pointer
                                     transform transition-all duration-500 ease-out
-                                    ${index < revealCount ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-2 scale-95'}
+                                    
                                 `}
                             >
                                 <BackgroundImage
@@ -249,25 +246,27 @@ const SearchScreen: React.FC = () => {
                                             h-full w-full
                                             text-center
                                             text-shadow-lg/60
-                                            text-(--color1)
                                             font-bold
                                             uppercase
                                             tracking-(--title-letter-spacing)
                                         "
-                                        style={{ fontFamily: 'Arimo, sans-serif' }}
+                                        style={{ 
+                                            fontFamily: 'Arimo, sans-serif',
+                                            color: 'var(--colorTextWhite)'
+                                        }}
                                     >
                                         {anime.title}
                                     </Text>
                                 </BackgroundImage>
                             </div>
                         ))
-                    }
 
+                    }
 
                 </div>
 
             </div>
-
+    
             {/* Componentes Drawer's que serão rederizados */}
             <Drawer
                 opened={openedCardInformation}
@@ -298,7 +297,7 @@ const SearchScreen: React.FC = () => {
                 size="35%"
                 radius="md"
                 overlayProps={{
-                    backgroundOpacity: 0.5, blur: 4 
+                    backgroundOpacity: 0.5, blur: 4
                 }}
                 classNames={{
                     root: DrawerModule.rootDrawer,
@@ -564,6 +563,8 @@ const SearchScreen: React.FC = () => {
                             </>
                         )}
 
+                        {/* Verifica se existe personagens na listagem, para assim
+                            mostrar a seção de "Outros Personagens" */}
                         <Divider
                             my="xl"
                             label={
@@ -587,8 +588,6 @@ const SearchScreen: React.FC = () => {
                             labelPosition="center"
                         />
 
-                        {/* Mostra outros personagens aleatórios do anime, sempre sendo uma leva diferente
-                            mostrando 10 personagens do anime */}
                         {animeSelectedCharacters && (
                             <>
                                 {Array.from(
@@ -624,16 +623,7 @@ const SearchScreen: React.FC = () => {
                 )}
             </Drawer>
 
-            {/* Componentes da logoBaseboard, sempre estando no limite inferior da tela */}
-            <div
-                className="
-                    fixed bottom-0 left-0 right-0
-                    flex items-center justify-center
-                "
-            >
-                <LogoBaseboard />
 
-            </div>
 
         </BackgroundImage>
 

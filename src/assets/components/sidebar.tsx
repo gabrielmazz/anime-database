@@ -1,5 +1,7 @@
 import React, { useMemo, useState } from 'react';
-import { Text } from '@mantine/core';
+import { Space, Text } from '@mantine/core';
+import CenteredModal from './centerModal';
+import LogoBaseboard from './logoBaseboard';
 
 type Item = {
 	key: string;
@@ -48,9 +50,18 @@ const SocialGithub = (
 	</svg>
 );
 
+const InformationIcon = (
+	<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+		<circle cx="12" cy="12" r="10" />
+		<line x1="12" y1="16" x2="12" y2="12" />
+		<line x1="12" y1="8" x2="12.01" y2="8" />
+	</svg>
+);
+
 const Sidebar: React.FC = () => {
 	const [collapsed, setCollapsed] = useState<boolean>(true);
 	const [active, setActive] = useState<string>('dashboard');
+	const [aboutOpen, setAboutOpen] = useState<boolean>(false);
 
 	const items: Item[] = useMemo(() => ([
 		{ key: 'home', label: 'Inicio', icon: HomeIcon, link: '/selectionScreen' },
@@ -67,7 +78,7 @@ const Sidebar: React.FC = () => {
 			style={{ backgroundColor: 'var(--panel-bg)', borderColor: 'var(--panel-border)' }}
 		>
 			{/* Header */}
-			<div 
+			<div
 				className="
 					px-4 pt-4 pb-2 
 					flex items-center justify-between 
@@ -137,15 +148,53 @@ const Sidebar: React.FC = () => {
 			</nav>
 
 			{/* Footer / Social */}
-			<div className="px-3 pb-3 mt-auto">
-				<div className={`flex ${collapsed ? 'justify-center' : 'justify-between'} items-center`}>
-					<div className="flex gap-2">
-						{[SocialTwitter, SocialDiscord, SocialGithub].map((ico, i) => (
-							<button key={i} className="w-9 h-9 rounded-full flex items-center justify-center bg-white/10 hover:bg-white/20" style={{ color: 'var(--color1)' }}>
-								{ico}
-							</button>
-						))}
-					</div>
+			<div className="px-3 pb-5 mt-auto">
+				<div className={`flex ${collapsed ? 'justify-center' : 'justify-between'} items-end`}>
+					{collapsed ? (
+						// Modo compacto: ícones empilhados em um "dock" elegante
+						<div
+							className="flex flex-col gap-1.5 p-1.5 backdrop-blur-sm mb-1"
+							style={{ color: 'var(--color1)' }}
+						>
+							{[
+								{ key: 'twitter', icon: SocialTwitter, label: 'Abrir Twitter/X', onClick: () => window.open('https://x.com', '_blank', 'noopener,noreferrer') },
+								{ key: 'discord', icon: SocialDiscord, label: 'Abrir Discord', onClick: () => window.open('https://discord.com', '_blank', 'noopener,noreferrer') },
+								{ key: 'github', icon: SocialGithub, label: 'Abrir GitHub', onClick: () => window.open('https://github.com', '_blank', 'noopener,noreferrer') },
+								{ key: 'info', icon: InformationIcon, label: 'Sobre o projeto', onClick: () => setAboutOpen(true) },
+							].map((btn) => (
+								<button
+									key={btn.key}
+									aria-label={btn.label}
+									title={btn.label}
+									className="w-8 h-8 rounded-full flex items-center justify-center bg-white/10 hover:bg-white/20 transition"
+									onClick={btn.onClick}
+								>
+									{btn.icon}
+								</button>
+							))}
+						</div>
+					) : (
+						<div className="flex gap-2">
+							{[
+								{ key: 'twitter', icon: SocialTwitter, label: 'Abrir Twitter/X', onClick: () => window.open('https://x.com', '_blank', 'noopener,noreferrer') },
+								{ key: 'discord', icon: SocialDiscord, label: 'Abrir Discord', onClick: () => window.open('https://discord.com', '_blank', 'noopener,noreferrer') },
+								{ key: 'github', icon: SocialGithub, label: 'Abrir GitHub', onClick: () => window.open('https://github.com', '_blank', 'noopener,noreferrer') },
+								{ key: 'info', icon: InformationIcon, label: 'Sobre o projeto', onClick: () => setAboutOpen(true) },
+							].map((btn) => (
+								<button
+									key={btn.key}
+									aria-label={btn.label}
+									title={btn.label}
+									className="w-9 h-9 rounded-full flex items-center justify-center bg-white/10 hover:bg-white/20 transition"
+									style={{ color: 'var(--color1)' }}
+									onClick={btn.onClick}
+								>
+									{btn.icon}
+								</button>
+							))}
+						</div>
+					)}
+
 					{!collapsed && (
 						<button
 							className="w-9 h-9 rounded-full flex items-center justify-center bg-white/10 hover:bg-white/20"
@@ -157,6 +206,38 @@ const Sidebar: React.FC = () => {
 					)}
 				</div>
 			</div>
+
+				<CenteredModal
+					opened={aboutOpen}
+					onClose={() => setAboutOpen(false)}
+					title="Sobre o projeto"
+					size="md"
+				>
+					<Text 
+						size="sm" 
+						className="
+								text-center mb-4
+                                tracking-(--title-letter-spacing)
+							"
+						style={
+							{
+								color: 'var(--color1)',
+								fontFamily: 'var(--text-font-body)',
+							}
+						}
+					>
+						AniDex é um projeto pessoal desenvolvido por Gabriel Mazzuco, com o objetivo de criar uma aplicação leve e eficiente para busca e seleção de animes.
+					</Text>
+
+					<Space h="md" />
+
+					{/* Conteúdo interno do modal: centraliza o LogoBaseboard dentro do corpo do modal */}
+					<div className="flex items-center justify-center py-2">
+						<LogoBaseboard />
+					</div>
+
+
+				</CenteredModal>
 		</aside>
 	);
 };

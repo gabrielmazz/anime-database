@@ -24,25 +24,25 @@ const LogoBaseboard = () => {
 					</svg>
 				</div>
 
-                <Space h="xs" />
+				<Space h="xs" />
 
-                <Text
-                    className="
+				<Text
+					className="
                         mb-2
                         text-shadow-lg/20
                         font-semibold
                         tracking-wide
 						uppercase
                     "
-                    style={{
-                        fontSize: 12,
-                        fontFamily: 'Raleway, sans-serif',
-                        color: 'var(--color1)'
+					style={{
+						fontSize: 12,
+						fontFamily: 'Raleway, sans-serif',
+						color: 'var(--color1)'
 						, letterSpacing: '0.18em'
-                    }}
-                >
-                    Desenvolvido por Gabriel Mazzuco - 2025
-                </Text>
+					}}
+				>
+					Gabriel Mazzuco - 2025
+				</Text>
 
 			</div>
 		</StyledWrapper>
@@ -210,7 +210,7 @@ const StyledWrapper = styled.div`
 
   .loader {
     display: inline-block;
-    margin: 0 38px;
+    margin: 0 10px;
     filter: drop-shadow(0 2px 6px rgba(0,0,0,0.25));
   }
 
