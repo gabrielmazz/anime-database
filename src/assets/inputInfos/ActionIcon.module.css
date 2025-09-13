@@ -1,0 +1,19 @@
+.rootActionIcon {
+    background-color: var(--color1)/10;
+    color: var(--color1);
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1px solid var(--color1-shadow);
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.rootActionIcon:hover {
+    background-color: var(--color1);
+    color: var(--color1);
+}
+
+.iconActionIcon:hover {
+    color: var(--color5);
+}
+    

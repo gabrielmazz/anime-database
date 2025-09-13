@@ -10,6 +10,19 @@ import { useSettings } from '../../state/settings';
 import { JsonInput } from '@mantine/core';
 import JsonInputModule from './../inputInfos/JsonInput.module.css';
 
+import { ActionIcon } from '@mantine/core';
+import ActionIconModule from '../inputInfos/ActionIcon.module.css';
+
+import { Tooltip } from '@mantine/core';
+import TooltipModule from '../inputInfos/Tooltip.module.css';
+
+// Importação dos icones do React-icons
+import { FaGithub } from "react-icons/fa";
+import { FaInfo } from "react-icons/fa6";
+import { FaHome } from "react-icons/fa";
+import { IoSearch } from "react-icons/io5";
+import { GrConfigure } from "react-icons/gr";
+
 type Item = {
 	key: string;
 	label: string;
@@ -17,61 +30,12 @@ type Item = {
 	link: string;
 };
 
-// Pequenos ícones SVG inline (sem dependências externas)
-const HomeIcon = (
-	<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-		<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-		<polyline points="9 22 9 12 15 12 15 22" />
-	</svg>
-);
-
-const SearchIcon = (
-	<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-		<circle cx="11" cy="11" r="8" />
-		<line x1="21" y1="21" x2="16.65" y2="16.65" />
-	</svg>
-);
-
-const DebugIcon = (
-	<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-		<circle cx="12" cy="12" r="10" />
-		<line x1="2" y1="12" x2="22" y2="12" />
-		<line x1="12" y1="2" x2="12" y2="22" />
-	</svg>
-);
-
-
 const IconChevron = ({ dir }: { dir: 'left' | 'right' }) => (
 	<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
 		{dir === 'left' ? <path d="M15 18l-6-6 6-6" /> : <path d="M9 18l6-6-6-6" />}
 	</svg>
 );
 
-const SocialTwitter = (
-	<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-		<path d="M22 5.92c-.77.34-1.6.57-2.46.67a4.21 4.21 0 0 0 1.85-2.33 8.36 8.36 0 0 1-2.66 1.02 4.18 4.18 0 0 0-7.12 3.81A11.87 11.87 0 0 1 3.16 4.6a4.17 4.17 0 0 0 1.29 5.58 4.17 4.17 0 0 1-1.9-.52v.05a4.18 4.18 0 0 0 3.35 4.1 4.22 4.22 0 0 1-1.89.07 4.18 4.18 0 0 0 3.9 2.9A8.38 8.38 0 0 1 2 19.54a11.83 11.83 0 0 0 6.41 1.88c7.69 0 11.89-6.37 11.89-11.89 0-.18-.01-.36-.02-.54A8.5 8.5 0 0 0 22 5.92Z" />
-	</svg>
-);
-
-const SocialDiscord = (
-	<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-		<path d="M20 4a16.1 16.1 0 0 0-4 .99c-.37-.22-.79-.37-1.24-.45A12.6 12.6 0 0 0 12 4c-.87 0-1.73.09-2.56.27-.45.08-.87.23-1.24.45A16.1 16.1 0 0 0 4 4C2.35 6.6 1.75 9.46 2 12.3c.57 2.57 2.8 4.5 5.44 5.15.42-.56.78-1.16 1.08-1.8-.59-.22-1.15-.5-1.68-.83.11-.08.22-.17.32-.26 1.2.56 2.52.86 3.85.86s2.65-.3 3.85-.86c.11.09.21.18.32.26-.53.33-1.09.61-1.68.83.3.64.66 1.24 1.08 1.8 2.64-.65 4.87-2.58 5.44-5.15.3-2.84-.35-5.7-2-8.3ZM9.25 12.5a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5Zm5.5 0a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5Z" />
-	</svg>
-);
-
-const SocialGithub = (
-	<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-		<path d="M12 2a10 10 0 0 0-3.16 19.49c.5.09.68-.22.68-.48v-1.69c-2.78.6-3.37-1.2-3.37-1.2-.45-1.15-1.1-1.46-1.1-1.46-.9-.61.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.89 1.52 2.33 1.08 2.9.83.09-.64.35-1.08.64-1.33-2.22-.25-4.56-1.11-4.56-4.95 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.65 0 0 .84-.27 2.75 1.02a9.56 9.56 0 0 1 5 0c1.9-1.29 2.74-1.02 2.74-1.02.55 1.38.2 2.4.1 2.65.64.7 1.03 1.59 1.03 2.68 0 3.85-2.34 4.7-4.57 4.95.36.31.69.92.69 1.86v2.76c0 .26.18.58.69.48A10 10 0 0 0 12 2Z" />
-	</svg>
-);
-
-const InformationIcon = (
-	<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-		<circle cx="12" cy="12" r="10" />
-		<line x1="12" y1="16" x2="12" y2="12" />
-		<line x1="12" y1="8" x2="12.01" y2="8" />
-	</svg>
-);
 
 const Sidebar: React.FC = () => {
 	const [collapsed, setCollapsed] = useState<boolean>(true);
@@ -81,9 +45,9 @@ const Sidebar: React.FC = () => {
 	const { devModeEnabled, lastApiPayload, lastSearchPayload, lastPicturesPayload, lastCharactersPayload } = useSettings();
 
 	const items: Item[] = useMemo(() => ([
-		{ key: 'home', label: 'Inicio', icon: HomeIcon, link: '/selectionScreen' },
-		{ key: 'search', label: 'Buscar Anime', icon: SearchIcon, link: '/searchScreen' },
-		{ key: 'debug', label: 'Debug', icon: DebugIcon, link: '/devConfigurationsScreen' },
+		{ key: 'home', label: 'Inicio', icon: <FaHome />, link: '/selectionScreen' },
+		{ key: 'search', label: 'Buscar Anime', icon: <IoSearch />, link: '/searchScreen' },
+		{ key: 'debug', label: 'Debug', icon: <GrConfigure />, link: '/devConfigurationsScreen' },
 	]), []);
 
 	const widthClass = collapsed ? 'w-16' : 'w-64';
@@ -92,8 +56,8 @@ const Sidebar: React.FC = () => {
 		<>
 			<aside
 				className={`fixed left-6 top-1/2 -translate-y-1/2 ${widthClass} h-[80vh] 
-      rounded-3xl border backdrop-blur-md shadow-xl z-20 flex flex-col overflow-hidden 
-      transition-all duration-300 ease-out`}
+							rounded-3xl border backdrop-blur-md shadow-xl z-20 flex flex-col overflow-hidden 
+							transition-all duration-300 ease-out`}
 				style={{ backgroundColor: 'var(--panel-bg)', borderColor: 'var(--panel-border)' }}
 			>
 				{/* Header */}
@@ -129,7 +93,6 @@ const Sidebar: React.FC = () => {
 										${isActive ? 'border-[var(--panel-border)]' : 'border-transparent'} 
 										hover:border-[var(--panel-border)] text-(--color1)`}
 								onClickCapture={(e) => {
-
 									// Navegação simples sem react-router
 									e.preventDefault();
 									window.location.href = it.link;
@@ -173,43 +136,61 @@ const Sidebar: React.FC = () => {
 							// Modo compacto: ícones empilhados em um "dock" elegante
 							<div
 								className="flex flex-col gap-1.5 p-1.5 backdrop-blur-sm mb-1"
-								style={{ color: 'var(--color1)' }}
 							>
 								{[
-									{ key: 'twitter', icon: SocialTwitter, label: 'Abrir Twitter/X', onClick: () => window.open('https://x.com', '_blank', 'noopener,noreferrer') },
-									{ key: 'discord', icon: SocialDiscord, label: 'Abrir Discord', onClick: () => window.open('https://discord.com', '_blank', 'noopener,noreferrer') },
-									{ key: 'github', icon: SocialGithub, label: 'Abrir GitHub', onClick: () => window.open('https://github.com', '_blank', 'noopener,noreferrer') },
-									{ key: 'info', icon: InformationIcon, label: 'Sobre o projeto', onClick: () => setAboutOpen(true) },
-								].map((btn) => (
-									<button
-										key={btn.key}
-										aria-label={btn.label}
-										title={btn.label}
-										className="w-8 h-8 rounded-full flex items-center justify-center bg-white/10 hover:bg-white/20 transition"
-										onClick={btn.onClick}
-									>
-										{btn.icon}
-									</button>
+									{ key: 'github', icon: FaGithub, label: 'Abrir GitHub', onClick: () => window.open('https://github.com', '_blank', 'noopener,noreferrer') },
+									{ key: 'info', icon: FaInfo, label: 'Sobre o projeto', onClick: () => setAboutOpen(true) },
+									].map((btn) => (
+										<Tooltip
+											label={btn.label}
+											withinPortal
+											offset={8}
+											openDelay={200}
+											closeDelay={80}
+											classNames={{ tooltip: TooltipModule.tooltip, arrow: TooltipModule.arrow }}
+											key={btn.key}
+										>
+										<ActionIcon
+											size={42}
+											variant="default"
+											onClick={btn.onClick}
+											classNames={{
+												root: ActionIconModule.rootActionIcon,
+												icon: ActionIconModule.iconActionIcon,
+											}}
+										>
+											{btn.icon({ size: 20 })}
+										</ActionIcon>
+									</Tooltip>
 								))}
 							</div>
 						) : (
 							<div className="flex gap-2">
 								{[
-									{ key: 'twitter', icon: SocialTwitter, label: 'Abrir Twitter/X', onClick: () => window.open('https://x.com', '_blank', 'noopener,noreferrer') },
-									{ key: 'discord', icon: SocialDiscord, label: 'Abrir Discord', onClick: () => window.open('https://discord.com', '_blank', 'noopener,noreferrer') },
-									{ key: 'github', icon: SocialGithub, label: 'Abrir GitHub', onClick: () => window.open('https://github.com', '_blank', 'noopener,noreferrer') },
-									{ key: 'info', icon: InformationIcon, label: 'Sobre o projeto', onClick: () => setAboutOpen(true) },
+									{ key: 'github', icon: FaGithub, label: 'Abrir GitHub', onClick: () => window.open('https://github.com', '_blank', 'noopener,noreferrer') },
+									{ key: 'info', icon: FaInfo, label: 'Sobre o projeto', onClick: () => setAboutOpen(true) },
 								].map((btn) => (
-									<button
+									<Tooltip
+										label={btn.label}
+										withinPortal
+										offset={8}
+										openDelay={200}
+										closeDelay={80}
+										classNames={{ tooltip: TooltipModule.tooltip, arrow: TooltipModule.arrow }}
 										key={btn.key}
-										aria-label={btn.label}
-										title={btn.label}
-										className="w-9 h-9 rounded-full flex items-center justify-center bg-white/10 hover:bg-white/20 transition"
-										style={{ color: 'var(--color1)' }}
-										onClick={btn.onClick}
 									>
-										{btn.icon}
-									</button>
+										<ActionIcon
+											size={42}
+											variant="default"
+											onClick={btn.onClick}
+											classNames={{
+												root: ActionIconModule.rootActionIcon,
+												icon: ActionIconModule.iconActionIcon,
+											}}
+										>
+											{btn.icon({ size: 20 })}
+										</ActionIcon>
+									</Tooltip>
 								))}
 							</div>
 						)}
@@ -286,6 +267,7 @@ const Sidebar: React.FC = () => {
 					root: DrawerModule.rootDrawer,
 					header: DrawerModule.headerDrawer,
 					body: DrawerModule.bodyDrawer,
+					content: DrawerModule.contentDrawer,
 				}}
 				title={
 					<Title
@@ -319,7 +301,7 @@ const Sidebar: React.FC = () => {
 										text-(--colorTextWhite)
 										uppercase
 										tracking-(--title-letter-spacing)
-									"	
+									"
 									style={{ fontSize: 12, fontFamily: 'var(--text-font-mono)' }}
 								>
 									Lista de Animes (getTopAnime)
