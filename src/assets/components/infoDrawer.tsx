@@ -5,6 +5,7 @@ type DrawerClassNames = Partial<{
 	root: string;
 	header: string;
 	body: string;
+	content: string;
 }>;
 
 type Props = {
