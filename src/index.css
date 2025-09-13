@@ -1,6 +1,7 @@
 /* Importação das fontes personalizadas diretamente do Google Fonts */
 @import url('https://fonts.googleapis.com/css2?family=Arimo:ital,wght@0,400..700;1,400..700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Arimo:ital,wght@0,400..700;1,400..700&family=Raleway:ital,wght@0,100..900;1,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Arimo:ital,wght@0,400..700;1,400..700&family=Orbitron:wght@400..900&family=Raleway:ital,wght@0,100..900;1,100..900&display=swap');
 
 @import "tailwindcss";
 @tailwind base;
@@ -29,6 +30,7 @@
 
   --text-font-title: 'Arimo', sans-serif;
   --text-font-body: 'Raleway', sans-serif;
+  --text-font-mono: 'Orbitron', sans-serif;
 }
 
 /* Remove margens padrão do body e assegura ocupação total da tela */

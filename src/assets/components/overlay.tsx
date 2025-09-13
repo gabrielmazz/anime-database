@@ -6,6 +6,7 @@ type Props = {
     message?: string;
 };
 
+// Componente de overlay de carregamento em tela cheia, com mensagem opcional
 const LoadingOverlayFullscreen: React.FC<Props> = ({ visible, message }) => {
     if (!visible) return null;
 
