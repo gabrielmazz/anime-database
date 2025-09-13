@@ -16,4 +16,33 @@
 .iconActionIcon:hover {
     color: var(--color5);
 }
+
+/* Navigation ActionIcon styles for sidebar footer */
+.rootNavIcon {
+  background-color: transparent;
+  color: var(--color1);
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 1px solid var(--panel-border);
+  transition: background-color 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.rootNavIcon:hover {
+  background-color: rgba(255,255,255,0.08);
+  color: var(--color1);
+}
+
+.rootNavIconActive {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px color-mix(in oklab, var(--accent) 30%, transparent);
+}
+
+.iconNav {
+  color: var(--color1);
+}
+
+.iconNav:hover {
+  color: var(--accent);
+}
     
