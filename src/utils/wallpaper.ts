@@ -1,25 +1,36 @@
-// Utility to dynamically gather and pick wallpapers from the assets folder
+// Utility to gather and pick wallpapers for different screens using a single module
 
-// Vite expands this at build time and returns URLs of imported files
-const wallpaperModules = import.meta.glob(
+// IMPORTANT: import.meta.glob precisa de padrões estáticos (sem variáveis dinâmicas).
+// Por isso, declaramos explicitamente cada pasta suportada e selecionamos via "key".
+
+type WallpaperKey = 'search' | 'dev';
+
+// Coleção: Search Screen
+const SEARCH_MODULES = import.meta.glob(
   '../assets/images/wallpaperSearchScreen/*.{png,jpg,jpeg,webp,avif}',
   { eager: true, import: 'default' }
 );
 
-const WALLPAPERS: string[] = Object.values(wallpaperModules) as string[];
+// Coleção: Dev Configurations Screen
+const DEV_MODULES = import.meta.glob(
+  '../assets/images/wallpaperDevConfigurationsScreen/*.{png,jpg,jpeg,webp,avif}',
+  { eager: true, import: 'default' }
+);
 
-export function getAllWallpapers(): string[] {
-  return WALLPAPERS;
+const COLLECTIONS: Record<WallpaperKey, string[]> = {
+  search: Object.values(SEARCH_MODULES) as string[],
+  dev: Object.values(DEV_MODULES) as string[],
+};
+
+export function getAllWallpapers(key: WallpaperKey = 'search'): string[] {
+  return COLLECTIONS[key] ?? [];
 }
 
-export function getRandomWallpaper(exclude?: string): string {
-  const pool = exclude && WALLPAPERS.length > 1
-    ? WALLPAPERS.filter((w) => w !== exclude)
-    : WALLPAPERS;
-
+export function getRandomWallpaper(key: WallpaperKey = 'search', exclude?: string): string {
+  const list = getAllWallpapers(key);
+  const pool = exclude && list.length > 1 ? list.filter((w) => w !== exclude) : list;
   if (pool.length === 0) return '';
   const idx = Math.floor(Math.random() * pool.length);
   return pool[idx]!;
 }
-
 

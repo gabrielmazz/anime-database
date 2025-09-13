@@ -9,6 +9,13 @@
     color: var(--color1);
 }
 
+.contentDrawer {
+    background-color: var(--panel-bg);
+    color: var(--color1);
+    border-left: 1px solid var(--panel-border);
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.03);
+}
+
 .bodyDrawer {
     background-color: var(--panel-bg);
     color: var(--color1);

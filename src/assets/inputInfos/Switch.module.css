@@ -1,0 +1,130 @@
+.labelWrapperSwitch {
+    color: var(--colorTextWhite);
+    font-size: 1.2rem;
+    font-family: var(--text-font-body);
+    letter-spacing: var(--text-letter-spacing);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    pointer-events: none;
+}
+
+.descriptionSwitch {
+    color: var(--colorTextWhite);
+    font-size: 0.8rem;
+    font-family: var(--text-font-body);
+    letter-spacing: var(--text-letter-spacing);
+    margin-top: 4px;
+    pointer-events: none;
+    max-width: 600px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.trackSwitch {
+    /* Base moderno: mais "quadrado" e consistente com os painéis */
+    --h: 30px;
+    /* altura do switch */
+    --r: 5px;
+    /* raio mais discreto, look quadradinho */
+    --pad: 3px;
+    /* espaço interno para o thumb */
+    --bw: 1px;
+    /* espessura da borda */
+
+    position: relative;
+    height: var(--h);
+    min-width: calc(var(--h) * 1.9);
+    background-color: var(--panel-bg);
+    border: var(--bw) solid var(--panel-border);
+    border-radius: var(--r);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+    transition: background-color 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+
+    input:checked+& {
+    background-color: var(--accent);
+    border-color: var(--accent);
+
+    &>.thumb {
+        background-color: var(--color1);
+
+        &::before {
+            background-color: var(--color1);
+        }
+    }
+}
+}
+
+.trackSwitch:hover {
+    border-color: var(--accent);
+}
+
+.trackSwitch[data-checked="true"] {
+    background: linear-gradient(180deg, color-mix(in oklab, var(--accent) 85%, #0000) 0%,
+            color-mix(in oklab, var(--accent) 70%, #0000) 100%);
+    border-color: var(--accent);
+}
+
+/* Thumb personalizado mais "quadrado" */
+.thumbSwitch {
+    height: calc(var(--h) - var(--pad) * 2);
+    width: calc(var(--h) - var(--pad) * 2);
+    margin: var(--pad);
+    background: var(--color1);
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35), inset 0 0 0 1px var(--panel-border);
+    transition: transform 180ms ease, background-color 180ms ease, box-shadow 180ms ease;
+}
+
+/* Quando ligado, o thumb acompanha o track; o Mantine aplica transform automaticamente.
+   Aqui apenas refinamos cor/sombra. */
+.trackSwitch[data-checked="true"] .thumbSwitch {
+    background: #fff;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.4), inset 0 0 0 1px color-mix(in oklab, var(--accent) 40%, #0000);
+}
+
+/* Estiliza o indicador interno padrão do Mantine (pseudo ::before do thumb) */
+.thumbSwitch[data-with-thumb-indicator]::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 40%;
+    height: 40%;
+    border-radius: 999px;
+    transform: translate(-50%, -50%);
+    box-shadow: inset 0 0 0 1px var(--panel-border);
+    transition: background-color 160ms ease, box-shadow 160ms ease;
+    pointer-events: none;
+}
+
+.trackSwitch[data-checked="true"] .thumbSwitch[data-with-thumb-indicator]::before {
+    background-color: var(--accent);
+    box-shadow: 0 0 6px var(--accent), 0 0 12px var(--accent), inset 0 0 0 1px color-mix(in oklab, var(--accent) 40%, transparent);
+}
+
+/* Labels ON/OFF dentro do track (se usados) */
+.trackSwitch span {
+    color: var(--color1);
+    font-weight: 600;
+    letter-spacing: 0.06em;
+}
+
+/* Estado desabilitado */
+.trackSwitch[data-disabled="true"] {
+    opacity: 0.6;
+    filter: grayscale(0.3);
+}
+
+/* Foco (quando o input dentro do root recebe focus) */
+.rootSwitch:focus-within .trackSwitch {
+    box-shadow: 0 0 0 2px color-mix(in oklab, var(--accent) 40%, transparent);
+}
+
+/* Alinha o corpo (thumb + textos) na mesma linha e centraliza verticalmente */
+.bodySwitch {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    /* espaço entre switch e textos */
+}
