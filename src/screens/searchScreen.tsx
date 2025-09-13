@@ -1,12 +1,17 @@
 import React, { useEffect } from 'react';
 import { useState } from 'react';
 
-// Componentes principais
+// Componentes principais, montagem da tela
 import { Drawer } from '@mantine/core';
 import DrawerModule from './../assets/inputInfos/Drawer.module.css';
 
+import LoadingOverlayFullscreen from '../assets/components/overlay.tsx';
+import Sidebar from '../assets/components/sidebar.tsx'
+import LogoBaseboard from '../assets/components/logoBaseboard.tsx'
+
 // Componente de carrossel
 import { Carousel } from '@mantine/carousel';
+import Autoplay from 'embla-carousel-autoplay';
 
 // Componentes de layout
 import { Grid } from '@mantine/core';
@@ -27,23 +32,13 @@ import { Title } from '@mantine/core';
 import { TextInput } from '@mantine/core';
 import TextInputModule from './../assets/inputInfos/TextInput.module.css';
 
-import Autoplay from 'embla-carousel-autoplay';
-
-// Utilidades
+// Utilitários, funções gerais
 import { getRandomWallpaper } from '../utils/wallpaper';
 import { applyPaletteToCssVariables, extractPaletteFromImage } from '../utils/palette';
-import LoadingOverlayFullscreen from '../assets/components/overlay.tsx';
-import {
-    searchAnimeByName,
-    getAnimePictures,
-    getAnimeCharacters,
-    type Anime,
-    type AnimeApiSearchResponse
-} from '../assets/API/jikan';
 
 // Importação das API's
+import { searchAnimeByName, getAnimePictures, getAnimeCharacters, type Anime, type AnimeApiSearchResponse } from '../assets/API/jikan';
 
-// Importação dinâmica via util (remove import direto de imagem)
 
 
 const SearchScreen: React.FC = () => {
@@ -118,28 +113,31 @@ const SearchScreen: React.FC = () => {
     // Estado para armazenar o anime selecionado
     const [selectedAnime, setSelectedAnime] = useState<Anime | null>(null);
 
-
-
     return (
 
         // BackgroundImage fara a estilização por tras da tela, sempre
         // aleatorizando uma imagem do fundo conforme a função getRandomWallpaper
         <BackgroundImage
             src={wallpaper}
-            className="relative text-white w-screen min-h-screen bg-cover bg-no-repeat bg-center bg-fixed"
+            className="relative text-white w-full min-h-screen bg-cover bg-no-repeat bg-center bg-fixed"
         >
-            {/* Overlay escurecedor */}
+            {/* Overlay escurecedor colocado por cima do BackgroundImage */}
             <div className="absolute inset-0 bg-black/60 pointer-events-none" />
 
             {/* Loading overlay durante chamadas à API */}
             <LoadingOverlayFullscreen visible={isLoading} message="Buscando animes..." />
 
+            {/* Sidebar fixa inspirada no design */}
+            <Sidebar />
+
             <div
                 // Div principal que abrigará toda a listagem de animes
                 className="
                 relative z-10
-                w-screen min-h-screen             
+                w-full min-h-screen             
                 max-w-7xl mx-auto
+                pl-24 md:pl-28
+                pb-28
                 align-top
             "
             >
@@ -148,7 +146,7 @@ const SearchScreen: React.FC = () => {
                         flex justify-center
                         pt-8
                         text-shadow-lg/20
-                        text-(--color2)
+                        text-(--color1)
                         uppercase
                         tracking-(--title-letter-spacing)
                     "
@@ -157,7 +155,7 @@ const SearchScreen: React.FC = () => {
                         fontFamily: 'Arimo, sans-serif',
                     }}
                 >
-                    Anime Database - Pesquise seu anime
+                    AniDex - Pesquise seu anime
                 </Title>
 
                 <Space h="md" />
@@ -176,16 +174,14 @@ const SearchScreen: React.FC = () => {
                         classNames={{
                             input: TextInputModule.inputTextInput
                         }}
-                        onBlur={() => {
-                            
+                        onChange={(event) => {
+
                             // Limpa o animeDatabase para não mostrar resultados antigos
                             setAnimeDatabase(null);
 
-                        }}
-                        onChange={(event) => {
-
                             // Atualiza o estado do input com o nome que será buscado
                             setNameAnimeSearch(event.currentTarget.value);
+
                         }}
                         onKeyDown={
                             (event) => {
@@ -204,7 +200,6 @@ const SearchScreen: React.FC = () => {
                     mt-4
                 "
                 >
-
                     {
                         // Verifica se a dataBase não está nula, se não estiver
                         // percorre o array de animes mostrando eles em tela
@@ -301,12 +296,13 @@ const SearchScreen: React.FC = () => {
                 }
                 position="right"
                 size="35%"
+                radius="md"
                 overlayProps={{
                     backgroundOpacity: 0.5, blur: 4 
                 }}
                 classNames={{
+                    root: DrawerModule.rootDrawer,
                     header: DrawerModule.headerDrawer,
-                    title: DrawerModule.titleDrawer,
                     body: DrawerModule.bodyDrawer,
                 }}
             >
@@ -627,6 +623,17 @@ const SearchScreen: React.FC = () => {
                     </>
                 )}
             </Drawer>
+
+            {/* Componentes da logoBaseboard, sempre estando no limite inferior da tela */}
+            <div
+                className="
+                    fixed bottom-0 left-0 right-0
+                    flex items-center justify-center
+                "
+            >
+                <LogoBaseboard />
+
+            </div>
 
         </BackgroundImage>
 
