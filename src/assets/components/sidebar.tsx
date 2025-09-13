@@ -57,8 +57,9 @@ const Sidebar: React.FC = () => {
 			<aside
 				className={`fixed left-6 top-1/2 -translate-y-1/2 ${widthClass} h-[80vh] 
 							rounded-3xl border backdrop-blur-md shadow-xl z-20 flex flex-col overflow-hidden 
-							transition-all duration-300 ease-out`}
-				style={{ backgroundColor: 'var(--panel-bg)', borderColor: 'var(--panel-border)' }}
+							transition-all duration-300 ease-out
+							bg-black/40 rounded-lg backdrop-blur-sm border border-white/20 shadow-lg
+							`}
 			>
 				{/* Header */}
 				<div
@@ -135,7 +136,7 @@ const Sidebar: React.FC = () => {
 						{collapsed ? (
 							// Modo compacto: ícones empilhados em um "dock" elegante
 							<div
-								className="flex flex-col gap-1.5 p-1.5 backdrop-blur-sm mb-1"
+								className="flex flex-col gap-1.5 p-1.5 sm mb-1"
 							>
 								{[
 									{ key: 'github', icon: FaGithub, label: 'Abrir GitHub', onClick: () => window.open('https://github.com', '_blank', 'noopener,noreferrer') },
@@ -194,16 +195,6 @@ const Sidebar: React.FC = () => {
 								))}
 							</div>
 						)}
-
-						{!collapsed && (
-							<button
-								className="w-9 h-9 rounded-full flex items-center justify-center bg-white/10 hover:bg-white/20"
-								style={{ color: 'var(--color1)' }}
-								onClick={() => setCollapsed((v) => !v)}
-							>
-								<IconChevron dir={collapsed ? 'right' : 'left'} />
-							</button>
-						)}
 					</div>
 				</div>
 
@@ -243,10 +234,13 @@ const Sidebar: React.FC = () => {
 			{/* Botão flutuante de DEV (aparece apenas com Dev Mode) */}
 			{devModeEnabled && (
 				<button
-					className="fixed left-6 bottom-6 z-20 px-3 py-2 rounded-xl border text-sm uppercase tracking-(--title-letter-spacing) shadow-lg backdrop-blur-sm hover:brightness-110 transition"
+					className="
+						fixed left-6 bottom-6 z-20 px-3 py-2 rounded-xl 
+						border text-sm uppercase tracking-(--title-letter-spacing)
+						shadow-lg backdrop-blur-sm hover:brightness-110 transition
+						bg-black/40 border-white/20 text-(--color1)
+					"
 					style={{
-						backgroundColor: 'var(--panel-bg)',
-						borderColor: 'var(--panel-border)',
 						color: 'var(--color1)'
 					}}
 					onClick={() => setDebugOpen(true)}

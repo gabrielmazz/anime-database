@@ -51,9 +51,9 @@ const DevConfigurationsScreen: React.FC = () => {
             <div
                 className="
                     relative z-10 w-full min-h-screen
-                    max-w-7xl mx-auto align-top
+                    max-w-[92vw] 2xl:max-w-[1900px] mx-auto align-top
                     px-4 sm:px-6 lg:px-12
-                    pl-20 sm:pl-24 md:pl-40
+                    pl-[1200px]
                 "
             >
                 <Title
@@ -76,15 +76,9 @@ const DevConfigurationsScreen: React.FC = () => {
                         bg-black/40 rounded-lg backdrop-blur-sm border border-white/20 shadow-lg
                         w-full max-w-none mx-auto
                         p-6 sm:p-10 md:p-16
-                        min-h-[40vh] sm:min-h-[50vh]
                         mt-8 mb-8
-                        flex flex-col
-                        grow
-                        min-h-[calc(100vh-160px)]
+                        min-h-[calc(100vh-265px)]
                     "
-                    style={{
-                        minHeight: 'calc(100vh - 160px)'
-                    }}
                 >
                     <Text style={{ color: 'var(--colorTextWhite)' }}>
 
@@ -109,7 +103,7 @@ const DevConfigurationsScreen: React.FC = () => {
                                 }}
                             />
 
-                            <Switch 
+                            <Switch
                                 size="xl"
                                 onLabel="ON"
                                 offLabel="OFF"
