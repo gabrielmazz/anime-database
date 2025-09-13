@@ -5,6 +5,7 @@ import './index.css'
 
 import { BrowserRouter } from 'react-router-dom'
 import { createTheme, MantineProvider } from '@mantine/core';
+import { SettingsProvider } from './state/settings.tsx';
 
 import '@mantine/core/styles.css';
 import '@mantine/carousel/styles.css';
@@ -12,21 +13,28 @@ import '@mantine/carousel/styles.css';
 // Importação das telas
 import SelectionScreen from './screens/selectionScreen.tsx'
 import SearchScreen from './screens/searchScreen.tsx'
+import DevConfigurationsScreen from './screens/devConfigurationsScreen.tsx'
 
 createRoot(document.getElementById('root')!).render(
 
-	<StrictMode>
-		<MantineProvider>
+    <StrictMode>
+        <MantineProvider>
+            <SettingsProvider>
 
-			<BrowserRouter basename="/selectionScreen">
-				<SelectionScreen />
-			</BrowserRouter>
+            <BrowserRouter basename="/selectionScreen">
+                <SelectionScreen />
+            </BrowserRouter>
 
 			<BrowserRouter basename="/searchScreen">
 				<SearchScreen />
 			</BrowserRouter>
 
-		</MantineProvider>
+            <BrowserRouter basename="/devConfigurationsScreen">
+                <DevConfigurationsScreen />
+            </BrowserRouter>
+
+            </SettingsProvider>
+        </MantineProvider>
 
 	</StrictMode>,
 )

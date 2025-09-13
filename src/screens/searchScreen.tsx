@@ -10,6 +10,7 @@ import Sidebar from '../assets/components/sidebar.tsx'
 import LoaderBox from '../assets/components/loaderBox.tsx';
 import AlertBox from '../assets/components/alert.tsx';
 import InfoDrawer from '../assets/components/infoDrawer.tsx';
+import { useSettings } from '../state/settings';
 
 // Componente de carrossel
 import { Carousel } from '@mantine/carousel';
@@ -43,11 +44,11 @@ import { searchAnimeByName, getAnimePictures, getAnimeCharacters, type Anime, ty
 import { translateText, translateTextDetailed } from '../assets/API/translate';
 
 
-
 const SearchScreen: React.FC = () => {
 
     const [nameAnimerSearch, setNameAnimeSearch] = useState('');
-    const [wallpaper, setWallpaper] = useState<string>(() => getRandomWallpaper());
+    const { apiModalEnabled, setLastApiPayload, setLastSearchPayload, setLastPicturesPayload, setLastCharactersPayload } = useSettings();
+    const [wallpaper, setWallpaper] = useState<string>(() => getRandomWallpaper('search'));
 
     // Extrai paleta baseada no wallpaper e aplica nas CSS variables
     useEffect(() => {
@@ -73,6 +74,11 @@ const SearchScreen: React.FC = () => {
         try {
             const data = await searchAnimeByName(nameAnimerSearch);
             setAnimeDatabase(data);
+            if (apiModalEnabled) {
+                const payload = { endpoint: 'searchAnimeByName', query: nameAnimerSearch, response: data };
+                setLastApiPayload(payload);
+                setLastSearchPayload(payload);
+            }
         } finally {
             setIsLoading(false);
         }
@@ -100,6 +106,11 @@ const SearchScreen: React.FC = () => {
     const searchAnimePictures = async (idAnime: number) => {
         const data = await getAnimePictures(idAnime);
         setAnimeSelectedPictures(data);
+        if (apiModalEnabled) {
+            const payload = { endpoint: 'getAnimePictures', id: idAnime, response: data };
+            setLastApiPayload(payload);
+            setLastPicturesPayload(payload);
+        }
         console.log(data);
     };
 
@@ -107,6 +118,11 @@ const SearchScreen: React.FC = () => {
     const searchAnimeCharacters = async (idAnime: number) => {
         const data = await getAnimeCharacters(idAnime);
         setAnimeSelectedCharacters(data);
+        if (apiModalEnabled) {
+            const payload = { endpoint: 'getAnimeCharacters', id: idAnime, response: data };
+            setLastApiPayload(payload);
+            setLastCharactersPayload(payload);
+        }
         console.log("Personagens do anime: ", data);
     }
 
