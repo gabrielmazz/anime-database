@@ -14,6 +14,7 @@ import '@mantine/carousel/styles.css';
 import SelectionScreen from './screens/selectionScreen.tsx'
 import SearchScreen from './screens/searchScreen.tsx'
 import DevConfigurationsScreen from './screens/devConfigurationsScreen.tsx'
+import SearchScreenManga from './screens/searchScreenManga.tsx'
 
 createRoot(document.getElementById('root')!).render(
 
@@ -31,6 +32,10 @@ createRoot(document.getElementById('root')!).render(
 
             <BrowserRouter basename="/devConfigurationsScreen">
                 <DevConfigurationsScreen />
+            </BrowserRouter>
+
+            <BrowserRouter basename="/searchScreenManga">
+                <SearchScreenManga />
             </BrowserRouter>
 
             </SettingsProvider>

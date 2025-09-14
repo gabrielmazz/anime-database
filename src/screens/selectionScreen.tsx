@@ -118,21 +118,22 @@ const SelectionScreen: React.FC = () => {
 								</BackgroundImage>
 							</Box>
 
-							{/* Card 3: Buscar Mangá (placeholder) */}
+						{/* Card 3: Buscar Mangá */}
 							<Box
-								className="
-								border-2 rounded-lg shadow-lg/30 overflow-hidden
+							className="
+								border-2 rounded-lg shadow-lg/30 overflow-hidden cursor-pointer
 								transition-all duration-300 ease-out
 								hover:scale-[1.01]
 							"
-								style={{ borderColor: 'var(--color1)' }}
-							>
+							style={{ borderColor: 'var(--color1)' }}
+							onClick={() => { window.location.href = '/searchScreenManga'; }}
+						>
 								<BackgroundImage
 									src={imgCard03}
 									className="
 									w-full h-[36vh] sm:h-[40vh] flex items-center justify-center
 									brightness-60 hover:brightness-100 transition duration-300
-									cursor-default
+									cursor-pointer
 								"
 								>
 									<Text

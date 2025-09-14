@@ -22,6 +22,8 @@ import { FaInfo } from "react-icons/fa6";
 import { FaHome } from "react-icons/fa";
 import { IoSearch } from "react-icons/io5";
 import { GrConfigure } from "react-icons/gr";
+import { FaTv } from "react-icons/fa";
+import { MdMenuBook } from "react-icons/md";
 
 type Item = {
 	key: string;
@@ -46,7 +48,8 @@ const Sidebar: React.FC = () => {
 
 	const items: Item[] = useMemo(() => ([
 		{ key: 'home', label: 'Inicio', icon: <FaHome />, link: '/selectionScreen' },
-		{ key: 'search', label: 'Buscar Anime', icon: <IoSearch />, link: '/searchScreen' },
+		{ key: 'search', label: 'Buscar Anime', icon: <FaTv />, link: '/searchScreen' },
+		{ key: 'searchManga', label: 'Buscar Manga', icon: <MdMenuBook />, link: '/searchScreenManga' },
 		{ key: 'debug', label: 'Debug', icon: <GrConfigure />, link: '/devConfigurationsScreen' },
 	]), []);
 
