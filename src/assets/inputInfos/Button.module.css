@@ -1,0 +1,16 @@
+.rootButton {
+    background: var(--color4);
+    color: var(--colorTextWhite);
+    border: 1px solid var(--panel-border);
+    box-shadow: 0 10px 24px rgba(0,0,0,0.35);
+    font-family: var(--text-font-body);
+    letter-spacing: var(--text-letter-spacing);
+    font-size: 12px;
+    text-transform: uppercase;
+}
+
+.rootButton:hover {
+    background: var(--color5);
+    transform: translateY(-1px);
+    transition: background 150ms ease, transform 150ms ease;
+}

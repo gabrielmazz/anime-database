@@ -24,6 +24,7 @@ import { IoSearch } from "react-icons/io5";
 import { GrConfigure } from "react-icons/gr";
 import { FaTv } from "react-icons/fa";
 import { MdMenuBook } from "react-icons/md";
+import { FaCubes } from "react-icons/fa";
 
 type Item = {
 	key: string;
@@ -47,6 +48,7 @@ const Sidebar: React.FC = () => {
 	const { devModeEnabled, lastApiPayload, lastSearchPayload, lastPicturesPayload, lastCharactersPayload } = useSettings();
 
 	const items: Item[] = useMemo(() => ([
+		{ key: 'intro', label: 'Introdução', icon: <FaCubes />, link: '/introScreen' },
 		{ key: 'home', label: 'Inicio', icon: <FaHome />, link: '/selectionScreen' },
 		{ key: 'search', label: 'Buscar Anime', icon: <FaTv />, link: '/searchScreen' },
 		{ key: 'searchManga', label: 'Buscar Manga', icon: <MdMenuBook />, link: '/searchScreenManga' },
