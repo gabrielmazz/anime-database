@@ -5,6 +5,8 @@ import imgCard01 from '../assets/images/imgSelectionScreen/imgCard01.jpg';
 import imgCard02 from '../assets/images/imgSelectionScreen/imgCard02.png';
 import imgCard03 from '../assets/images/imgSelectionScreen/imgCard03.jpg';
 import imgCard04 from '../assets/images/imgSelectionScreen/imgCard04.jpg';
+import imgCard05 from '../assets/images/imgSelectionScreen/imgCard05.jpg';
+import imgCard06 from '../assets/images/imgSelectionScreen/imgCard06.jpg';
 
 // Importação dos componentes do mantine
 import { BackgroundImage, Container, Space, Title, Text, Box } from '@mantine/core';
@@ -71,17 +73,19 @@ const SelectionScreen: React.FC = () => {
 						min-h-[calc(100vh-265px)]
 					"
 				>
-                    <ScrollArea h="78vh" type="auto" scrollbarSize={12} offsetScrollbars>
-                        <Box
-                            className="
+					<ScrollArea h="70vh" type="auto" scrollbarSize={12} offsetScrollbars>
+						<Box
+							className="
                                 grid gap-6 h-full
                                 grid-cols-1 md:grid-cols-2 md:grid-rows-2
+								md:[grid-template-rows:repeat(2,minmax(320px,1fr))]
+                                auto-rows-[minmax(260px,auto)]
                                 pt-2 pb-6 pr-2 pl-2
                             "
-                        >
+						>
 							{/* Card 1: Buscar Anime */}
-                            <Box
-                                className="
+							<Box
+								className="
                                     border-2 rounded-lg shadow-lg/30 overflow-hidden cursor-pointer
                                     transition-all duration-300 ease-out
                                     hover:scale-[1.01]
@@ -90,13 +94,13 @@ const SelectionScreen: React.FC = () => {
 								style={{ borderColor: 'var(--color1)' }}
 								onClick={() => { window.location.href = '/searchScreen'; }}
 							>
-                                <BackgroundImage
-                                    src={imgCard01}
-                                    className="
+								<BackgroundImage
+									src={imgCard01}
+									className="
                                         w-full h-full flex items-center justify-center
                                         brightness-60 hover:brightness-100 transition duration-300
                                     "
-                                >
+								>
 									<Text
 										className="
 										p-4                                     
@@ -119,25 +123,25 @@ const SelectionScreen: React.FC = () => {
 								</BackgroundImage>
 							</Box>
 
-						{/* Card 3: Buscar Mangá */}
-                            <Box
-                            className="
+							{/* Card 2: Buscar Mangá */}
+							<Box
+								className="
                                 border-2 rounded-lg shadow-lg/30 overflow-hidden cursor-pointer
                                 transition-all duration-300 ease-out
                                 hover:scale-[1.01]
                                 min-h-[320px] md:min-h-[360px]
                             "
-							style={{ borderColor: 'var(--color1)' }}
-							onClick={() => { window.location.href = '/searchScreenManga'; }}
-						>
-                                <BackgroundImage
-                                    src={imgCard03}
-                                    className="
+								style={{ borderColor: 'var(--color1)' }}
+								onClick={() => { window.location.href = '/searchScreenManga'; }}
+							>
+								<BackgroundImage
+									src={imgCard03}
+									className="
                                         w-full h-full flex items-center justify-center
                                         brightness-60 hover:brightness-100 transition duration-300
                                         cursor-pointer
                                     "
-                                >
+								>
 									<Text
 										className="
 										p-4                                     
@@ -160,9 +164,9 @@ const SelectionScreen: React.FC = () => {
 								</BackgroundImage>
 							</Box>
 
-							{/* Card 4: Buscar Produtores (placeholder) */}
-                            <Box
-                                className="
+							{/* Card 3: Buscar Produtores (placeholder) */}
+							<Box
+								className="
                                     border-2 rounded-lg shadow-lg/30 overflow-hidden
                                     transition-all duration-300 ease-out
                                     hover:scale-[1.01]
@@ -170,14 +174,14 @@ const SelectionScreen: React.FC = () => {
                                 "
 								style={{ borderColor: 'var(--color1)' }}
 							>
-                                <BackgroundImage
-                                    src={imgCard04}
-                                    className="
+								<BackgroundImage
+									src={imgCard04}
+									className="
                                         w-full h-full flex items-center justify-center
                                         brightness-60 hover:brightness-100 transition duration-300
                                         cursor-default
                                     "
-                                >
+								>
 									<Text
 										className="
 										p-4                                     
@@ -200,9 +204,9 @@ const SelectionScreen: React.FC = () => {
 								</BackgroundImage>
 							</Box>
 
-							{/* Card 2: Buscar Personagem (placeholder) */}
-                            <Box
-                                className="
+							{/* Card 4: Buscar Personagem (placeholder) */}
+							<Box
+								className="
                                     border-2 rounded-lg shadow-lg/30 overflow-hidden
                                     transition-all duration-300 ease-out
                                     hover:scale-[1.01]
@@ -210,14 +214,14 @@ const SelectionScreen: React.FC = () => {
                                 "
 								style={{ borderColor: 'var(--color1)' }}
 							>
-                                <BackgroundImage
-                                    src={imgCard02}
-                                    className="
+								<BackgroundImage
+									src={imgCard02}
+									className="
                                         w-full h-full flex items-center justify-center
                                         brightness-60 hover:brightness-100 transition duration-300
                                         cursor-default
                                     "
-                                >
+								>
 									<Text
 										className="
 										p-4                                     
@@ -239,6 +243,12 @@ const SelectionScreen: React.FC = () => {
 									</Text>
 								</BackgroundImage>
 							</Box>
+
+							{/* Card 5: Busca Animes por Season */}
+							
+							{/* Card 6: Buscar Animes com as melhores notas */}
+							
+
 						</Box>
 					</ScrollArea>
 				</Container>
