@@ -11,7 +11,7 @@ import imgCard06 from '../assets/images/imgSelectionScreen/imgCard06.jpg';
 // Importação dos componentes do mantine
 import { BackgroundImage, Container, Space, Title, Text, Box } from '@mantine/core';
 
-import { ScrollArea } from '@mantine/core';
+// import { ScrollArea } from '@mantine/core';
 
 // Sidebar e utilitários de tema
 import Sidebar from '../assets/components/sidebar.tsx';
@@ -32,7 +32,7 @@ const SelectionScreen: React.FC = () => {
 	return (
 		<BackgroundImage
 			src={wallpaper}
-			className="relative text-white w-full min-h-screen bg-cover bg-no-repeat bg-center bg-fixed"
+			className="relative w-full min-h-screen bg-cover bg-no-repeat bg-center bg-fixed"
 		>
 			{/* Overlay escuro por cima do wallpaper */}
 			<div className="absolute inset-0 bg-black/60 pointer-events-none" />
@@ -42,54 +42,51 @@ const SelectionScreen: React.FC = () => {
 
 			{/* Container principal */}
 			<div
-				className="
-					relative z-10 w-full min-h-screen
-					max-w-[92vw] 2xl:max-w-[1900px] mx-auto align-top
-					px-4 sm:px-6 lg:px-12
-					pl-[88px]
-				"
-			>
-				<Title
-					className="
-						flex justify-center pt-8
-						text-shadow-lg/20 text-(--color1)
-						uppercase tracking-(--title-letter-spacing)
-						text-[clamp(24px,4vw,42px)]
-          			"
-					style={{ fontFamily: 'var(--text-font-mono)' }}
-				>
+                className="
+                    relative z-10 w-full min-h-screen
+                    max-w-[92vw] 2xl:max-w-[1900px] mx-auto align-top
+                    px-4 sm:px-6 lg:px-12
+                "
+                >
+                <Title
+                    className="
+                        flex justify-center pt-6
+                        text-shadow-lg/20 text-(--color1)
+                        uppercase tracking-(--title-letter-spacing)
+                        text-[clamp(24px,4vw,42px)]
+                    "
+                    style={{ fontFamily: 'var(--text-font-mono)' }}
+                >
 					AniDex — Selecione uma opção
 				</Title>
 
 				<Space h="md" />
 
-				<Container
-					fluid
-					className="
-						bg-black/40 rounded-lg backdrop-blur-sm border border-white/20 shadow-lg
-						w-full max-w-none mx-auto
-						p-6 sm:p-10 md:p-16
-						mt-8 mb-8
-						min-h-[calc(100vh-265px)]
-					"
-				>
-					<ScrollArea h="70vh" type="auto" scrollbarSize={12} offsetScrollbars>
-						<Box
-							className="
-                                grid gap-6 h-full
-                                grid-cols-1 md:grid-cols-2 md:grid-rows-2
-								md:[grid-template-rows:repeat(2,minmax(320px,1fr))]
-                                auto-rows-[minmax(260px,auto)]
-                                pt-2 pb-6 pr-2 pl-2
+                <Container
+                    fluid
+                    className="
+                        bg-black/40 rounded-lg backdrop-blur-sm border border-white/20 shadow-lg
+                        w-full max-w-none mx-auto
+                        p-4 sm:p-6 md:p-8
+                        mt-12 mb-0
+                        h-[80vh] overflow-hidden
+                    "
+                >
+                        <Box
+                            className="
+                                grid gap-4 h-full
+                                grid-cols-1 md:grid-cols-2
+                                md:[grid-template-rows:repeat(3,minmax(220px,1fr))]
+                                pt-2 pb-2 pr-2 pl-2
                             "
-						>
+                        >
 							{/* Card 1: Buscar Anime */}
 							<Box
 								className="
                                     border-2 rounded-lg shadow-lg/30 overflow-hidden cursor-pointer
                                     transition-all duration-300 ease-out
                                     hover:scale-[1.01]
-                                    min-h-[320px] md:min-h-[360px]
+                                min-h-[220px] md:min-h-[240px]
                                 "
 								style={{ borderColor: 'var(--color1)' }}
 								onClick={() => { window.location.href = '/searchScreen'; }}
@@ -129,7 +126,7 @@ const SelectionScreen: React.FC = () => {
                                 border-2 rounded-lg shadow-lg/30 overflow-hidden cursor-pointer
                                 transition-all duration-300 ease-out
                                 hover:scale-[1.01]
-                                min-h-[320px] md:min-h-[360px]
+                                min-h-[220px] md:min-h-[240px]
                             "
 								style={{ borderColor: 'var(--color1)' }}
 								onClick={() => { window.location.href = '/searchScreenManga'; }}
@@ -170,7 +167,7 @@ const SelectionScreen: React.FC = () => {
                                     border-2 rounded-lg shadow-lg/30 overflow-hidden
                                     transition-all duration-300 ease-out
                                     hover:scale-[1.01]
-                                    min-h-[320px] md:min-h-[360px]
+                                    min-h-[220px] md:min-h-[240px]
                                 "
 								style={{ borderColor: 'var(--color1)' }}
 							>
@@ -210,7 +207,7 @@ const SelectionScreen: React.FC = () => {
                                     border-2 rounded-lg shadow-lg/30 overflow-hidden
                                     transition-all duration-300 ease-out
                                     hover:scale-[1.01]
-                                    min-h-[320px] md:min-h-[360px]
+                                    min-h-[220px] md:min-h-[240px]
                                 "
 								style={{ borderColor: 'var(--color1)' }}
 							>
@@ -244,13 +241,76 @@ const SelectionScreen: React.FC = () => {
 								</BackgroundImage>
 							</Box>
 
-							{/* Card 5: Busca Animes por Season */}
-							
-							{/* Card 6: Buscar Animes com as melhores notas */}
-							
+                        {/* Card 5: Explorar Temporadas */}
+                        <Box
+                            className="
+                                border-2 rounded-lg shadow-lg/30 overflow-hidden cursor-pointer
+                                transition-all duration-300 ease-out
+                                hover:scale-[1.01]
+                                min-h-[220px] md:min-h-[240px]
+                            "
+                            style={{ borderColor: 'var(--color1)' }}
+                            onClick={() => { window.location.href = '/seasonScreen'; }}
+                        >
+                            <BackgroundImage
+                                src={imgCard05}
+                                className="
+                                    w-full h-full flex items-center justify-center
+                                    brightness-60 hover:brightness-100 transition duration-300
+                                "
+                            >
+                                <Text
+                                    className="
+                                        p-4 flex items-center justify-center h-full w-full text-center
+                                        text-shadow-lg/60 font-bold uppercase tracking-(--title-letter-spacing)
+                                    "
+                                    style={{
+                                        fontFamily: 'var(--text-font-mono)',
+                                        color: 'var(--colorTextWhite)',
+                                        fontSize: 28,
+                                    }}
+                                >
+                                    Explorar Temporadas
+                                </Text>
+                            </BackgroundImage>
+                        </Box>
 
-						</Box>
-					</ScrollArea>
+                        {/* Card 6: Top Animes */}
+                        <Box
+                            className="
+                                border-2 rounded-lg shadow-lg/30 overflow-hidden cursor-pointer
+                                transition-all duration-300 ease-out
+                                hover:scale-[1.01]
+                                min-h-[220px] md:min-h-[240px]
+                            "
+                            style={{ borderColor: 'var(--color1)' }}
+                            onClick={() => { window.location.href = '/topAnimesScreen'; }}
+                        >
+                            <BackgroundImage
+                                src={imgCard06}
+                                className="
+                                    w-full h-full flex items-center justify-center
+                                    brightness-60 hover:brightness-100 transition duration-300
+                                "
+                            >
+                                <Text
+                                    className="
+                                        p-4 flex items-center justify-center h-full w-full text-center
+                                        text-shadow-lg/60 font-bold uppercase tracking-(--title-letter-spacing)
+                                    "
+                                    style={{
+                                        fontFamily: 'var(--text-font-mono)',
+                                        color: 'var(--colorTextWhite)',
+                                        fontSize: 28,
+                                    }}
+                                >
+                                    Top Animes
+                                </Text>
+                            </BackgroundImage>
+                        </Box>
+
+
+					</Box>
 				</Container>
 			</div>
 		</BackgroundImage>

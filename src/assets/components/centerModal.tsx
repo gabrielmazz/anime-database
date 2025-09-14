@@ -10,15 +10,17 @@ type Props = {
     children: React.ReactNode;
     title?: string;
     size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | number;
+    radius?: string | number;
 };
 
-const CenteredModal: React.FC<Props> = ({ opened, onClose, children, title, size = 'md' }) => {
+const CenteredModal: React.FC<Props> = ({ opened, onClose, children, title, size = 'md', radius = 'md' }) => {
     return (
         <Modal
             opened={opened}
             onClose={onClose}
             title={title}
             size={size}
+            radius={radius}
             centered
             classNames={{
                 root: CenterModule.rootCenterModal,
