@@ -15,12 +15,17 @@ import SelectionScreen from './screens/selectionScreen.tsx'
 import SearchScreen from './screens/searchScreen.tsx'
 import DevConfigurationsScreen from './screens/devConfigurationsScreen.tsx'
 import SearchScreenManga from './screens/searchScreenManga.tsx'
+import IntroScreen from './screens/introScreen.tsx'
 
 createRoot(document.getElementById('root')!).render(
 
     <StrictMode>
         <MantineProvider>
             <SettingsProvider>
+
+            <BrowserRouter basename="/introScreen">
+                <IntroScreen />
+            </BrowserRouter>
 
             <BrowserRouter basename="/selectionScreen">
                 <SelectionScreen />
