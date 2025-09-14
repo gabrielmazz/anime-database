@@ -14,6 +14,7 @@ type Props = {
 	title?: React.ReactNode;
 	position?: 'left' | 'right' | 'top' | 'bottom';
 	size?: string | number;
+	radius?: string | number;
 	overlayProps?: any;
 	classNames?: DrawerClassNames;
 	content: React.ReactNode;
@@ -26,6 +27,7 @@ const InfoDrawer: React.FC<Props> = ({
 	title,
 	position = 'right',
 	size = '35%',
+	radius = 'md',
 	overlayProps = { backgroundOpacity: 0.5, blur: 4 },
 	classNames,
 	content,
@@ -37,7 +39,7 @@ const InfoDrawer: React.FC<Props> = ({
 			title={title}
 			position={position}
 			size={size}
-			radius="md"
+			radius={radius}
 			overlayProps={overlayProps}
 			classNames={classNames}
 		>

@@ -60,12 +60,13 @@ const Sidebar: React.FC = () => {
 	return (
 		<>
 			<aside
-				className={`fixed left-6 top-1/2 -translate-y-1/2 ${widthClass} h-[80vh] 
-							rounded-3xl border backdrop-blur-md shadow-xl z-20 flex flex-col overflow-hidden 
+				className={`fixed left-6 top-1/2 -translate-y-1/2 ${widthClass} h-[80vh]
+							rounded-md z-20 flex flex-col overflow-hidden
+							bg-black/40 backdrop-blur-md border border-white/20 shadow-xl
 							transition-all duration-300 ease-out
-							bg-black/40 rounded-lg backdrop-blur-sm border border-white/20 shadow-lg
 							`}
 			>
+
 				{/* Header */}
 				<div
 					className="
@@ -146,16 +147,16 @@ const Sidebar: React.FC = () => {
 								{[
 									{ key: 'github', icon: FaGithub, label: 'Abrir GitHub', onClick: () => window.open('https://github.com', '_blank', 'noopener,noreferrer') },
 									{ key: 'info', icon: FaInfo, label: 'Sobre o projeto', onClick: () => setAboutOpen(true) },
-									].map((btn) => (
-										<Tooltip
-											label={btn.label}
-											withinPortal
-											offset={8}
-											openDelay={200}
-											closeDelay={80}
-											classNames={{ tooltip: TooltipModule.tooltip, arrow: TooltipModule.arrow }}
-											key={btn.key}
-										>
+								].map((btn) => (
+									<Tooltip
+										label={btn.label}
+										withinPortal
+										offset={8}
+										openDelay={200}
+										closeDelay={80}
+										classNames={{ tooltip: TooltipModule.tooltip, arrow: TooltipModule.arrow }}
+										key={btn.key}
+									>
 										<ActionIcon
 											size={42}
 											variant="default"
@@ -203,37 +204,6 @@ const Sidebar: React.FC = () => {
 					</div>
 				</div>
 
-				<CenteredModal
-					opened={aboutOpen}
-					onClose={() => setAboutOpen(false)}
-					title="Sobre o projeto"
-					size="md"
-				>
-					<Text
-						size="sm"
-						className="
-								text-center mb-4
-                                tracking-(--title-letter-spacing)
-							"
-						style={
-							{
-								color: 'var(--color1)',
-								fontFamily: 'var(--text-font-body)',
-							}
-						}
-					>
-						AniDex é um projeto pessoal desenvolvido por Gabriel Mazzuco, com o objetivo de criar uma aplicação para buscar, explorar e conhecer animes
-					</Text>
-
-					<Space h="md" />
-
-					{/* Conteúdo interno do modal: centraliza o LogoBaseboard dentro do corpo do modal */}
-					<div className="flex items-center justify-center py-2">
-						<LogoBaseboard />
-					</div>
-
-
-				</CenteredModal>
 			</aside>
 
 			{/* Botão flutuante de DEV (aparece apenas com Dev Mode) */}
@@ -255,12 +225,46 @@ const Sidebar: React.FC = () => {
 				</button>
 			)}
 
+			<CenteredModal
+				opened={aboutOpen}
+				onClose={() => setAboutOpen(false)}
+				title="Sobre o projeto"
+				size="md"
+				radius="md"
+			>
+				<Text
+					size="sm"
+					className="
+								text-center mb-4
+                                tracking-(--title-letter-spacing)
+							"
+					style={
+						{
+							color: 'var(--color1)',
+							fontFamily: 'var(--text-font-body)',
+						}
+					}
+				>
+					AniDex é um projeto pessoal desenvolvido por Gabriel Mazzuco, com o objetivo de criar uma aplicação para buscar, explorar e conhecer animes
+				</Text>
+
+				<Space h="md" />
+
+				{/* Conteúdo interno do modal: centraliza o LogoBaseboard dentro do corpo do modal */}
+				<div className="flex items-center justify-center py-2">
+					<LogoBaseboard />
+				</div>
+
+
+			</CenteredModal>
+
 			{/* Drawer de Debug */}
 			<InfoDrawer
 				opened={debugOpen}
 				onClose={() => setDebugOpen(false)}
 				position="right"
 				size="50%"
+				radius="md"
 				overlayProps={{ backgroundOpacity: 0.35, blur: 2 }}
 				classNames={{
 					root: DrawerModule.rootDrawer,
@@ -353,6 +357,7 @@ const Sidebar: React.FC = () => {
 					</div>
 				}
 			/>
+
 		</>
 	);
 };

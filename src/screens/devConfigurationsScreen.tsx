@@ -68,16 +68,16 @@ const DevConfigurationsScreen: React.FC = () => {
                     Painel de Configurações (Dev)
                 </Title>
 
-                <Space h="md" />
+                <Space h={40} />
 
                 <Container
                     fluid
                     className="
                         bg-black/40 rounded-lg backdrop-blur-sm border border-white/20 shadow-lg
                         w-full max-w-none mx-auto
-                        p-6 sm:p-10 md:p-16
-                        mt-8 mb-8
-                        min-h-[calc(100vh-265px)]
+                        p-4 sm:p-6 md:p-8
+                        mt-4 mb-0
+                        h-[80vh] overflow-hidden
                     "
                 >
                     <Text style={{ color: 'var(--colorTextWhite)' }}>
