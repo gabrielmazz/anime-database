@@ -1,0 +1,55 @@
+.rootTable {
+	background-color: transparent;
+}
+
+.tableTable {
+	background-color: var(--panel-bg);
+	color: var(--color1);
+	border: 1px solid var(--panel-border);
+	border-radius: 8px;
+	overflow: hidden;
+}
+
+.theadTable {
+	background-color: color-mix(in srgb, var(--panel-bg) 90%, var(--color1) 10%);
+}
+
+.thTable {
+	font-family: var(--text-font-title);
+	letter-spacing: var(--title-letter-spacing);
+	color: var(--color1);
+	text-transform: uppercase;
+	font-size: 12px;
+	border-bottom: 1px solid var(--panel-border);
+}
+
+.trTable {
+	transition: background-color 120ms ease;
+}
+
+.trTable:hover {
+	background-color: color-mix(in srgb, var(--panel-bg) 94%, #fff 6%);
+}
+
+.tdTable {
+	color: var(--colorTextWhite);
+	border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.captionTable {
+	color: var(--color1);
+}
+
+/* Ajusta o striping padrão do Mantine para evitar faixas brancas */
+.tableTable[data-striped] {
+  --table-striped-color: color-mix(in srgb, var(--panel-bg) 88%, var(--color1) 12%);
+}
+
+/* Aplica a cor nas células listradas explicitamente */
+.tableTable[data-striped] tbody tr:nth-of-type(odd) td {
+  background-color: var(--table-striped-color);
+}
+
+.tableTable[data-striped="even"] tbody tr:nth-of-type(even) td {
+  background-color: var(--table-striped-color);
+}

@@ -45,15 +45,16 @@ const Sidebar: React.FC = () => {
 	const [active, setActive] = useState<string>('dashboard');
 	const [aboutOpen, setAboutOpen] = useState<boolean>(false);
 	const [debugOpen, setDebugOpen] = useState<boolean>(false);
-	const { devModeEnabled, lastApiPayload, lastSearchPayload, lastPicturesPayload, lastCharactersPayload } = useSettings();
+	const { devModeEnabled, lastApiPayload, lastSearchPayload, lastPicturesPayload, lastCharactersPayload, lastTopCharactersPayload, lastCharactersSearchPayload } = useSettings();
 
-	const items: Item[] = useMemo(() => ([
-		{ key: 'intro', label: 'Introdução', icon: <FaCubes />, link: '/introScreen' },
-		{ key: 'home', label: 'Inicio', icon: <FaHome />, link: '/selectionScreen' },
-		{ key: 'search', label: 'Buscar Anime', icon: <FaTv />, link: '/searchScreen' },
-		{ key: 'searchManga', label: 'Buscar Manga', icon: <MdMenuBook />, link: '/searchScreenManga' },
-		{ key: 'debug', label: 'Debug', icon: <GrConfigure />, link: '/devConfigurationsScreen' },
-	]), []);
+    const items: Item[] = useMemo(() => ([
+        { key: 'intro', label: 'Introdução', icon: <FaCubes />, link: '/introScreen' },
+        { key: 'home', label: 'Inicio', icon: <FaHome />, link: '/selectionScreen' },
+        { key: 'search', label: 'Buscar Anime', icon: <FaTv />, link: '/searchScreen' },
+        { key: 'searchManga', label: 'Buscar Manga', icon: <MdMenuBook />, link: '/searchScreenManga' },
+        { key: 'searchCharacters', label: 'Buscar Personagem', icon: <IoSearch />, link: '/searchScreenCharacters' },
+        { key: 'debug', label: 'Debug', icon: <GrConfigure />, link: '/devConfigurationsScreen' },
+    ]), []);
 
 	const widthClass = collapsed ? 'w-16' : 'w-64';
 
@@ -235,9 +236,9 @@ const Sidebar: React.FC = () => {
 				<Text
 					size="sm"
 					className="
-								text-center mb-4
-                                tracking-(--title-letter-spacing)
-							"
+						text-center mb-4
+						tracking-(--title-letter-spacing)
+					"
 					style={
 						{
 							color: 'var(--color1)',
@@ -353,6 +354,40 @@ const Sidebar: React.FC = () => {
 								wrapper: JsonInputModule.wrapper,
 							}}
 							value={lastCharactersPayload ? JSON.stringify(lastCharactersPayload, null, 2) : '{\n  "info": "Sem dados de personagens ainda."\n}'}
+						/>
+
+						<JsonInput
+							autosize
+							minRows={10}
+							maxRows={24}
+							readOnly
+							label="Top Personagens (getTopCharacters)"
+							classNames={{
+								root: JsonInputModule.root,
+								label: JsonInputModule.label,
+								input: JsonInputModule.input,
+								error: JsonInputModule.error,
+								description: JsonInputModule.description,
+								wrapper: JsonInputModule.wrapper,
+							}}
+							value={lastTopCharactersPayload ? JSON.stringify(lastTopCharactersPayload, null, 2) : '{\n  "info": "Sem dados de top personagens ainda."\n}'}
+						/>
+
+						<JsonInput
+							autosize
+							minRows={10}
+							maxRows={24}
+							readOnly
+							label="Busca Personagens (characters?q=)"
+							classNames={{
+								root: JsonInputModule.root,
+								label: JsonInputModule.label,
+								input: JsonInputModule.input,
+								error: JsonInputModule.error,
+								description: JsonInputModule.description,
+								wrapper: JsonInputModule.wrapper,
+							}}
+							value={lastCharactersSearchPayload ? JSON.stringify(lastCharactersSearchPayload, null, 2) : '{\n  "info": "Sem dados de busca de personagens ainda."\n}'}
 						/>
 					</div>
 				}
