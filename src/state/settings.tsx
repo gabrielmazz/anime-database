@@ -13,6 +13,10 @@ type Settings = {
   setLastPicturesPayload: (p: any | null) => void;
   lastCharactersPayload: any | null;
   setLastCharactersPayload: (p: any | null) => void;
+  lastTopCharactersPayload: any | null;
+  setLastTopCharactersPayload: (p: any | null) => void;
+  lastCharactersSearchPayload: any | null;
+  setLastCharactersSearchPayload: (p: any | null) => void;
 };
 
 const SettingsContext = createContext<Settings | undefined>(undefined);
@@ -37,6 +41,10 @@ function loadInitial(): Settings {
                 setLastPicturesPayload: () => {},
                 lastCharactersPayload: null,
                 setLastCharactersPayload: () => {},
+                lastTopCharactersPayload: null,
+                setLastTopCharactersPayload: () => {},
+                lastCharactersSearchPayload: null,
+                setLastCharactersSearchPayload: () => {},
             } as Settings;
 		}
 	} catch { }
@@ -53,6 +61,10 @@ function loadInitial(): Settings {
     setLastPicturesPayload: () => {},
     lastCharactersPayload: null,
     setLastCharactersPayload: () => {},
+    lastTopCharactersPayload: null,
+    setLastTopCharactersPayload: () => {},
+    lastCharactersSearchPayload: null,
+    setLastCharactersSearchPayload: () => {},
   } as Settings;
 }
 
@@ -64,6 +76,8 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [lastSearchPayload, setLastSearchPayload] = useState<any | null>(null);
   const [lastPicturesPayload, setLastPicturesPayload] = useState<any | null>(null);
   const [lastCharactersPayload, setLastCharactersPayload] = useState<any | null>(null);
+  const [lastTopCharactersPayload, setLastTopCharactersPayload] = useState<any | null>(null);
+  const [lastCharactersSearchPayload, setLastCharactersSearchPayload] = useState<any | null>(null);
 
 	useEffect(() => {
 		try {
@@ -88,6 +102,10 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       setLastPicturesPayload,
       lastCharactersPayload,
       setLastCharactersPayload,
+      lastTopCharactersPayload,
+      setLastTopCharactersPayload,
+      lastCharactersSearchPayload,
+      setLastCharactersSearchPayload,
     }),
     [
       apiModalEnabled,
@@ -96,6 +114,8 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       lastSearchPayload,
       lastPicturesPayload,
       lastCharactersPayload,
+      lastTopCharactersPayload,
+      lastCharactersSearchPayload,
     ]
   );
 

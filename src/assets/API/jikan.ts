@@ -125,3 +125,54 @@ export async function getMangaCharacters(id: number): Promise<MangaCharactersRes
     if (!response.ok) throw new Error('Falha ao buscar personagens do mangá');
     return response.json();
 }
+
+// =============================
+// Characters endpoints
+// =============================
+
+export type Character = {
+  mal_id: number;
+  name: string;
+  favorites?: number;
+  images?: {
+    jpg?: {
+      image_url?: string;
+    }
+  };
+};
+
+export type CharactersResponse = {
+  data: Character[];
+};
+
+export async function getTopCharacters(page: number = 1): Promise<CharactersResponse> {
+  const response = await fetch(`${BASE_URL}/top/characters?page=${page}`);
+  if (!response.ok) throw new Error('Falha ao buscar personagens em destaque');
+  return response.json();
+}
+
+export async function searchCharactersByName(name: string, page: number = 1): Promise<CharactersResponse> {
+  const q = name.trim();
+  const response = await fetch(`${BASE_URL}/characters?q=${encodeURIComponent(q)}&page=${page}`);
+  if (!response.ok) throw new Error('Falha ao buscar personagens');
+  return response.json();
+}
+
+// Detalhes completos do personagem
+export type CharacterFullResponse = {
+  data: {
+    mal_id: number;
+    name: string;
+    about?: string | null;
+    images?: any;
+    favorites?: number;
+    anime?: Array<{ role?: string; anime?: { title?: string } }>;
+    manga?: Array<{ role?: string; manga?: { title?: string } }>;
+  };
+};
+
+export async function getCharacterFull(id: number): Promise<CharacterFullResponse> {
+  const response = await fetch(`${BASE_URL}/characters/${id}/full`);
+  if (!response.ok) throw new Error('Falha ao buscar detalhes do personagem');
+  return response.json();
+}

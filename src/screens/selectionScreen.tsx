@@ -42,64 +42,64 @@ const SelectionScreen: React.FC = () => {
 
 			{/* Container principal */}
 			<div
-                className="
+				className="
                     relative z-10 w-full min-h-screen
                     max-w-[92vw] 2xl:max-w-[1900px] mx-auto align-top
                     px-4 sm:px-6 lg:px-12
                 "
-                >
-                <Title
-                    className="
+			>
+				<Title
+					className="
                         flex justify-center pt-6
                         text-shadow-lg/20 text-(--color1)
                         uppercase tracking-(--title-letter-spacing)
                         text-[clamp(24px,4vw,42px)]
                     "
-                    style={{ fontFamily: 'var(--text-font-mono)' }}
-                >
+					style={{ fontFamily: 'var(--text-font-mono)' }}
+				>
 					AniDex — Selecione uma opção
 				</Title>
 
 				<Space h="md" />
 
-                <Container
-                    fluid
-                    className="
+				<Container
+					fluid
+					className="
                         bg-black/40 rounded-lg backdrop-blur-sm border border-white/20 shadow-lg
                         w-full max-w-none mx-auto
                         p-4 sm:p-6 md:p-8
                         mt-12 mb-0
                         h-[80vh] overflow-hidden
                     "
-                >
-                        <Box
-                            className="
+				>
+					<Box
+						className="
                                 grid gap-4 h-full
                                 grid-cols-1 md:grid-cols-2
                                 md:[grid-template-rows:repeat(3,minmax(220px,1fr))]
                                 pt-2 pb-2 pr-2 pl-2
                             "
-                        >
-							{/* Card 1: Buscar Anime */}
-							<Box
-								className="
+					>
+						{/* Card 1: Buscar Anime */}
+						<Box
+							className="
                                     border-2 rounded-lg shadow-lg/30 overflow-hidden cursor-pointer
                                     transition-all duration-300 ease-out
                                     hover:scale-[1.01]
                                 min-h-[220px] md:min-h-[240px]
                                 "
-								style={{ borderColor: 'var(--color1)' }}
-								onClick={() => { window.location.href = '/searchScreen'; }}
-							>
-								<BackgroundImage
-									src={imgCard01}
-									className="
+							style={{ borderColor: 'var(--color1)' }}
+							onClick={() => { window.location.href = '/searchScreen'; }}
+						>
+							<BackgroundImage
+								src={imgCard01}
+								className="
                                         w-full h-full flex items-center justify-center
                                         brightness-60 hover:brightness-100 transition duration-300
                                     "
-								>
-									<Text
-										className="
+							>
+								<Text
+									className="
 										p-4                                     
 										flex items-center justify-center
 										h-full w-full
@@ -109,38 +109,38 @@ const SelectionScreen: React.FC = () => {
 										uppercase
 										tracking-(--title-letter-spacing)
 									"
-										style={{
-											fontFamily: 'var(--text-font-mono)',
-											color: 'var(--colorTextWhite)',
-											fontSize: 28
-										}}
-									>
-										Procurar Anime
-									</Text>
-								</BackgroundImage>
-							</Box>
+									style={{
+										fontFamily: 'var(--text-font-mono)',
+										color: 'var(--colorTextWhite)',
+										fontSize: 28
+									}}
+								>
+									Procurar Anime
+								</Text>
+							</BackgroundImage>
+						</Box>
 
-							{/* Card 2: Buscar Mangá */}
-							<Box
-								className="
+						{/* Card 2: Buscar Mangá */}
+						<Box
+							className="
                                 border-2 rounded-lg shadow-lg/30 overflow-hidden cursor-pointer
                                 transition-all duration-300 ease-out
                                 hover:scale-[1.01]
                                 min-h-[220px] md:min-h-[240px]
                             "
-								style={{ borderColor: 'var(--color1)' }}
-								onClick={() => { window.location.href = '/searchScreenManga'; }}
-							>
-								<BackgroundImage
-									src={imgCard03}
-									className="
+							style={{ borderColor: 'var(--color1)' }}
+							onClick={() => { window.location.href = '/searchScreenManga'; }}
+						>
+							<BackgroundImage
+								src={imgCard03}
+								className="
                                         w-full h-full flex items-center justify-center
                                         brightness-60 hover:brightness-100 transition duration-300
                                         cursor-pointer
                                     "
-								>
-									<Text
-										className="
+							>
+								<Text
+									className="
 										p-4                                     
 										flex items-center justify-center
 										h-full w-full
@@ -150,77 +150,78 @@ const SelectionScreen: React.FC = () => {
 										uppercase
 										tracking-(--title-letter-spacing)
 									"
-										style={{
-											fontFamily: 'var(--text-font-mono)',
-											color: 'var(--colorTextWhite)',
-											fontSize: 28
-										}}
-									>
-										Procurar Mangá
-									</Text>
-								</BackgroundImage>
-							</Box>
+									style={{
+										fontFamily: 'var(--text-font-mono)',
+										color: 'var(--colorTextWhite)',
+										fontSize: 28
+									}}
+								>
+									Procurar Mangá
+								</Text>
+							</BackgroundImage>
+						</Box>
 
-							{/* Card 3: Buscar Produtores (placeholder) */}
-							<Box
+						{/* Card 3: Buscar Personagem (placeholder) */}
+						<Box
+							className="
+								border-2 rounded-lg shadow-lg/30 overflow-hidden
+								transition-all duration-300 ease-out
+								hover:scale-[1.01]
+								min-h-[220px] md:min-h-[240px]
+							"
+							style={{ borderColor: 'var(--color1)' }}
+							onClick={() => { window.location.href = '/searchScreenCharacters'; }}
+						>
+							<BackgroundImage
+								src={imgCard02}
 								className="
+									w-full h-full flex items-center justify-center
+									brightness-60 hover:brightness-100 transition duration-300
+									cursor-default
+								"
+							>
+								<Text
+									className="
+										p-4                                     
+										flex items-center justify-center
+										h-full w-full
+										text-center
+										text-shadow-lg/60
+										font-bold
+										uppercase
+										tracking-(--title-letter-spacing)
+									"
+									style={{
+										fontFamily: 'var(--text-font-mono)',
+										color: 'var(--colorTextWhite)',
+										fontSize: 28
+									}}
+								>
+									Procurar Personagem
+								</Text>
+							</BackgroundImage>
+						</Box>
+
+						{/* Card 4: Buscar Produtores (placeholder) */}
+						<Box
+							className="
                                     border-2 rounded-lg shadow-lg/30 overflow-hidden
                                     transition-all duration-300 ease-out
                                     hover:scale-[1.01]
                                     min-h-[220px] md:min-h-[240px]
                                 "
-								style={{ borderColor: 'var(--color1)' }}
-							>
-								<BackgroundImage
-									src={imgCard04}
-									className="
-                                        w-full h-full flex items-center justify-center
-                                        brightness-60 hover:brightness-100 transition duration-300
-                                        cursor-default
-                                    "
-								>
-									<Text
-										className="
-										p-4                                     
-										flex items-center justify-center
-										h-full w-full
-										text-center
-										text-shadow-lg/60
-										font-bold
-										uppercase
-										tracking-(--title-letter-spacing)
-									"
-										style={{
-											fontFamily: 'var(--text-font-mono)',
-											color: 'var(--colorTextWhite)',
-											fontSize: 28
-										}}
-									>
-										Procurar Produtores
-									</Text>
-								</BackgroundImage>
-							</Box>
-
-							{/* Card 4: Buscar Personagem (placeholder) */}
-							<Box
+							style={{ borderColor: 'var(--color1)' }}
+						>
+							<BackgroundImage
+								src={imgCard04}
 								className="
-                                    border-2 rounded-lg shadow-lg/30 overflow-hidden
-                                    transition-all duration-300 ease-out
-                                    hover:scale-[1.01]
-                                    min-h-[220px] md:min-h-[240px]
-                                "
-								style={{ borderColor: 'var(--color1)' }}
-							>
-								<BackgroundImage
-									src={imgCard02}
-									className="
                                         w-full h-full flex items-center justify-center
                                         brightness-60 hover:brightness-100 transition duration-300
                                         cursor-default
                                     "
-								>
-									<Text
-										className="
+							>
+								<Text
+									className="
 										p-4                                     
 										flex items-center justify-center
 										h-full w-full
@@ -230,84 +231,84 @@ const SelectionScreen: React.FC = () => {
 										uppercase
 										tracking-(--title-letter-spacing)
 									"
-										style={{
-											fontFamily: 'var(--text-font-mono)',
-											color: 'var(--colorTextWhite)',
-											fontSize: 28
-										}}
-									>
-										Procurar Personagem
-									</Text>
-								</BackgroundImage>
-							</Box>
+									style={{
+										fontFamily: 'var(--text-font-mono)',
+										color: 'var(--colorTextWhite)',
+										fontSize: 28
+									}}
+								>
+									Procurar Produtores
+								</Text>
+							</BackgroundImage>
+						</Box>
 
-                        {/* Card 5: Explorar Temporadas */}
-                        <Box
-                            className="
+						{/* Card 5: Explorar Temporadas */}
+						<Box
+							className="
                                 border-2 rounded-lg shadow-lg/30 overflow-hidden cursor-pointer
                                 transition-all duration-300 ease-out
                                 hover:scale-[1.01]
                                 min-h-[220px] md:min-h-[240px]
                             "
-                            style={{ borderColor: 'var(--color1)' }}
-                            onClick={() => { window.location.href = '/seasonScreen'; }}
-                        >
-                            <BackgroundImage
-                                src={imgCard05}
-                                className="
+							style={{ borderColor: 'var(--color1)' }}
+							onClick={() => { window.location.href = '/seasonScreen'; }}
+						>
+							<BackgroundImage
+								src={imgCard05}
+								className="
                                     w-full h-full flex items-center justify-center
                                     brightness-60 hover:brightness-100 transition duration-300
                                 "
-                            >
-                                <Text
-                                    className="
+							>
+								<Text
+									className="
                                         p-4 flex items-center justify-center h-full w-full text-center
                                         text-shadow-lg/60 font-bold uppercase tracking-(--title-letter-spacing)
                                     "
-                                    style={{
-                                        fontFamily: 'var(--text-font-mono)',
-                                        color: 'var(--colorTextWhite)',
-                                        fontSize: 28,
-                                    }}
-                                >
-                                    Explorar Temporadas
-                                </Text>
-                            </BackgroundImage>
-                        </Box>
+									style={{
+										fontFamily: 'var(--text-font-mono)',
+										color: 'var(--colorTextWhite)',
+										fontSize: 28,
+									}}
+								>
+									Explorar Temporadas
+								</Text>
+							</BackgroundImage>
+						</Box>
 
-                        {/* Card 6: Top Animes */}
-                        <Box
-                            className="
+						{/* Card 6: Top Animes */}
+						<Box
+							className="
                                 border-2 rounded-lg shadow-lg/30 overflow-hidden cursor-pointer
                                 transition-all duration-300 ease-out
                                 hover:scale-[1.01]
                                 min-h-[220px] md:min-h-[240px]
                             "
-                            style={{ borderColor: 'var(--color1)' }}
-                            onClick={() => { window.location.href = '/topAnimesScreen'; }}
-                        >
-                            <BackgroundImage
-                                src={imgCard06}
-                                className="
+							style={{ borderColor: 'var(--color1)' }}
+							onClick={() => { window.location.href = '/topAnimesScreen'; }}
+						>
+							<BackgroundImage
+								src={imgCard06}
+								className="
                                     w-full h-full flex items-center justify-center
                                     brightness-60 hover:brightness-100 transition duration-300
                                 "
-                            >
-                                <Text
-                                    className="
+							>
+								<Text
+									className="
                                         p-4 flex items-center justify-center h-full w-full text-center
                                         text-shadow-lg/60 font-bold uppercase tracking-(--title-letter-spacing)
                                     "
-                                    style={{
-                                        fontFamily: 'var(--text-font-mono)',
-                                        color: 'var(--colorTextWhite)',
-                                        fontSize: 28,
-                                    }}
-                                >
-                                    Top Animes
-                                </Text>
-                            </BackgroundImage>
-                        </Box>
+									style={{
+										fontFamily: 'var(--text-font-mono)',
+										color: 'var(--colorTextWhite)',
+										fontSize: 28,
+									}}
+								>
+									Top Animes
+								</Text>
+							</BackgroundImage>
+						</Box>
 
 
 					</Box>

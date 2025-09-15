@@ -16,6 +16,7 @@ import SearchScreen from './screens/searchScreen.tsx'
 import DevConfigurationsScreen from './screens/devConfigurationsScreen.tsx'
 import SearchScreenManga from './screens/searchScreenManga.tsx'
 import IntroScreen from './screens/introScreen.tsx'
+import SearchScreenCharacters from './screens/searchScreenCharacters.tsx'
 
 createRoot(document.getElementById('root')!).render(
 
@@ -41,6 +42,10 @@ createRoot(document.getElementById('root')!).render(
 
             <BrowserRouter basename="/searchScreenManga">
                 <SearchScreenManga />
+            </BrowserRouter>
+
+            <BrowserRouter basename="/searchScreenCharacters">
+                <SearchScreenCharacters />
             </BrowserRouter>
 
             </SettingsProvider>
