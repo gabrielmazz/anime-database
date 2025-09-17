@@ -5,6 +5,14 @@
   transition: 0.3s;
   color: var(--color1);
   letter-spacing: var(--text-letter-spacing);
+  /* Mantém altura fixa independente da quantidade de pills */
+  height: 44px;
+  min-height: 44px;
+  max-height: 44px;
+  display: flex;
+  align-items: center;
+  overflow: hidden; /* impede crescimento vertical */
+  white-space: nowrap;
 }
 
 .inputMultiSelect:focus {
@@ -57,10 +65,21 @@
   background-color: color-mix(in oklab, var(--accent) 18%, transparent);
   border: 1px solid var(--panel-border);
   color: var(--color1);
-  /* tamanho levemente menor, sem forçar altura fixa */
-  padding: 2px 8px;
-  font-size: 0.9em;
-  line-height: 1.1;
+  /* formata visual e impede quebra de linha */
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.8rem;
 }
 
-.pillsListMultiSelect { gap: 6px; }
+.pillsListMultiSelect {
+  gap: 6px;
+  display: flex;
+  flex-wrap: nowrap; /* mantêm tudo em uma linha */
+  overflow: hidden;  /* esconde excesso sem crescer o input */
+  max-width: 100%;
+}
+
+/* mantém o campo de digitação em uma linha sem forçar o container a crescer */
+.inputMultiSelect input {
+  white-space: nowrap;
+}

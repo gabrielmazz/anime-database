@@ -6,9 +6,11 @@ import { getRandomWallpaper } from '../utils/wallpaper';
 import { applyPaletteToCssVariables, extractPaletteFromImage } from '../utils/palette';
 
 // Componentes do Mantine
-import { BackgroundImage, Container, Title, Text, Box, Space } from '@mantine/core';
+import { BackgroundImage, Container, Title, Text, Box, Space, Divider } from '@mantine/core';
 import { Image } from '@mantine/core';
 import { Group } from '@mantine/core';
+import { ThemeIcon } from '@mantine/core';
+import { List } from '@mantine/core';
 
 import { ActionIcon } from '@mantine/core';
 import ActionIconModule from './../assets/inputInfos/ActionIcon.module.css';
@@ -25,6 +27,12 @@ import LogoBaseboard from '../assets/components/logoBaseboard.tsx';
 // Importação do icones
 import { FaGithub } from "react-icons/fa";
 import { FaInfo } from "react-icons/fa6";
+import { MdOutlineBiotech, MdApi, MdViewCarousel } from "react-icons/md";
+import { FaReact } from "react-icons/fa";
+import { TbBrandVite, TbBrandTailwind, TbBrandTypescript, TbRoute, TbPalette, TbIcons } from "react-icons/tb";
+import { SiStyledcomponents, SiEslint, SiPostcss, SiReactrouter } from "react-icons/si";
+
+// Importação do modal centralizado
 import CenteredModal from '../assets/components/centerModal.tsx';
 
 const IntroScreen: React.FC = () => {
@@ -32,6 +40,7 @@ const IntroScreen: React.FC = () => {
 
 
     const [aboutOpen, setAboutOpen] = useState<boolean>(false);
+    const [techOpen, setTechOpen] = useState<boolean>(false);
 
     useEffect(() => {
         if (!wallpaper) return;
@@ -174,11 +183,35 @@ const IntroScreen: React.FC = () => {
 
                                 <Space h="md" />
 
+                                <Divider my="xl"  />
+
+                                <Text
+                                    className="
+                                    w-full
+                                    text-center
+                                    text-shadow-lg/60
+                                    text-justify
+                                    font-bold
+                                    uppercase
+                                    tracking-(--title-letter-spacing)
+                                "
+                                    style={{
+                                        fontFamily: 'var(--text-font-body)',
+                                        color: 'var(--colorTextWhite)',
+                                        fontSize: 24,
+                                    }}
+                                >
+                                    Este projeto utiliza a API não oficial do MyAnimeList (Jikan) para buscar informações sobre animes. 
+                                </Text>
+
+                                <Space h="md" />
+
                                 <Group>
 
                                     {[
                                         { key: 'github', icon: FaGithub, label: 'Abrir GitHub', onClick: () => window.open('https://github.com', '_blank', 'noopener,noreferrer') },
                                         { key: 'info', icon: FaInfo, label: 'Sobre o projeto', onClick: () => setAboutOpen(true) },
+                                        { key: 'tech', icon: MdOutlineBiotech, label: 'Tecnologias usadas', onClick: () => setTechOpen(true) },
                                     ].map((btn) => (
                                         <Tooltip
                                             label={btn.label}
@@ -244,6 +277,105 @@ const IntroScreen: React.FC = () => {
 
                 </CenteredModal>
 
+                <CenteredModal
+                    opened={false}
+                    onClose={() => { }}
+                    title="Tecnologias usadas"
+                    size="md"
+                >
+                    <Text
+                        size="sm"
+                        className="
+                                text-center mb-4
+                                tracking-(--title-letter-spacing)
+                            "
+                        style={
+                            {
+                                color: 'var(--color1)',
+                                fontFamily: 'var(--text-font-body)',
+                            }
+                        }
+                    >
+                        Este projeto utiliza a API não oficial do MyAnimeList (Jikan) para buscar informações sobre animes.
+                    </Text>
+
+                </CenteredModal>
+
+                <CenteredModal
+                    opened={techOpen}
+                    onClose={() => setTechOpen(false)}
+                    title="Tecnologias usadas"
+                    size="xl"
+                >
+                    {/* Lista de tecnologias usadas no projeto */}
+                    <Text
+                        size="sm"
+                        className="
+                                mb-4
+                                tracking-(--title-letter-spacing)
+                            "
+                        style={
+                            {
+                                color: 'var(--color1)',
+                                fontFamily: 'var(--text-font-body)',
+                            }
+                        }
+                    >
+                        As tecnologias utilizadas no desenvolvimento do AniDex incluem:
+                    </Text>
+
+                    <Space h="md" />
+
+                    {(() => {
+                        const iconStyle = { color: 'var(--color1)' } as const;
+                        const techs = [
+                            { key: 'react', icon: <FaReact size={18} style={iconStyle} />, text: 'React – Framework UI.' },
+                            { key: 'ts', icon: <TbBrandTypescript size={18} style={iconStyle} />, text: 'TypeScript – Linguagem principal.' },
+                            { key: 'vite', icon: <TbBrandVite size={18} style={iconStyle} />, text: 'Vite – build dev rápido para React/TS.' },
+                            { key: 'mantine', icon: <TbPalette size={18} style={iconStyle} />, text: 'Mantine UI – componentes (Core + Carousel).' },
+                            { key: 'tailwind', icon: <TbBrandTailwind size={18} style={iconStyle} />, text: 'Tailwind CSS + @tailwindcss/vite.' },
+                            { key: 'router', icon: <SiReactrouter size={18} style={iconStyle} />, text: 'React Router DOM – navegação entre telas.' },
+                            { key: 'icons', icon: <TbIcons size={18} style={iconStyle} />, text: 'React Icons – pacote de ícones.' },
+                            { key: 'jikan', icon: <MdApi size={18} style={iconStyle} />, text: 'Jikan API (MyAnimeList) – dados de animes.' },
+                        ];
+                        return (
+                            <List
+                                size="sm"
+                                spacing="sm"
+                                center
+                                className="mb-4"
+                                style={{ color: 'var(--colorTextWhite)', fontFamily: 'var(--text-font-body)' }}
+                            >
+                                {techs.map((t) => (
+                                    <List.Item
+                                        key={t.key}
+                                        icon={
+                                            <ThemeIcon
+                                                variant="outline"
+                                                radius="md"
+                                                size={28}
+                                                style={{
+                                                    borderColor: 'var(--color1)',
+                                                    color: 'var(--color1)',
+                                                    display: 'inline-flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                }}
+                                            >
+                                                {t.icon}
+                                            </ThemeIcon>
+                                        }
+                                    >
+                                        <Text component="span" className="tracking-(--title-letter-spacing)" style={{ fontFamily: 'var(--text-font-body)' }}>
+                                            {t.text}
+                                        </Text>
+                                    </List.Item>
+                                ))}
+                            </List>
+                        );
+                    })()}
+
+                </CenteredModal>
 
             </div>
 
