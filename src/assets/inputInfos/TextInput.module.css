@@ -1,18 +1,36 @@
 .inputTextInput {
     font-family: 'Raleway', sans-serif;
-    background-color: transparent;
-    border: 1px solid var(--color1-shadow);
-    transition: 0.3s;
-    color: var(--color1);
-    letter-spacing: var(--text-letter-spacing);
+	background-color: transparent;
+	border: 1px solid var(--color1-shadow);
+	transition: 0.3s;
+	color: var(--color1);
+	letter-spacing: var(--text-letter-spacing);
+	font-family: var(--text-font-body);
 }
 
 .inputTextInput:focus {
     border: 1px solid var(--color1);
-    outline: none;
-    transition: 0.3s;
+	outline: none;
+	transition: 0.3s;
 }
 
 .inputTextInput::placeholder {
     color: var(--color1-shadow);
+}
+
+/* Padronização de label/description para TextInput (alinhado com Select) */
+.labelTextInput {
+  color: var(--colorTextWhite);
+	font-size: 1.2rem;
+	font-family: var(--text-font-body);
+	letter-spacing: var(--text-letter-spacing);
+	pointer-events: none;
+}
+
+.descriptionTextInput {
+  color: var(--colorTextWhite);
+	font-size: 0.8rem;
+	font-family: var(--text-font-body);
+	letter-spacing: var(--text-letter-spacing);
+	margin-top: 4px;
 }

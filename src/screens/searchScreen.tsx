@@ -222,8 +222,9 @@ const SearchScreen: React.FC = () => {
                 className="
                 relative z-10
                 w-full min-h-screen             
-                max-w-7xl mx-auto
+                max-w-[92vw] 2xl:max-w-[1900px] mx-auto
                 align-top
+                px-4 sm:px-6 lg:px-12
             "
             >
                 <Title
@@ -236,45 +237,47 @@ const SearchScreen: React.FC = () => {
                         tracking-(--title-letter-spacing)
                     "
                     style={{
-                        fontSize: 42,
                         fontFamily: 'var(--text-font-mono)',
                     }}
                 >
                     AniDex - Pesquise seu anime
                 </Title>
 
-                <Space h="md" />
+                <Space h={33} />
 
-                <Group
-                    grow
-                    className="
-                        px-12
-                    "
-                >
+                <Group grow>
                     <TextInput
-                        value={nameAnimerSearch}
-                        radius="lg"
-                        placeholder="Digite o nome do anime"
                         size="md"
+                        label="Buscar anime"
+                        description="Digite o nome do anime para buscar"
+                        placeholder="Ex.: Bleach, Jujutsu Kaisen, OPM..."
+                        value={nameAnimerSearch}
                         classNames={{
-                            input: TextInputModule.inputTextInput
+                            input: TextInputModule.inputTextInput,
+                            label: TextInputModule.labelTextInput,
+                            description: TextInputModule.descriptionTextInput,
                         }}
+                        className="
+							mt-4
+						"
                         onChange={(event) => {
-
-                            // Limpa o animeDatabase para não mostrar resultados antigos
                             setAnimeDatabase(null);
-
-                            // Atualiza o estado do input com o nome que será buscado
                             setNameAnimeSearch(event.currentTarget.value);
-
                         }}
-                        onKeyDown={
-                            (event) => {
-                                if (event.key === 'Enter') {
-                                    searchAnime();
-                                }
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                                e.preventDefault();
+                                const v = (e.currentTarget.value || '').trim();
+                                setNameAnimeSearch(v);
+                                e.currentTarget.blur();
+                                if (v) searchAnime();
                             }
-                        }
+                        }}
+                        onBlur={(e) => {
+                            const v = (e.currentTarget.value || '').trim();
+                            if (v !== nameAnimerSearch) setNameAnimeSearch(v);
+                        }}
+                        onFocus={(e) => e.target.select()}
                     />
                 </Group>
 
@@ -331,7 +334,7 @@ const SearchScreen: React.FC = () => {
                                             uppercase
                                             tracking-(--title-letter-spacing)
                                         "
-                                        style={{ 
+                                        style={{
                                             fontFamily: 'var(--text-font-mono)',
                                             color: 'var(--colorTextWhite)'
                                         }}
@@ -347,7 +350,7 @@ const SearchScreen: React.FC = () => {
                 </div>
 
             </div>
-    
+
             {/* Drawer genérico: conteúdo passado via prop `content` */}
             <InfoDrawer
                 opened={openedCardInformation}
@@ -561,114 +564,114 @@ const SearchScreen: React.FC = () => {
                         </Carousel>
 
                         {animeSelectedCharacters && Array.isArray(animeSelectedCharacters.data) &&
-                         animeSelectedCharacters.data.some((character: any) => character.role === 'Main') && (
-                            <>
-                                <Divider
-                                    my="xl"
-                                    label={
-                                        <Text
-                                            component="span"
-                                            className="
+                            animeSelectedCharacters.data.some((character: any) => character.role === 'Main') && (
+                                <>
+                                    <Divider
+                                        my="xl"
+                                        label={
+                                            <Text
+                                                component="span"
+                                                className="
                                                 font-bold
                                                 uppercase
                                                 tracking-(--title-letter-spacing)
                                             "
-                                            style={{
-                                                fontSize: 16,
-                                                fontFamily: 'Raleway, sans-serif',
-                                                color: 'var(--colorTextWhite)',
-                                                marginRight: 6
-                                            }}
-                                        >
-                                            Personagens Principais
-                                        </Text>
-                                    }
-                                    labelPosition="center"
-                                />
-                                {Array.from(
-                                    { length: Math.ceil(animeSelectedCharacters.data.filter((character: any) => character.role === 'Main').length / 2) },
-                                    (_, rowIndex) => {
-                                        const mainCharacters = animeSelectedCharacters.data.filter((character: any) => character.role === 'Main');
-                                        const rowCharacters = mainCharacters.slice(rowIndex * 2, rowIndex * 2 + 2);
-                                        return (
-                                            <Grid key={rowIndex} gutter="md" mb="md">
-                                                {rowCharacters.map((character: any, colIndex: number) => (
-                                                    <Grid.Col span={6} key={colIndex}>
-                                                        <Group>
-                                                            <Image
-                                                                src={character.character.images.jpg.image_url}
-                                                                radius="md"
-                                                                h={120}
-                                                                w={80}
-                                                                alt={character.character.name}
-                                                            />
-                                                            <Text style={{ color: '#E8D4B7', fontWeight: 600 }}>
-                                                                {character.character.name}
-                                                            </Text>
-                                                        </Group>
-                                                    </Grid.Col>
-                                                ))}
-                                            </Grid>
-                                        );
-                                    }
-                                )}
-                            </>
-                        )}
+                                                style={{
+                                                    fontSize: 16,
+                                                    fontFamily: 'Raleway, sans-serif',
+                                                    color: 'var(--colorTextWhite)',
+                                                    marginRight: 6
+                                                }}
+                                            >
+                                                Personagens Principais
+                                            </Text>
+                                        }
+                                        labelPosition="center"
+                                    />
+                                    {Array.from(
+                                        { length: Math.ceil(animeSelectedCharacters.data.filter((character: any) => character.role === 'Main').length / 2) },
+                                        (_, rowIndex) => {
+                                            const mainCharacters = animeSelectedCharacters.data.filter((character: any) => character.role === 'Main');
+                                            const rowCharacters = mainCharacters.slice(rowIndex * 2, rowIndex * 2 + 2);
+                                            return (
+                                                <Grid key={rowIndex} gutter="md" mb="md">
+                                                    {rowCharacters.map((character: any, colIndex: number) => (
+                                                        <Grid.Col span={6} key={colIndex}>
+                                                            <Group>
+                                                                <Image
+                                                                    src={character.character.images.jpg.image_url}
+                                                                    radius="md"
+                                                                    h={120}
+                                                                    w={80}
+                                                                    alt={character.character.name}
+                                                                />
+                                                                <Text style={{ color: '#E8D4B7', fontWeight: 600 }}>
+                                                                    {character.character.name}
+                                                                </Text>
+                                                            </Group>
+                                                        </Grid.Col>
+                                                    ))}
+                                                </Grid>
+                                            );
+                                        }
+                                    )}
+                                </>
+                            )}
 
                         {animeSelectedCharacters && Array.isArray(animeSelectedCharacters.data) &&
-                         animeSelectedCharacters.data.some((character: any) => character.role !== 'Main') && (
-                            <>
-                                <Divider
-                                    my="xl"
-                                    label={
-                                        <Text
-                                            component="span"
-                                            className="
+                            animeSelectedCharacters.data.some((character: any) => character.role !== 'Main') && (
+                                <>
+                                    <Divider
+                                        my="xl"
+                                        label={
+                                            <Text
+                                                component="span"
+                                                className="
                                                 font-bold
                                                 uppercase
                                                 tracking-(--title-letter-spacing)
                                             "
-                                            style={{
-                                                fontSize: 16,
-                                                fontFamily: 'Raleway, sans-serif',
-                                                color: 'var(--colorTextWhite)',
-                                                marginRight: 6
-                                            }}
-                                        >
-                                            Outros Personagens
-                                        </Text>
-                                    }
-                                    labelPosition="center"
-                                />
-                                {Array.from(
-                                    { length: Math.ceil(animeSelectedCharacters.data.filter((character: any) => character.role !== 'Main').length / 2) },
-                                    (_, rowIndex) => {
-                                        const otherCharacters = animeSelectedCharacters.data.filter((character: any) => character.role !== 'Main');
-                                        const rowCharacters = otherCharacters.slice(rowIndex * 2, rowIndex * 2 + 2);
-                                        return (
-                                            <Grid key={rowIndex} gutter="md" mb="md">
-                                                {rowCharacters.map((character: any, colIndex: number) => (
-                                                    <Grid.Col span={6} key={colIndex}>
-                                                        <Group>
-                                                            <Image
-                                                                src={character.character.images.jpg.image_url}
-                                                                radius="md"
-                                                                h={120}
-                                                                w={80}
-                                                                alt={character.character.name}
-                                                            />
-                                                            <Text style={{ color: 'var(--colorTextWhite)', fontWeight: 600 }}>
-                                                                {character.character.name}
-                                                            </Text>
-                                                        </Group>
-                                                    </Grid.Col>
-                                                ))}
-                                            </Grid>
-                                        );
-                                    }
-                                )}
-                            </>
-                        )}
+                                                style={{
+                                                    fontSize: 16,
+                                                    fontFamily: 'Raleway, sans-serif',
+                                                    color: 'var(--colorTextWhite)',
+                                                    marginRight: 6
+                                                }}
+                                            >
+                                                Outros Personagens
+                                            </Text>
+                                        }
+                                        labelPosition="center"
+                                    />
+                                    {Array.from(
+                                        { length: Math.ceil(animeSelectedCharacters.data.filter((character: any) => character.role !== 'Main').length / 2) },
+                                        (_, rowIndex) => {
+                                            const otherCharacters = animeSelectedCharacters.data.filter((character: any) => character.role !== 'Main');
+                                            const rowCharacters = otherCharacters.slice(rowIndex * 2, rowIndex * 2 + 2);
+                                            return (
+                                                <Grid key={rowIndex} gutter="md" mb="md">
+                                                    {rowCharacters.map((character: any, colIndex: number) => (
+                                                        <Grid.Col span={6} key={colIndex}>
+                                                            <Group>
+                                                                <Image
+                                                                    src={character.character.images.jpg.image_url}
+                                                                    radius="md"
+                                                                    h={120}
+                                                                    w={80}
+                                                                    alt={character.character.name}
+                                                                />
+                                                                <Text style={{ color: 'var(--colorTextWhite)', fontWeight: 600 }}>
+                                                                    {character.character.name}
+                                                                </Text>
+                                                            </Group>
+                                                        </Grid.Col>
+                                                    ))}
+                                                </Grid>
+                                            );
+                                        }
+                                    )}
+                                </>
+                            )}
                     </>
                 )}
             />

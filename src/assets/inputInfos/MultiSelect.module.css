@@ -1,0 +1,66 @@
+.inputMultiSelect {
+  font-family: 'Raleway', sans-serif;
+  background-color: transparent;
+  border: 1px solid var(--color1-shadow);
+  transition: 0.3s;
+  color: var(--color1);
+  letter-spacing: var(--text-letter-spacing);
+}
+
+.inputMultiSelect:focus {
+  border: 1px solid var(--color1);
+  outline: none;
+  transition: 0.3s;
+}
+
+.labelMultiSelect {
+  color: var(--colorTextWhite);
+  font-size: 1rem;
+  font-family: var(--text-font-body);
+  letter-spacing: var(--text-letter-spacing);
+}
+
+.descriptionMultiSelect {
+  color: var(--colorTextWhite);
+  font-size: 0.8rem;
+  margin-top: 5px;
+  font-family: var(--text-font-body);
+  letter-spacing: var(--text-letter-spacing);
+}
+
+.dropdownMultiSelect {
+  background-color: rgba(0,0,0,0.7);
+  border: 1px solid var(--color1-shadow);
+  backdrop-filter: blur(4px);
+}
+
+.optionMultiSelect {
+  color: var(--colorTextWhite);
+  border-radius: 8px;
+  transition: background-color 140ms ease, color 140ms ease;
+}
+
+.optionMultiSelect:hover,
+.optionMultiSelect[data-hovered],
+.optionMultiSelect[data-combobox-hovered] {
+  background-color: color-mix(in oklab, var(--accent) 12%, transparent);
+}
+
+.optionMultiSelect[aria-selected="true"],
+.optionMultiSelect[data-selected],
+.optionMultiSelect[data-combobox-selected] {
+  background-color: color-mix(in oklab, var(--accent) 22%, transparent);
+  color: var(--color1);
+}
+
+.pillMultiSelect {
+  background-color: color-mix(in oklab, var(--accent) 18%, transparent);
+  border: 1px solid var(--panel-border);
+  color: var(--color1);
+  /* tamanho levemente menor, sem forçar altura fixa */
+  padding: 2px 8px;
+  font-size: 0.9em;
+  line-height: 1.1;
+}
+
+.pillsListMultiSelect { gap: 6px; }

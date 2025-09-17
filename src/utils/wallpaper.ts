@@ -3,7 +3,7 @@
 // IMPORTANT: import.meta.glob precisa de padrões estáticos (sem variáveis dinâmicas).
 // Por isso, declaramos explicitamente cada pasta suportada e selecionamos via "key".
 
-type WallpaperKey = 'search' | 'dev' | 'selection' | 'manga' | 'intro' | 'characters';
+type WallpaperKey = 'search' | 'dev' | 'selection' | 'manga' | 'intro' | 'characters' | 'topAnimes' | 'seasons';
 
 // Coleção: Search Screen
 const SEARCH_MODULES = import.meta.glob(
@@ -41,6 +41,18 @@ const CHARACTERS_MODULES = import.meta.glob(
   { eager: true, import: 'default' }
 );
 
+// Coleção: Top Animes Screen
+const TOP_ANIMES_MODULES = import.meta.glob(
+  '../assets/images/wallpaperTopAnimesScreen/*.{png,jpg,jpeg,webp,avif}',
+  { eager: true, import: 'default' }
+);
+
+// Coleção: Explore Seasons Screen
+const SEASONS_SCREEN_MODULES = import.meta.glob(
+  '../assets/images/wallpaperExploreSeasons/*.{png,jpg,jpeg,webp,avif}',
+  { eager: true, import: 'default' }
+);
+
 const COLLECTIONS: Record<WallpaperKey, string[]> = {
   search: Object.values(SEARCH_MODULES) as string[],
   dev: Object.values(DEV_MODULES) as string[],
@@ -48,6 +60,8 @@ const COLLECTIONS: Record<WallpaperKey, string[]> = {
   manga: Object.values(MANGA_MODULES) as string[],
   intro: Object.values(INTRO_MODULES) as string[],
   characters: Object.values(CHARACTERS_MODULES) as string[],
+  topAnimes: Object.values(TOP_ANIMES_MODULES) as string[],
+  seasons: Object.values(SEASONS_SCREEN_MODULES) as string[],
 };
 
 export function getAllWallpapers(key: WallpaperKey = 'search'): string[] {

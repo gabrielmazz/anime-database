@@ -1,0 +1,48 @@
+.inputNumberInput {
+	font-family: 'Raleway', sans-serif;
+	background-color: transparent;
+	border: 1px solid var(--color1-shadow);
+	transition: 0.3s;
+	color: var(--color1);
+	letter-spacing: var(--text-letter-spacing);
+	font-family: var(--text-font-body);
+}
+
+.inputNumberInput:focus {
+	border: 1px solid var(--color1);
+	outline: none;
+	transition: 0.3s;
+}
+
+.inputNumberInput::placeholder {
+	color: var(--color1-shadow);
+}
+
+/* Controles do NumberInput */
+.controlsNumberInput {
+	color: var(--color1);
+}
+
+.controlNumberInput {
+	color: var(--color1);
+}
+
+.controlNumberInput:hover {
+	color: var(--color1);
+}
+
+.labelNumberInput {
+	color: var(--colorTextWhite);
+	font-size: 1.2rem;
+	font-family: var(--text-font-body);
+	letter-spacing: var(--text-letter-spacing);
+	pointer-events: none;
+}
+
+.descriptionNumberInput {
+	color: var(--colorTextWhite);
+	font-size: 0.8rem;
+	font-family: var(--text-font-body);
+	letter-spacing: var(--text-letter-spacing);
+	margin-top: 4px;
+}

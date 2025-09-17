@@ -1,0 +1,60 @@
+.inputSelect {
+  font-family: 'Raleway', sans-serif;
+  background-color: transparent;
+  border: 1px solid var(--color1-shadow);
+  transition: 0.3s;
+  color: var(--color1);
+  letter-spacing: var(--text-letter-spacing);
+}
+
+.inputSelect:focus {
+  border: 1px solid var(--color1);
+  outline: none;
+  transition: 0.3s;
+}
+
+.labelSelect {
+  color: var(--colorTextWhite);
+  font-size: 1rem;
+  font-family: var(--text-font-body);
+  letter-spacing: var(--text-letter-spacing);
+}
+
+.descriptionSelect {
+  color: var(--colorTextWhite);
+  font-size: 0.8rem;
+  margin-top: 5px;
+  font-family: var(--text-font-body);
+  letter-spacing: var(--text-letter-spacing);
+}
+
+.dropdownSelect {
+  background-color: rgba(0,0,0,0.7);
+  border: 1px solid var(--color1-shadow);
+  backdrop-filter: blur(4px);
+}
+
+.optionSelect {
+  color: var(--colorTextWhite);
+  border-radius: 8px;
+  transition: background-color 140ms ease, color 140ms ease;
+}
+
+.optionSelect:hover,
+.optionSelect[data-hovered],
+.optionSelect[data-combobox-hovered] {
+  /* hover sutil que não contrasta demais com o fundo */
+  background-color: color-mix(in oklab, var(--accent) 12%, transparent);
+}
+
+/* estado selecionado dentro da lista (sem branco chapado) */
+.optionSelect[aria-selected="true"],
+.optionSelect[data-selected],
+.optionSelect[data-combobox-selected] {
+  background-color: color-mix(in oklab, var(--accent) 22%, transparent);
+  color: var(--color1);
+}
+
+.wrapperSelect {
+  margin-top: 8px;
+}

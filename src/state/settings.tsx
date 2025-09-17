@@ -5,6 +5,10 @@ type Settings = {
   setApiModalEnabled: (v: boolean) => void;
   devModeEnabled: boolean;
   setDevModeEnabled: (v: boolean) => void;
+  animesPageLimit: number;
+  setAnimesPageLimit: (n: number) => void;
+  charactersPageLimit: number;
+  setCharactersPageLimit: (n: number) => void;
   lastApiPayload: any | null;
   setLastApiPayload: (p: any | null) => void;
   lastSearchPayload: any | null;
@@ -33,6 +37,10 @@ function loadInitial(): Settings {
                 setApiModalEnabled: () => {},
                 devModeEnabled: Boolean(parsed.devModeEnabled),
                 setDevModeEnabled: () => {},
+                animesPageLimit: Number(parsed.animesPageLimit ?? 25) || 25,
+                setAnimesPageLimit: () => {},
+                charactersPageLimit: Number(parsed.charactersPageLimit ?? 25) || 25,
+                setCharactersPageLimit: () => {},
                 lastApiPayload: null,
                 setLastApiPayload: () => {},
                 lastSearchPayload: null,
@@ -53,6 +61,10 @@ function loadInitial(): Settings {
 		setApiModalEnabled: () => {},
 		devModeEnabled: false,
 		setDevModeEnabled: () => {},
+    animesPageLimit: 25,
+    setAnimesPageLimit: () => {},
+    charactersPageLimit: 25,
+    setCharactersPageLimit: () => {},
     lastApiPayload: null,
     setLastApiPayload: () => {},
     lastSearchPayload: null,
@@ -69,9 +81,11 @@ function loadInitial(): Settings {
 }
 
 export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-	const initial = loadInitial();
+    const initial = loadInitial();
   const [apiModalEnabled, setApiModalEnabled] = useState<boolean>(initial.apiModalEnabled);
   const [devModeEnabled, setDevModeEnabled] = useState<boolean>(initial.devModeEnabled);
+  const [animesPageLimit, setAnimesPageLimit] = useState<number>(initial.animesPageLimit);
+  const [charactersPageLimit, setCharactersPageLimit] = useState<number>(initial.charactersPageLimit);
   const [lastApiPayload, setLastApiPayload] = useState<any | null>(null);
   const [lastSearchPayload, setLastSearchPayload] = useState<any | null>(null);
   const [lastPicturesPayload, setLastPicturesPayload] = useState<any | null>(null);
@@ -80,13 +94,13 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [lastCharactersSearchPayload, setLastCharactersSearchPayload] = useState<any | null>(null);
 
 	useEffect(() => {
-		try {
-			localStorage.setItem(
-				STORAGE_KEY,
-				JSON.stringify({ apiModalEnabled, devModeEnabled })
-			);
-		} catch { }
-	}, [apiModalEnabled, devModeEnabled]);
+        try {
+            localStorage.setItem(
+                STORAGE_KEY,
+                JSON.stringify({ apiModalEnabled, devModeEnabled, animesPageLimit, charactersPageLimit })
+            );
+        } catch { }
+    }, [apiModalEnabled, devModeEnabled, animesPageLimit, charactersPageLimit]);
 
   const value = useMemo<Settings>(
     () => ({
@@ -94,6 +108,10 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       setApiModalEnabled,
       devModeEnabled,
       setDevModeEnabled,
+      animesPageLimit,
+      setAnimesPageLimit,
+      charactersPageLimit,
+      setCharactersPageLimit,
       lastApiPayload,
       setLastApiPayload,
       lastSearchPayload,
@@ -110,6 +128,8 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     [
       apiModalEnabled,
       devModeEnabled,
+      animesPageLimit,
+      charactersPageLimit,
       lastApiPayload,
       lastSearchPayload,
       lastPicturesPayload,
