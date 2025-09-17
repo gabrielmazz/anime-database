@@ -149,25 +149,46 @@ const SearchScreenManga: React.FC = () => {
 			<AlertBox visible={alertVisible} message={alertMessage} type={alertType} />
 			<Sidebar />
 
-			<div className="relative z-10 w-full min-h-screen max-w-7xl mx-auto align-top">
+			<div className="relative z-10 w-full min-h-screen max-w-[92vw] 2xl:max-w-[1900px] mx-auto align-top px-4 sm:px-6 lg:px-12">
 				<Title
 					className="flex justify-center pt-8 text-shadow-lg/20 text-(--color1) uppercase tracking-(--title-letter-spacing)"
-					style={{ fontSize: 42, fontFamily: 'var(--text-font-mono)' }}
+					style={{ fontFamily: 'var(--text-font-mono)' }}
 				>
 					AniDex - Pesquise seu mangá
 				</Title>
 
-				<Space h="md" />
+				<Space h={33} />
 
-				<Group grow className="px-12">
+				<Group grow>
 					<TextInput
 						value={query}
-						radius="lg"
-						placeholder="Digite o nome do mangá"
 						size="md"
-						classNames={{ input: TextInputModule.inputTextInput }}
+						label="Buscar mangá"
+						description="Digite o nome do mangá para buscar"
+						placeholder="Ex.: Berserk, Vagabond, OP..."
+						classNames={{
+							input: TextInputModule.inputTextInput,
+							label: TextInputModule.labelTextInput,
+							description: TextInputModule.descriptionTextInput,
+						}}
+						className="
+							mt-4
+						"
 						onChange={(e) => { setMangaDatabase(null); setQuery(e.currentTarget.value); }}
-						onKeyDown={(e) => { if (e.key === 'Enter') searchManga(); }}
+						onKeyDown={(e) => {
+							if (e.key === 'Enter') {
+								e.preventDefault();
+								const v = (e.currentTarget.value || '').trim();
+								setQuery(v);
+								e.currentTarget.blur();
+								if (v) searchManga();
+							}
+						}}
+						onBlur={(e) => {
+							const v = (e.currentTarget.value || '').trim();
+							if (v !== query) setQuery(v);
+						}}
+						onFocus={(e) => e.target.select()}
 					/>
 				</Group>
 

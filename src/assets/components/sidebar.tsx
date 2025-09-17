@@ -17,12 +17,12 @@ import { Tooltip } from '@mantine/core';
 import TooltipModule from '../inputInfos/Tooltip.module.css';
 
 // Importação dos icones do React-icons
-import { FaGithub } from "react-icons/fa";
+import { FaGithub, FaCalendarAlt } from "react-icons/fa";
 import { FaInfo } from "react-icons/fa6";
 import { FaHome } from "react-icons/fa";
 import { IoSearch } from "react-icons/io5";
 import { GrConfigure } from "react-icons/gr";
-import { FaTv } from "react-icons/fa";
+import { FaTv, FaTrophy } from "react-icons/fa";
 import { MdMenuBook } from "react-icons/md";
 import { FaCubes } from "react-icons/fa";
 
@@ -52,7 +52,9 @@ const Sidebar: React.FC = () => {
         { key: 'home', label: 'Inicio', icon: <FaHome />, link: '/selectionScreen' },
         { key: 'search', label: 'Buscar Anime', icon: <FaTv />, link: '/searchScreen' },
         { key: 'searchManga', label: 'Buscar Manga', icon: <MdMenuBook />, link: '/searchScreenManga' },
+        { key: 'seasons', label: 'Explorar Temporadas', icon: <FaCalendarAlt />, link: '/seasonScreen' },
         { key: 'searchCharacters', label: 'Buscar Personagem', icon: <IoSearch />, link: '/searchScreenCharacters' },
+        { key: 'topAnimes', label: 'Top Animes', icon: <FaTrophy />, link: '/topAnimesScreen' },
         { key: 'debug', label: 'Debug', icon: <GrConfigure />, link: '/devConfigurationsScreen' },
     ]), []);
 

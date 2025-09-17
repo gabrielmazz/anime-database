@@ -1,12 +1,16 @@
+.rootSwitch:focus-within {
+    border-color: var(--color1);
+    outline: none;
+}
+
 .labelWrapperSwitch {
     color: var(--colorTextWhite);
-    font-size: 1.2rem;
     font-family: var(--text-font-body);
     letter-spacing: var(--text-letter-spacing);
     display: flex;
     flex-direction: column;
     justify-content: center;
-    pointer-events: none;
+    order: 1;
 }
 
 .descriptionSwitch {
@@ -22,46 +26,38 @@
 }
 
 .trackSwitch {
-    /* Base moderno: mais "quadrado" e consistente com os painéis */
     --h: 30px;
-    /* altura do switch */
     --r: 5px;
-    /* raio mais discreto, look quadradinho */
     --pad: 3px;
-    /* espaço interno para o thumb */
     --bw: 1px;
-    /* espessura da borda */
 
-    position: relative;
     height: var(--h);
     min-width: calc(var(--h) * 1.9);
-    background-color: var(--panel-bg);
-    border: var(--bw) solid var(--panel-border);
+    background-color: transparent;
+    border: var(--bw) solid var(--color1-shadow);
     border-radius: var(--r);
-    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.03);
-    transition: background-color 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+    transition: background-color 160ms ease, border-color 160ms ease;
 
     input:checked+& {
-    background-color: var(--accent);
-    border-color: var(--accent);
+        background-color: var(--accent);
+        border-color: var(--accent);
 
-    &>.thumb {
-        background-color: var(--color1);
-
-        &::before {
+        &>.thumb {
             background-color: var(--color1);
+
+            &::before {
+                background-color: var(--color1);
+            }
         }
     }
 }
-}
 
 .trackSwitch:hover {
-    border-color: var(--accent);
+    border-color: var(--color1);
 }
 
-.trackSwitch[data-checked="true"] {
-    background: linear-gradient(180deg, color-mix(in oklab, var(--accent) 85%, #0000) 0%,
-            color-mix(in oklab, var(--accent) 70%, #0000) 100%);
+.trackSwitchField[data-checked="true"] {
+    background-color: color-mix(in oklab, var(--accent) 35%, transparent);
     border-color: var(--accent);
 }
 
@@ -72,8 +68,8 @@
     margin: var(--pad);
     background: var(--color1);
     border-radius: 8px;
+    /* mesmo raio do outro switch */
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35), inset 0 0 0 1px var(--panel-border);
-    transition: transform 180ms ease, background-color 180ms ease, box-shadow 180ms ease;
 }
 
 /* Quando ligado, o thumb acompanha o track; o Mantine aplica transform automaticamente.
@@ -110,10 +106,54 @@
     letter-spacing: 0.06em;
 }
 
-/* Estado desabilitado */
-.trackSwitch[data-disabled="true"] {
-    opacity: 0.6;
-    filter: grayscale(0.3);
+/* Estado desabilitado (robusto: aplica via root e via track) */
+.rootSwitch[data-disabled],
+.trackSwitch[data-disabled] {
+    cursor: not-allowed;
+}
+
+.rootSwitch[data-disabled] .trackSwitch,
+.trackSwitch[data-disabled] {
+    background-color: color-mix(in srgb, var(--panel-bg) 65%, #9aa0a6 35%);
+    border-color: color-mix(in srgb, var(--panel-border) 50%, #9aa0a6 50%);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+    filter: grayscale(0.5);
+    opacity: 1;
+}
+
+/* Fallback: quando somente o input recebe disabled */
+.rootSwitch input[disabled]~.trackSwitch,
+.rootSwitch input[disabled]~* .trackSwitch {
+    background-color: color-mix(in srgb, var(--panel-bg) 65%, #9aa0a6 35%);
+    border-color: color-mix(in srgb, var(--panel-border) 50%, #9aa0a6 50%);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+    filter: grayscale(0.5);
+}
+
+.rootSwitch[data-disabled] .thumbSwitch,
+.trackSwitch[data-disabled] .thumbSwitch {
+    background: color-mix(in srgb, var(--colorTextWhite) 35%, #9aa0a6 65%);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--panel-border) 50%, #9aa0a6 50%);
+}
+
+.rootSwitch[data-disabled] .trackSwitch:hover {
+    border-color: color-mix(in srgb, var(--panel-border) 80%, #9aa0a6 20%);
+}
+
+.rootSwitch[data-disabled] .labelWrapperSwitch,
+.rootSwitch[data-disabled] .descriptionSwitch {
+    color: color-mix(in srgb, var(--colorTextWhite) 35%, #9aa0a6 65%);
+}
+
+.rootSwitch input[disabled]~.labelWrapperSwitch,
+.rootSwitch input[disabled]~* .labelWrapperSwitch,
+.rootSwitch input[disabled]~.descriptionSwitch,
+.rootSwitch input[disabled]~* .descriptionSwitch {
+    color: color-mix(in srgb, var(--colorTextWhite) 35%, #9aa0a6 65%);
+}
+
+.rootSwitch[data-disabled] .trackSwitch span {
+    color: color-mix(in srgb, var(--color1) 35%, #9aa0a6 65%);
 }
 
 /* Foco (quando o input dentro do root recebe focus) */

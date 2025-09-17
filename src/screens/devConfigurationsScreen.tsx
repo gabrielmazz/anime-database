@@ -8,6 +8,8 @@ import { Text } from '@mantine/core';
 import { Title } from '@mantine/core';
 import { Container } from '@mantine/core';
 import { Group } from '@mantine/core';
+import { NumberInput } from '@mantine/core';
+import NumberInputModule from '../assets/inputInfos/NumberInput.module.css';
 
 // Componentes de input
 import { Switch } from '@mantine/core';
@@ -25,7 +27,7 @@ import { getRandomWallpaper } from '../utils/wallpaper';
 
 const DevConfigurationsScreen: React.FC = () => {
     const [wallpaper, setWallpaper] = useState<string>(() => getRandomWallpaper('dev'));
-    const { apiModalEnabled, setApiModalEnabled, devModeEnabled, setDevModeEnabled } = useSettings();
+    const { apiModalEnabled, setApiModalEnabled, devModeEnabled, setDevModeEnabled, animesPageLimit, setAnimesPageLimit, charactersPageLimit, setCharactersPageLimit } = useSettings();
 
     // Extrai paleta baseada no wallpaper e aplica nas CSS variables
     useEffect(() => {
@@ -82,6 +84,25 @@ const DevConfigurationsScreen: React.FC = () => {
                 >
                     <Text style={{ color: 'var(--colorTextWhite)' }}>
 
+                        <Title
+                            className="
+                                flex justify-center pt-8
+                                text-shadow-lg/20 text-(--color1)
+                                uppercase tracking-(--title-letter-spacing)
+                                text-[clamp(24px,4vw,42px)]
+                            "
+                            style={
+                                {
+                                    fontFamily: 'var(--text-font-mono)',
+                                    fontSize: '22px',
+                                }
+                            }
+                        >
+                            Configurações para o botão de Dev Mode
+                        </Title>
+
+                        <Space h="md" />
+
                         <Group grow>
 
                             {/* Switch para ativar o Dev Mode (mostra o menu/botão de debug) */}
@@ -108,6 +129,7 @@ const DevConfigurationsScreen: React.FC = () => {
                                 onLabel="ON"
                                 offLabel="OFF"
                                 label="Capturar retorno das APIs"
+                                disabled={!devModeEnabled}
                                 description="Salva o último retorno de API para inspeção no Drawer de debug."
                                 checked={apiModalEnabled}
                                 onChange={(e) => setApiModalEnabled(e.currentTarget.checked)}
@@ -118,6 +140,107 @@ const DevConfigurationsScreen: React.FC = () => {
                                     description: SwitchModule.descriptionSwitch,
                                     track: SwitchModule.trackSwitch,
                                     thumb: SwitchModule.thumbSwitch,
+                                }}
+                            />
+
+
+
+                        </Group>
+
+                        <Space h="md" />
+
+                        <Title
+                            className="
+                                flex justify-center pt-8
+                                text-shadow-lg/20 text-(--color1)
+                                uppercase tracking-(--title-letter-spacing)
+                                text-[clamp(24px,4vw,42px)]
+                            "
+                            style={
+                                {
+                                    fontFamily: 'var(--text-font-mono)',
+                                    fontSize: '22px',
+                                }
+                            }
+                        >
+                            Configurações da tela de busca de personagens
+                        </Title>
+
+                        <Space h="md" />
+
+                        <Group grow>
+
+                            <NumberInput
+                                size="xl"
+                                label="Quantidade de personagens por página"
+                                description="Define quantos personagens retornar por requisição na API do Jikan, por limite da própria API, o limite é 25."
+                                min={1}
+                                max={25}
+                                step={1}
+                                clampBehavior="strict"
+                                allowDecimal={false}
+                                value={charactersPageLimit}
+                                onChange={(v) => {
+                                    const n = typeof v === 'number' ? v : parseInt(String(v || 0), 10);
+                                    const safe = isNaN(n) ? 25 : Math.min(1000, Math.max(1, n));
+                                    setCharactersPageLimit(safe);
+                                }}
+                                classNames={{
+                                    input: NumberInputModule.inputNumberInput,
+                                    controls: NumberInputModule.controlsNumberInput,
+                                    control: NumberInputModule.controlNumberInput,
+                                    label: NumberInputModule.labelNumberInput,
+                                    description: NumberInputModule.descriptionNumberInput,
+                                }}
+                            />
+
+
+                        </Group>
+
+                        <Space h="md" />
+
+                        <Title
+                            className="
+                                flex justify-center pt-8
+                                text-shadow-lg/20 text-(--color1)
+                                uppercase tracking-(--title-letter-spacing)
+                                text-[clamp(24px,4vw,42px)]
+                            "
+                            style={
+                                {
+                                    fontFamily: 'var(--text-font-mono)',
+                                    fontSize: '22px',
+                                }
+                            }
+                        >
+                            Configurações da tela Top Animes
+                        </Title>
+
+                        <Space h="md" />
+
+                        <Group grow>
+
+                            <NumberInput
+                                size="xl"
+                                label="Quantidade de animes por página"
+                                description="Define quantos animes retornar por requisição na API do Jikan, por limite da própria API, o limite é 25."
+                                min={1}
+                                max={25}
+                                step={1}
+                                clampBehavior="strict"
+                                allowDecimal={false}
+                                value={animesPageLimit}
+                                onChange={(v) => {
+                                    const n = typeof v === 'number' ? v : parseInt(String(v || 0), 10);
+                                    const safe = isNaN(n) ? 25 : Math.min(25, Math.max(1, n));
+                                    setAnimesPageLimit(safe);
+                                }}
+                                classNames={{
+                                    input: NumberInputModule.inputNumberInput,
+                                    controls: NumberInputModule.controlsNumberInput,
+                                    control: NumberInputModule.controlNumberInput,
+                                    label: NumberInputModule.labelNumberInput,
+                                    description: NumberInputModule.descriptionNumberInput,
                                 }}
                             />
 

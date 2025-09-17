@@ -8,6 +8,9 @@ import DrawerModule from '../assets/inputInfos/Drawer.module.css';
 import LoaderBox from '../assets/components/loaderBox.tsx';
 import AlertBox from '../assets/components/alert.tsx';
 
+import TextInputModule from './../assets/inputInfos/TextInput.module.css';
+import SelectModule from '../assets/inputInfos/Select.module.css';
+
 // Componentes compartilhados
 import Sidebar from '../assets/components/sidebar.tsx';
 import LoadingOverlayFullscreen from '../assets/components/overlay.tsx';
@@ -33,11 +36,11 @@ const SearchScreenCharacters: React.FC = () => {
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const [query, setQuery] = useState<string>('');
 	const [rows, setRows] = useState<Character[]>([]);
-	const { apiModalEnabled, setLastApiPayload, setLastTopCharactersPayload, setLastCharactersSearchPayload } = useSettings();
-    const [mode, setMode] = useState<'top' | 'search'>('top');
-    const [page, setPage] = useState<number>(1);
-    const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
-    const [hasMore, setHasMore] = useState<boolean>(true);
+	const { apiModalEnabled, setLastApiPayload, setLastTopCharactersPayload, setLastCharactersSearchPayload, charactersPageLimit } = useSettings();
+	const [mode, setMode] = useState<'top' | 'search'>('top');
+	const [page, setPage] = useState<number>(1);
+	const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
+	const [hasMore, setHasMore] = useState<boolean>(true);
 	const scrollRef = useRef<HTMLDivElement | null>(null);
 	const sentinelRef = useRef<HTMLDivElement | null>(null);
 	const [openedCharacterInfo, setOpenedCharacterInfo] = useState<boolean>(false);
@@ -63,17 +66,17 @@ const SearchScreenCharacters: React.FC = () => {
 		const run = async () => {
 			setIsLoading(true);
 			try {
-				const r = await getTopCharacters(1);
+				const r = await getTopCharacters(1, charactersPageLimit);
 				if (apiModalEnabled) {
-					const payload = { endpoint: 'getTopCharacters', page: 1, response: r };
+					const payload = { endpoint: 'getTopCharacters', page: 1, limit: charactersPageLimit, response: r };
 					setLastApiPayload(payload);
 					setLastTopCharactersPayload(payload);
 				}
 				if (!cancelled) {
 					setRows(r.data ?? []);
-                    setMode('top');
-                    setPage(1);
-                    setHasMore(((r as any)?.data?.length ?? 0) >= 25);
+					setMode('top');
+					setPage(1);
+					setHasMore(((r as any)?.data?.length ?? 0) >= charactersPageLimit);
 				}
 				setAlertType('success');
 				setAlertMessage(`Top carregado (${(r as any)?.data?.length ?? 0} personagens)`);
@@ -84,7 +87,7 @@ const SearchScreenCharacters: React.FC = () => {
 		};
 		run();
 		return () => { cancelled = true; };
-	}, []);
+	}, [charactersPageLimit]);
 
 	// Busca por nome quando houver texto (com pequeno debounce), cai para Top quando vazio
 	useEffect(() => {
@@ -95,17 +98,17 @@ const SearchScreenCharacters: React.FC = () => {
 				// Volta para o Top
 				setIsLoading(true);
 				try {
-					const r = await getTopCharacters(1);
+					const r = await getTopCharacters(1, charactersPageLimit);
 					if (apiModalEnabled) {
-						const payload = { endpoint: 'getTopCharacters', page: 1, response: r };
+						const payload = { endpoint: 'getTopCharacters', page: 1, limit: charactersPageLimit, response: r };
 						setLastApiPayload(payload);
 						setLastTopCharactersPayload(payload);
 					}
 					if (!cancelled) {
 						setRows(r.data ?? []);
-                        setMode('top');
-                        setPage(1);
-                        setHasMore(((r as any)?.data?.length ?? 0) >= 25);
+						setMode('top');
+						setPage(1);
+						setHasMore(((r as any)?.data?.length ?? 0) >= charactersPageLimit);
 					}
 					setAlertType('success');
 					setAlertMessage(`Top carregado (${(r as any)?.data?.length ?? 0} personagens)`);
@@ -118,18 +121,18 @@ const SearchScreenCharacters: React.FC = () => {
 
 			setIsLoading(true);
 			try {
-				const r = await searchCharactersByName(query.trim(), 1);
+				const r = await searchCharactersByName(query.trim(), 1, charactersPageLimit);
 				const sorted = (r.data ?? []).slice().sort((a, b) => (b.favorites ?? 0) - (a.favorites ?? 0));
 				if (apiModalEnabled) {
-					const payload = { endpoint: 'searchCharactersByName', page: 1, query: query.trim(), response: r, responseSorted: sorted };
+					const payload = { endpoint: 'searchCharactersByName', page: 1, limit: charactersPageLimit, query: query.trim(), response: r, responseSorted: sorted };
 					setLastApiPayload(payload);
 					setLastCharactersSearchPayload(payload);
 				}
 				if (!cancelled) {
 					setRows(sorted);
-                    setMode('search');
-                    setPage(1);
-                    setHasMore(sorted.length >= 25);
+					setMode('search');
+					setPage(1);
+					setHasMore(sorted.length >= charactersPageLimit);
 				}
 				setAlertType('success');
 				setAlertMessage(`Busca carregada (${sorted.length} personagens)`);
@@ -139,7 +142,7 @@ const SearchScreenCharacters: React.FC = () => {
 			}
 		}, 400);
 		return () => { cancelled = true; window.clearTimeout(handler); };
-	}, [query]);
+	}, [query, charactersPageLimit]);
 
 	// Auto esconde o alerta após alguns segundos
 	useEffect(() => {
@@ -154,58 +157,58 @@ const SearchScreenCharacters: React.FC = () => {
 		const root = scrollRef.current;
 		const sentinel = sentinelRef.current;
 
-    const observer = new IntersectionObserver((entries) => {
-      const entry = entries[0];
-      if (!entry?.isIntersecting) return;
-      if (isLoadingMore || !hasMore) return;
+		const observer = new IntersectionObserver((entries) => {
+			const entry = entries[0];
+			if (!entry?.isIntersecting) return;
+			if (isLoadingMore || !hasMore) return;
 
-      const nextPage = page + 1;
-      setIsLoadingMore(true);
-      const loadMore = async () => {
-        try {
-          if (mode === 'top') {
-            const r2 = await getTopCharacters(nextPage);
-            if (apiModalEnabled) {
-              const payload = { endpoint: 'getTopCharacters', page: nextPage, response: r2 };
-              setLastApiPayload(payload);
-              setLastTopCharactersPayload(payload);
-            }
-            const count = (r2 as any)?.data?.length ?? 0;
-            setRows((prev) => [...prev, ...(r2.data ?? [])]);
-            setAlertType('success');
-            setAlertMessage(`Mais ${count} personagens (Top) carregados — pág. ${nextPage}`);
-            setAlertVisible(true);
-            setPage(nextPage);
-            setHasMore(count >= 25);
-          } else {
-            const q = query.trim();
-            const r2 = await searchCharactersByName(q, nextPage);
-            const count = (r2 as any)?.data?.length ?? 0;
-            const merged = [...rows, ...(r2.data ?? [])];
-            const sorted = merged.slice().sort((a, b) => (b.favorites ?? 0) - (a.favorites ?? 0));
-            if (apiModalEnabled) {
-              const payload = { endpoint: 'searchCharactersByName', page: nextPage, query: q, response: r2, mergedCount: merged.length };
-              setLastApiPayload(payload);
-              setLastCharactersSearchPayload(payload);
-            }
-            setRows(sorted);
-            setAlertType('success');
-            setAlertMessage(`Mais ${count} personagens (Busca) carregados — pág. ${nextPage}`);
-            setAlertVisible(true);
-            setPage(nextPage);
-            setHasMore(count >= 25);
-          }
-        } catch { }
-        finally {
-          setIsLoadingMore(false);
-        }
-      };
-      loadMore();
-    }, { root, rootMargin: '0px 0px 200px 0px', threshold: 0.05 });
+			const nextPage = page + 1;
+			setIsLoadingMore(true);
+			const loadMore = async () => {
+				try {
+					if (mode === 'top') {
+						const r2 = await getTopCharacters(nextPage, charactersPageLimit);
+						if (apiModalEnabled) {
+							const payload = { endpoint: 'getTopCharacters', page: nextPage, limit: charactersPageLimit, response: r2 };
+							setLastApiPayload(payload);
+							setLastTopCharactersPayload(payload);
+						}
+						const count = (r2 as any)?.data?.length ?? 0;
+						setRows((prev) => [...prev, ...(r2.data ?? [])]);
+						setAlertType('success');
+						setAlertMessage(`Mais ${count} personagens (Top) carregados — pág. ${nextPage}`);
+						setAlertVisible(true);
+						setPage(nextPage);
+						setHasMore(count >= charactersPageLimit);
+					} else {
+						const q = query.trim();
+						const r2 = await searchCharactersByName(q, nextPage, charactersPageLimit);
+						const count = (r2 as any)?.data?.length ?? 0;
+						const merged = [...rows, ...(r2.data ?? [])];
+						const sorted = merged.slice().sort((a, b) => (b.favorites ?? 0) - (a.favorites ?? 0));
+						if (apiModalEnabled) {
+							const payload = { endpoint: 'searchCharactersByName', page: nextPage, limit: charactersPageLimit, query: q, response: r2, mergedCount: merged.length };
+							setLastApiPayload(payload);
+							setLastCharactersSearchPayload(payload);
+						}
+						setRows(sorted);
+						setAlertType('success');
+						setAlertMessage(`Mais ${count} personagens (Busca) carregados — pág. ${nextPage}`);
+						setAlertVisible(true);
+						setPage(nextPage);
+						setHasMore(count >= charactersPageLimit);
+					}
+				} catch { }
+				finally {
+					setIsLoadingMore(false);
+				}
+			};
+			loadMore();
+		}, { root, rootMargin: '0px 0px 200px 0px', threshold: 0.05 });
 
 		observer.observe(sentinel);
 		return () => observer.disconnect();
-  }, [mode, page, rows, query, apiModalEnabled, hasMore, isLoadingMore]);
+	}, [mode, page, rows, query, apiModalEnabled, hasMore, isLoadingMore, charactersPageLimit]);
 
 	const tableRows = useMemo(() => {
 		return rows.map((c, idx) => (
@@ -261,21 +264,57 @@ const SearchScreenCharacters: React.FC = () => {
 				<div
 					className="
 					relative z-10 w-full min-h-screen
-                    max-w-[92vw] 2xl:max-w-[1900px] mx-auto align-top
-                    px-4 sm:px-6 lg:px-12
+					max-w-[92vw] 2xl:max-w-[1900px] mx-auto align-top
+					px-4 sm:px-6 lg:px-12
 				"
 				>
 					<Title
 						className="
-						flex justify-center pt-6
-                        text-shadow-lg/20 text-(--color1)
-                        uppercase tracking-(--title-letter-spacing)
-                        text-[clamp(24px,4vw,42px)]
-					"
+							flex justify-center
+							pt-8
+							text-shadow-lg/20
+							text-(--color1)
+							uppercase
+							tracking-(--title-letter-spacing)
+						"
 						style={{ fontFamily: 'var(--text-font-mono)' }}
 					>
 						Personagens — Top e Busca
 					</Title>
+
+					<Space h={33} />
+
+					<Group grow>
+						<TextInput
+							size="md"
+							label="Buscar personagem"
+							description="Digite o nome do personagem para buscar"
+							placeholder="Ex.: Levi, Luffy, Naruto..."
+							value={query}
+							classNames={{
+								input: TextInputModule.inputTextInput,
+								label: TextInputModule.labelTextInput,
+								description: TextInputModule.descriptionTextInput,
+							}}
+							className="
+								mt-4
+							"
+							onChange={(e) => setQuery(e.currentTarget.value)}
+							onKeyDown={(e) => {
+								if (e.key === 'Enter') {
+									e.preventDefault();
+									const v = (e.currentTarget.value || '').trim();
+									setQuery(v);
+									e.currentTarget.blur();
+								}
+							}}
+							onBlur={(e) => {
+								const v = (e.currentTarget.value || '').trim();
+								if (v !== query) setQuery(v);
+							}}
+							onFocus={(e) => e.target.select()}
+						/>
+					</Group>
 
 					<Space h="md" />
 
@@ -285,25 +324,15 @@ const SearchScreenCharacters: React.FC = () => {
 						bg-black/40 rounded-lg backdrop-blur-sm border border-white/20 shadow-lg
                         w-full max-w-none mx-auto
                         p-4 sm:p-6 md:p-8
-                        mt-12 mb-0
-                        h-[80vh] overflow-hidden
+                        mt-6 mb-0
+                        h-[70vh] overflow-hidden
 					"
 					>
-						<TextInput
-							value={query}
-							radius="lg"
-							placeholder="Digite o nome do personagem (busca automática)"
-							size="md"
-							onChange={(e) => setQuery(e.currentTarget.value)}
-						/>
 
-						<Space h="md" />
-
-						<div ref={scrollRef} className="h-[calc(100%-84px)] overflow-auto rounded-md">
+						<div ref={scrollRef} className="h-[calc(100%-0px)] overflow-auto rounded-md">
 							<Table
 								highlightOnHover
 								classNames={{
-									root: TableModule.rootTable,
 									table: TableModule.tableTable,
 									thead: TableModule.theadTable,
 									th: TableModule.thTable,

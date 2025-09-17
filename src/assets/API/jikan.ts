@@ -1,17 +1,17 @@
 // Jikan API helpers centralizados
 
 export type Anime = {
-	mal_id: number;
-	title: string;
-	synopsis: string;
-	episodes: number;
-	status: string;
-	score: number;
-	images: {
-		jpg: {
-			image_url: string;
-		};
-	};
+    mal_id: number;
+    title: string;
+    synopsis: string;
+    episodes: number;
+    status: string;
+    score: number;
+    images: {
+        jpg: {
+            image_url: string;
+        };
+    };
 };
 
 export type AnimeApiSearchResponse = {
@@ -43,11 +43,99 @@ export type AnimeCharactersResponse = {
 };
 
 const BASE_URL = 'https://api.jikan.moe/v4';
+const MAX_JIKAN_LIMIT = 25; // Limite máximo aceito pela API
+
+// =============================
+// Genres
+// =============================
+export type Genre = {
+  mal_id: number;
+  name: string;
+  url?: string;
+  count?: number;
+  type?: 'genres' | 'explicit_genres' | 'themes' | 'demographics' | string;
+};
+
+export type GenresResponse = {
+  data: Genre[];
+};
+
+export async function getAnimeGenres(): Promise<GenresResponse> {
+  const response = await fetch(`${BASE_URL}/genres/anime`);
+  if (!response.ok) throw new Error('Falha ao buscar gêneros de anime');
+  return response.json();
+}
 
 export async function searchAnimeByName(name: string): Promise<AnimeApiSearchResponse> {
 	const response = await fetch(`${BASE_URL}/anime?q=${encodeURIComponent(name)}`);
 	if (!response.ok) throw new Error('Falha ao buscar animes');
 	return response.json();
+}
+
+// Top Animes endpoints
+export async function getTopAnime(page: number = 1, limit: number = 25): Promise<AnimeApiSearchResponse> {
+  // Se o limite for menor/igual ao máximo, requisição direta
+  if (limit <= MAX_JIKAN_LIMIT) {
+    const response = await fetch(`${BASE_URL}/top/anime?page=${page}&limit=${limit}`);
+    if (!response.ok) throw new Error('Falha ao buscar top animes');
+    return response.json();
+  }
+
+  // Acima do limite, agregamos resultados de múltiplas páginas
+  const unit = MAX_JIKAN_LIMIT;
+  const startIndex = (page - 1) * limit;
+  const endExclusive = page * limit;
+  const firstJikanPage = Math.floor(startIndex / unit) + 1;
+  const lastJikanPage = Math.ceil(endExclusive / unit);
+
+  const aggregated: Anime[] = [];
+  const sliceStart = startIndex - (firstJikanPage - 1) * unit;
+  for (let p = firstJikanPage; p <= lastJikanPage; p++) {
+    const resp = await fetch(`${BASE_URL}/top/anime?page=${p}&limit=${unit}`);
+    if (!resp.ok) throw new Error('Falha ao buscar top animes');
+    const json = (await resp.json()) as AnimeApiSearchResponse;
+    const items = Array.isArray(json?.data) ? json.data : [];
+    aggregated.push(...items);
+    if (aggregated.length >= sliceStart + limit) break;
+    if (items.length < unit) break;
+  }
+
+  const data = aggregated.slice(sliceStart, sliceStart + limit);
+  return { data };
+}
+
+// Listar animes por estação (temporada) e ano
+export type SeasonKey = 'winter' | 'spring' | 'summer' | 'fall';
+
+export async function getAnimeBySeason(year: number, season: SeasonKey, page: number = 1, limit: number = 25): Promise<AnimeApiSearchResponse> {
+  // Limite dentro do permitido -> requisição simples
+  if (limit <= MAX_JIKAN_LIMIT) {
+    const response = await fetch(`${BASE_URL}/seasons/${year}/${season}?page=${page}&limit=${limit}`);
+    if (!response.ok) throw new Error('Falha ao buscar animes da temporada');
+    return response.json();
+  }
+
+  // Limite acima do permitido -> buscar em múltiplas páginas e fatiar
+  const unit = MAX_JIKAN_LIMIT;
+  const startIndex = (page - 1) * limit;
+  const endExclusive = page * limit;
+  const firstJikanPage = Math.floor(startIndex / unit) + 1;
+  const lastJikanPage = Math.ceil(endExclusive / unit);
+
+  const aggregated: Anime[] = [];
+  const sliceStart = startIndex - (firstJikanPage - 1) * unit;
+  for (let p = firstJikanPage; p <= lastJikanPage; p++) {
+    const resp = await fetch(`${BASE_URL}/seasons/${year}/${season}?page=${p}&limit=${unit}`);
+    if (!resp.ok) throw new Error('Falha ao buscar animes da temporada');
+    const json = (await resp.json()) as AnimeApiSearchResponse;
+    const items = Array.isArray(json?.data) ? json.data : [];
+    aggregated.push(...items);
+    if (aggregated.length >= sliceStart + limit) break;
+    if (items.length < unit) break;
+  }
+
+  const data = aggregated.slice(sliceStart, sliceStart + limit);
+  return { data };
 }
 
 export async function getAnimePictures(id: number): Promise<AnimePicturesResponse> {
@@ -145,17 +233,72 @@ export type CharactersResponse = {
   data: Character[];
 };
 
-export async function getTopCharacters(page: number = 1): Promise<CharactersResponse> {
-  const response = await fetch(`${BASE_URL}/top/characters?page=${page}`);
-  if (!response.ok) throw new Error('Falha ao buscar personagens em destaque');
-  return response.json();
+export async function getTopCharacters(page: number = 1, limit: number = 25): Promise<CharactersResponse> {
+  // Se o limite solicitado couber no limite da API, faz requisição simples
+  if (limit <= MAX_JIKAN_LIMIT) {
+    const response = await fetch(`${BASE_URL}/top/characters?page=${page}&limit=${limit}`);
+    if (!response.ok) throw new Error('Falha ao buscar personagens em destaque');
+    return response.json();
+  }
+
+  // Quando o limite solicitado excede o permitido pela API, buscamos em páginas
+  // múltiplas (de 25 em 25) e fatiamos o resultado para retornar exatamente
+  // a quantidade pedida, respeitando a paginação "externa" (page, limit)
+  const unit = MAX_JIKAN_LIMIT;
+  const startIndex = (page - 1) * limit; // índice inicial absoluto
+  const endExclusive = page * limit; // índice final exclusivo absoluto
+  const firstJikanPage = Math.floor(startIndex / unit) + 1;
+  const lastJikanPage = Math.ceil(endExclusive / unit);
+
+  const aggregated: Character[] = [];
+  const sliceStart = startIndex - (firstJikanPage - 1) * unit;
+  for (let p = firstJikanPage; p <= lastJikanPage; p++) {
+    const resp = await fetch(`${BASE_URL}/top/characters?page=${p}&limit=${unit}`);
+    if (!resp.ok) throw new Error('Falha ao buscar personagens em destaque');
+    const json = (await resp.json()) as CharactersResponse;
+    const items = Array.isArray(json?.data) ? json.data : [];
+    aggregated.push(...items);
+    // Otimização: pare quando já tivermos dados suficientes para o recorte solicitado
+    if (aggregated.length >= sliceStart + limit) break;
+    // Se a página atual retornou menos itens que o unit, não há mais dados
+    if (items.length < unit) break;
+  }
+
+  const data = aggregated.slice(sliceStart, sliceStart + limit);
+  return { data };
 }
 
-export async function searchCharactersByName(name: string, page: number = 1): Promise<CharactersResponse> {
+export async function searchCharactersByName(name: string, page: number = 1, limit: number = 25): Promise<CharactersResponse> {
   const q = name.trim();
-  const response = await fetch(`${BASE_URL}/characters?q=${encodeURIComponent(q)}&page=${page}`);
-  if (!response.ok) throw new Error('Falha ao buscar personagens');
-  return response.json();
+
+  // Limite dentro do permitido -> requisição simples
+  if (limit <= MAX_JIKAN_LIMIT) {
+    const response = await fetch(`${BASE_URL}/characters?q=${encodeURIComponent(q)}&page=${page}&limit=${limit}`);
+    if (!response.ok) throw new Error('Falha ao buscar personagens');
+    return response.json();
+  }
+
+  // Limite acima do permitido -> buscar em múltiplas páginas e fatiar
+  const unit = MAX_JIKAN_LIMIT;
+  const startIndex = (page - 1) * limit;
+  const endExclusive = page * limit;
+  const firstJikanPage = Math.floor(startIndex / unit) + 1;
+  const lastJikanPage = Math.ceil(endExclusive / unit);
+
+  const aggregated: Character[] = [];
+  const sliceStart = startIndex - (firstJikanPage - 1) * unit;
+  for (let p = firstJikanPage; p <= lastJikanPage; p++) {
+    const resp = await fetch(`${BASE_URL}/characters?q=${encodeURIComponent(q)}&page=${p}&limit=${unit}`);
+    if (!resp.ok) throw new Error('Falha ao buscar personagens');
+    const json = (await resp.json()) as CharactersResponse;
+    const items = Array.isArray(json?.data) ? json.data : [];
+    aggregated.push(...items);
+    if (aggregated.length >= sliceStart + limit) break;
+    if (items.length < unit) break;
+  }
+
+  const data = aggregated.slice(sliceStart, sliceStart + limit);
+  return { data };
 }
 
 // Detalhes completos do personagem
