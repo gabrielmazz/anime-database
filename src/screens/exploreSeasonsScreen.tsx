@@ -80,7 +80,24 @@ const ExploreSeasonsScreen: React.FC = () => {
 			.catch(() => { /* ignora erros silenciosamente */ });
 	}, [wallpaper]);
 
-	// Carrega lista de gêneros (flat, sem grupos)
+	// Helper para derivar gêneros a partir da lista carregada de animes
+	function deriveGenreOptionsFromAnimes(list: Anime[]): { value: string; label: string }[] {
+		const collect = (arr?: any[]) => (Array.isArray(arr) ? arr.map((g) => String(g?.name || '').trim()).filter(Boolean) : []);
+		const set = new Set<string>();
+		for (const a of list) {
+			for (const n of [
+				...collect((a as any)?.genres),
+				...collect((a as any)?.themes),
+				...collect((a as any)?.explicit_genres),
+				...collect((a as any)?.demographics),
+			]) set.add(n);
+		}
+		return Array.from(set)
+			.sort((a, b) => a.localeCompare(b))
+			.map((name) => ({ value: name, label: name }));
+	}
+
+	// Carrega lista de gêneros (flat, sem grupos) com fallback
 	useEffect(() => {
 		let cancelled = false;
 		(async () => {
@@ -92,13 +109,31 @@ const ExploreSeasonsScreen: React.FC = () => {
 					// Remove duplicados e ordena
 					const uniq: Record<string, { value: string; label: string }> = {};
 					for (const o of opts) uniq[o.value] = o;
-					const list = Object.values(uniq).sort((a, b) => a.label.localeCompare(b.label));
+					let list = Object.values(uniq).sort((a, b) => a.label.localeCompare(b.label));
+					// Fallback: se a API retornar vazio, extrai dos animes carregados
+					if (list.length === 0) {
+						list = deriveGenreOptionsFromAnimes(rawRows);
+					}
 					setGenreOptions(list);
 				}
-			} catch { /* silencioso */ }
+			} catch {
+				// Fallback total em caso de erro: tenta derivar dos animes já carregados
+				if (!cancelled) {
+					const list = deriveGenreOptionsFromAnimes(rawRows);
+					if (list.length > 0) setGenreOptions(list);
+				}
+			}
 		})();
 		return () => { cancelled = true; };
 	}, []);
+
+	// Caso a lista de gêneros continue vazia após carregar animes, tenta derivar novamente
+	useEffect(() => {
+		if (genreOptions.length > 0) return;
+		if (!rawRows || rawRows.length === 0) return;
+		const list = deriveGenreOptionsFromAnimes(rawRows);
+		if (list.length > 0) setGenreOptions(list);
+	}, [genreOptions, rawRows]);
 
 	function isHentaiAnime(a: any): boolean {
 		try {
@@ -113,9 +148,9 @@ const ExploreSeasonsScreen: React.FC = () => {
 
 	const applyHentaiFilter = (list: Anime[], allow: boolean): Anime[] => allow ? list : list.filter((x) => !isHentaiAnime(x));
 
-	const hasAnySelectedGenre = (a: any, selected: string[]): boolean => {
+	const hasAllSelectedGenres = (a: any, selected: string[]): boolean => {
 		if (!Array.isArray(selected) || selected.length === 0) return true; // sem filtro -> inclui
-		const lower = new Set(selected.map((s) => s.toLowerCase()));
+		const selectedLower = selected.map((s) => s.toLowerCase());
 		const collect = (arr?: any[]) => (Array.isArray(arr) ? arr.map((g) => String(g?.name || '').toLowerCase()) : []);
 		const names = [
 			...collect((a as any)?.genres),
@@ -123,10 +158,11 @@ const ExploreSeasonsScreen: React.FC = () => {
 			...collect((a as any)?.explicit_genres),
 			...collect((a as any)?.demographics),
 		];
-		return names.some((n) => lower.has(n));
+		const namesSet = new Set(names);
+		return selectedLower.every((g) => namesSet.has(g));
 	};
 
-	const applyGenreFilter = (list: Anime[], selected: string[]): Anime[] => list.filter((x) => hasAnySelectedGenre(x, selected));
+	const applyGenreFilter = (list: Anime[], selected: string[]): Anime[] => list.filter((x) => hasAllSelectedGenres(x, selected));
 
 	const applyAllFilters = (base: Anime[]): Anime[] => {
 		const selectedLower = selectedGenres.map((g) => g.toLowerCase());
@@ -371,7 +407,7 @@ const ExploreSeasonsScreen: React.FC = () => {
 
 					<Space h="md" />
 
-					{/* <Container
+					<Container
 						fluid
 						className="
 							bg-black/40 rounded-lg backdrop-blur-sm border border-white/20 shadow-lg
@@ -406,7 +442,7 @@ const ExploreSeasonsScreen: React.FC = () => {
 							</Table>
 							<div ref={sentinelRef} style={{ height: 8, width: '100%' }} />
 						</div>
-					</Container> */}
+					</Container>
 				</div>
 			</BackgroundImage>
 
