@@ -26,6 +26,7 @@ import { Divider } from '@mantine/core';
 import { Space } from '@mantine/core';
 import { BackgroundImage } from '@mantine/core';
 import { Image } from '@mantine/core';
+import { useMediaQuery } from '@mantine/hooks';
 
 // Componentes de texto
 import { Text } from '@mantine/core';
@@ -137,6 +138,14 @@ const SearchScreen: React.FC = () => {
     const [alertMessage, setAlertMessage] = useState("");
     const [alertType, setAlertType] = useState<'info' | 'warning' | 'error' | 'success'>('info');
 
+    // Breakpoints (alinhados aos do Tailwind) para ajustes responsivos
+    const isSmDown = useMediaQuery('(max-width: 640px)');
+    const isMdDown = useMediaQuery('(max-width: 768px)');
+    const isLgDown = useMediaQuery('(max-width: 1024px)');
+    const drawerSize = isLgDown ? '100%' : '35%';
+    const coverHeight = isSmDown ? 360 : isLgDown ? 480 : 600;
+    const carouselHeight = isSmDown ? 320 : isLgDown ? 420 : 600;
+
     // Traduz a sinopse automaticamente quando um anime é selecionado
     useEffect(() => {
         let cancelled = false;
@@ -220,21 +229,23 @@ const SearchScreen: React.FC = () => {
             <div
                 // Div principal que abrigará toda a listagem de animes
                 className="
-                relative z-10
-                w-full min-h-screen             
-                max-w-[92vw] 2xl:max-w-[1900px] mx-auto
-                align-top
-                px-4 sm:px-6 lg:px-12
-            "
+                    container
+                    relative z-10
+                    min-h-screen
+                    mx-auto
+                    px-4 sm:px-6 lg:px-8
+                    flex flex-col
+                "
             >
                 <Title
                     className="
-                        flex justify-center
+                        flex justify-center text-center
                         pt-8
                         text-shadow-lg/20
                         text-(--color1)
                         uppercase
                         tracking-(--title-letter-spacing)
+                        text-2xl sm:text-3xl lg:text-4xl
                     "
                     style={{
                         fontFamily: 'var(--text-font-mono)',
@@ -257,9 +268,7 @@ const SearchScreen: React.FC = () => {
                             label: TextInputModule.labelTextInput,
                             description: TextInputModule.descriptionTextInput,
                         }}
-                        className="
-							mt-4
-						"
+                        className="mt-4 w-full max-w-2xl mx-auto"
                         onChange={(event) => {
                             setAnimeDatabase(null);
                             setNameAnimeSearch(event.currentTarget.value);
@@ -283,10 +292,11 @@ const SearchScreen: React.FC = () => {
 
                 {/* Seção dos cards que mostrarão os animes voltados da
                     consulta na API */}
-                <div className="
-                    grid grid-cols-3 gap-4
-                    mt-4
-                "
+                <div
+                    className="
+                        grid mt-4 gap-4
+                        grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5
+                    "
                 >
                     {
                         // Verifica se a dataBase não está nula, se não estiver
@@ -301,16 +311,16 @@ const SearchScreen: React.FC = () => {
                                 `}
                                 style={{
                                     willChange: 'opacity, transform',
-                                    borderColor: 'var(--color1)', // Usa a cor dinâmica da paleta
+                                    borderColor: 'var(--color1)',
                                 }}
                             >
                                 <BackgroundImage
                                     src={anime.images.jpg.image_url}
-                                    h={600}
                                     w="auto"
                                     radius="md"
                                     className="
-                                        w-full h-full flex
+                                        w-full flex
+                                        h-56 sm:h-64 md:h-72 lg:h-96 xl:h-[28rem]
                                         brightness-60
                                         hover:brightness-100
                                         transition duration-300
@@ -333,6 +343,7 @@ const SearchScreen: React.FC = () => {
                                             font-bold
                                             uppercase
                                             tracking-(--title-letter-spacing)
+                                            text-base sm:text-lg lg:text-xl
                                         "
                                         style={{
                                             fontFamily: 'var(--text-font-mono)',
@@ -376,7 +387,7 @@ const SearchScreen: React.FC = () => {
                     </Title>
                 }
                 position="right"
-                size="35%"
+                size={drawerSize}
                 overlayProps={{ backgroundOpacity: 0.5, blur: 4 }}
                 classNames={{
                     root: DrawerModule.rootDrawer,
@@ -389,8 +400,8 @@ const SearchScreen: React.FC = () => {
                             <Image
                                 src={selectedAnime.images.jpg.image_url}
                                 radius="md"
-                                h={600}
                                 w="auto"
+                                h={coverHeight}
                                 className="
                                     mb-4
                                     flex items-center justify-center justify-self-center
@@ -544,7 +555,7 @@ const SearchScreen: React.FC = () => {
 
                         <Carousel
                             slideSize="70%"
-                            height={600}
+                            height={carouselHeight}
                             withControls={false}
                             withIndicators={false}
                             slideGap="xs"
@@ -558,7 +569,7 @@ const SearchScreen: React.FC = () => {
                         >
                             {animeSelectedPictures && animeSelectedPictures.data.map((picture: any, index: number) => (
                                 <Carousel.Slide key={index}>
-                                    <Image src={picture.jpg.large_image_url} radius="md" h={600} w="auto" />
+                                    <Image src={picture.jpg.large_image_url} radius="md" h={carouselHeight} w="auto" />
                                 </Carousel.Slide>
                             ))}
                         </Carousel>

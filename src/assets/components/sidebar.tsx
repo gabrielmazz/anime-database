@@ -39,9 +39,25 @@ const IconChevron = ({ dir }: { dir: 'left' | 'right' }) => (
 	</svg>
 );
 
+const IconHamburger = () => (
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <line x1="3" y1="6" x2="21" y2="6" />
+        <line x1="3" y1="12" x2="21" y2="12" />
+        <line x1="3" y1="18" x2="21" y2="18" />
+    </svg>
+);
+
+const IconClose = () => (
+    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <line x1="18" y1="6" x2="6" y2="18" />
+        <line x1="6" y1="6" x2="18" y2="18" />
+    </svg>
+);
+
 
 const Sidebar: React.FC = () => {
 	const [collapsed, setCollapsed] = useState<boolean>(true);
+	const [isOpen, setIsOpen] = useState<boolean>(false);
 	const [active, setActive] = useState<string>('dashboard');
 	const [aboutOpen, setAboutOpen] = useState<boolean>(false);
 	const [debugOpen, setDebugOpen] = useState<boolean>(false);
@@ -62,12 +78,44 @@ const Sidebar: React.FC = () => {
 
 	return (
 		<>
+			{/* Botão Hambúrguer */}
+			{!isOpen && (
+				<>
+					<button
+						aria-label="Abrir menu"
+						aria-expanded={isOpen}
+						className="fixed left-4 top-4 z-30 inline-flex lg:hidden h-10 w-10 items-center justify-center rounded-md
+							bg-black/50 border border-white/20 text-[var(--color1)] backdrop-blur-md hover:bg-black/60 transition"
+						onClick={() => { setCollapsed(true); setIsOpen(true); }}
+					>
+						<IconHamburger />
+					</button>
+
+					{/* Botão seta para abrir já expandida */}
+					<button
+						aria-label="Abrir menu expandido"
+						className="fixed left-4 top-4 z-30 hidden lg:inline-flex h-10 w-10 items-center justify-center rounded-md
+							bg-black/50 border border-white/20 text-[var(--color1)] backdrop-blur-md hover:bg-black/60 transition"
+						onClick={() => { setCollapsed(false); setIsOpen(true); }}
+						title="Abrir menu expandido"
+					>
+						<IconChevron dir="right" />
+					</button>
+				</>
+			)}
+
+			{/* Overlay */}
+			<div
+				className={`fixed inset-0 z-20 bg-black/40 transition-opacity ${isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
+				onClick={() => { setIsOpen(false); setCollapsed(false); }}
+			/>
+
 			<aside
-				className={`fixed left-6 top-1/2 -translate-y-1/2 ${widthClass} h-[80vh]
-							rounded-md z-20 flex flex-col overflow-hidden
-							bg-black/40 backdrop-blur-md border border-white/20 shadow-xl
-							transition-all duration-300 ease-out
-							`}
+				className={`fixed left-0 top-0 ${widthClass} h-screen rounded-r-xl z-30 flex flex-col overflow-hidden
+						bg-black/40 backdrop-blur-md border border-white/20 shadow-xl
+						transition-all duration-300 ease-in-out
+						${isOpen ? 'translate-x-0' : '-translate-x-full'}`}
+				style={{ willChange: 'width, transform' }}
 			>
 
 				{/* Header */}
@@ -82,13 +130,26 @@ const Sidebar: React.FC = () => {
 					{!collapsed && (
 						<Text style={{ color: 'var(--color1)', fontWeight: 700 }}>AniDex</Text>
 					)}
-					<button
-						aria-label="Collapse sidebar"
-						className="ml-auto inline-flex items-center justify-center w-8 h-8 rounded-xl hover:bg-white/10 text-(--color1)"
-						onClick={() => setCollapsed((v) => !v)}
-					>
-						<IconChevron dir={collapsed ? 'right' : 'left'} />
-					</button>
+					<div className="ml-auto flex items-center gap-2">
+						{/* Fechar Drawer */}
+						<button
+							aria-label="Fechar menu"
+							className="inline-flex items-center justify-center w-8 h-8 rounded-xl hover:bg-white/10 text-(--color1)"
+							onClick={() => { setIsOpen(false); setCollapsed(false); }}
+						>
+							<IconClose />
+						</button>
+						{/* Colapsar largura */}
+						<button
+							aria-label="Alternar largura"
+							className="inline-flex items-center justify-center w-8 h-8 rounded-xl hover:bg-white/10 text-(--color1) transition-transform duration-300 ease-in-out active:scale-95"
+							onClick={() => setCollapsed((v) => !v)}
+						>
+							<span className={`inline-block transition-transform duration-300 ${collapsed ? 'rotate-180' : 'rotate-0'}`}>
+								<IconChevron dir={collapsed ? 'right' : 'left'} />
+							</span>
+						</button>
+					</div>
 				</div>
 
 				{/* Items */}
