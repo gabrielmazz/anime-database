@@ -14,6 +14,7 @@ import TextInputModule from './../assets/inputInfos/TextInput.module.css';
 // Carrossel
 import { Carousel } from '@mantine/carousel';
 import Autoplay from 'embla-carousel-autoplay';
+import { useMediaQuery } from '@mantine/hooks';
 
 // Utilitários, funções gerais
 import { getRandomWallpaper } from '../utils/wallpaper';
@@ -101,6 +102,13 @@ const SearchScreenManga: React.FC = () => {
 	const [alertMessage, setAlertMessage] = useState("");
 	const [alertType, setAlertType] = useState<'info' | 'warning' | 'error' | 'success'>('info');
 
+	// Breakpoints para responsividade semelhante à tela de animes
+	const isSmDown = useMediaQuery('(max-width: 640px)');
+	const isLgDown = useMediaQuery('(max-width: 1024px)');
+	const drawerSize = isLgDown ? '100%' : '35%';
+	const coverHeight = isSmDown ? 360 : isLgDown ? 480 : 600;
+	const carouselHeight = isSmDown ? 320 : isLgDown ? 420 : 600;
+
 	useEffect(() => {
 		let cancelled = false;
 		const run = async () => {
@@ -149,9 +157,9 @@ const SearchScreenManga: React.FC = () => {
 			<AlertBox visible={alertVisible} message={alertMessage} type={alertType} />
 			<Sidebar />
 
-			<div className="relative z-10 w-full min-h-screen max-w-[92vw] 2xl:max-w-[1900px] mx-auto align-top px-4 sm:px-6 lg:px-12">
+			<div className="container relative z-10 min-h-screen mx-auto px-4 sm:px-6 lg:px-8 flex flex-col">
 				<Title
-					className="flex justify-center pt-8 text-shadow-lg/20 text-(--color1) uppercase tracking-(--title-letter-spacing)"
+					className="flex justify-center text-center pt-8 text-shadow-lg/20 text-(--color1) uppercase tracking-(--title-letter-spacing) text-2xl sm:text-3xl lg:text-4xl"
 					style={{ fontFamily: 'var(--text-font-mono)' }}
 				>
 					AniDex - Pesquise seu mangá
@@ -171,9 +179,7 @@ const SearchScreenManga: React.FC = () => {
 							label: TextInputModule.labelTextInput,
 							description: TextInputModule.descriptionTextInput,
 						}}
-						className="
-							mt-4
-						"
+						className="mt-4 w-full max-w-2xl mx-auto"
 						onChange={(e) => { setMangaDatabase(null); setQuery(e.currentTarget.value); }}
 						onKeyDown={(e) => {
 							if (e.key === 'Enter') {
@@ -192,7 +198,7 @@ const SearchScreenManga: React.FC = () => {
 					/>
 				</Group>
 
-				<div className="grid grid-cols-3 gap-4 mt-4">
+				<div className="grid mt-4 gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
 					{mangaDatabase && mangaDatabase.data.map((manga: Manga, index: number) => (
 						<div
 							key={manga.mal_id}
@@ -201,15 +207,14 @@ const SearchScreenManga: React.FC = () => {
 						>
 							<BackgroundImage
 								src={manga.images.jpg.image_url}
-								h={600}
 								w="auto"
 								radius="md"
-								className="w-full h-full flex brightness-60 hover:brightness-100 transition duration-300"
+								className="w-full flex h-56 sm:h-64 md:h-72 lg:h-96 xl:h-[28rem] brightness-60 hover:brightness-100 transition duration-300"
 								onClick={() => { setSelectedManga(manga); searchMangaPictures(manga.mal_id); searchMangaCharacters(manga.mal_id); setOpenedCardInformation(true); }}
 							>
 								<Text
 									size="xl"
-									className="p-4 flex items-center justify-center h-full w-full text-center text-shadow-lg/60 font-bold uppercase tracking-(--title-letter-spacing)"
+									className="p-4 flex items-center justify-center h-full w-full text-center text-shadow-lg/60 font-bold uppercase tracking-(--title-letter-spacing) text-base sm:text-lg lg:text-xl"
 									style={{ fontFamily: 'var(--text-font-mono)', color: 'var(--colorTextWhite)' }}
 								>
 									{manga.title}
@@ -233,13 +238,13 @@ const SearchScreenManga: React.FC = () => {
 					</Title>
 				}
 				position="right"
-				size="35%"
+				size={drawerSize}
 				overlayProps={{ backgroundOpacity: 0.5, blur: 4 }}
 				classNames={{ root: DrawerModule.rootDrawer, header: DrawerModule.headerDrawer, body: DrawerModule.bodyDrawer }}
 				content={selectedManga && (
 					<>
 						<Box>
-							<Image src={selectedManga.images.jpg.image_url} radius="md" h={600} w="auto" className="mb-4 flex items-center justify-center justify-self-center shadow-lg/40" />
+							<Image src={selectedManga.images.jpg.image_url} radius="md" h={coverHeight} w="auto" className="mb-4 flex items-center justify-center justify-self-center shadow-lg/40" />
 
 							<Space h="md" />
 
@@ -306,10 +311,10 @@ const SearchScreenManga: React.FC = () => {
 							</Text>
 						} labelPosition="center" />
 
-						<Carousel slideSize="70%" height={600} withControls={false} withIndicators={false} slideGap="xs" emblaOptions={{ loop: true, dragFree: true, align: 'center', slidesToScroll: 1 }} plugins={[Autoplay({ delay: 2500 })]}>
+						<Carousel slideSize="70%" height={carouselHeight} withControls={false} withIndicators={false} slideGap="xs" emblaOptions={{ loop: true, dragFree: true, align: 'center', slidesToScroll: 1 }} plugins={[Autoplay({ delay: 2500 })]}>
 							{mangaSelectedPictures && mangaSelectedPictures.data.map((picture: any, index: number) => (
 								<Carousel.Slide key={index}>
-									<Image src={picture.jpg.large_image_url} radius="md" h={600} w="auto" />
+									<Image src={picture.jpg.large_image_url} radius="md" h={carouselHeight} w="auto" />
 								</Carousel.Slide>
 							))}
 						</Carousel>
