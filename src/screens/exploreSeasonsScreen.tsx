@@ -1,7 +1,10 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 // UI base e layout
-import { BackgroundImage, Box, Container, Group, Image, NumberInput, Select, Space, Table, Text, Title, MultiSelect } from '@mantine/core';
+import { BackgroundImage, Box, Container, Group, Image, NumberInput, Select, Space, Table, Text, Title, MultiSelect, Grid, Divider } from '@mantine/core';
+import { Carousel } from '@mantine/carousel';
+import Autoplay from 'embla-carousel-autoplay';
+import { useMediaQuery } from '@mantine/hooks';
 import InfoDrawer from '../assets/components/infoDrawer.tsx';
 import DrawerModule from '../assets/inputInfos/Drawer.module.css';
 import LoaderBox from '../assets/components/loaderBox.tsx';
@@ -16,7 +19,8 @@ import { applyPaletteToCssVariables, extractPaletteFromImage } from '../utils/pa
 import { getRandomWallpaper } from '../utils/wallpaper';
 
 // APIs
-import { getAnimeBySeason, getAnimeGenres, type SeasonKey, type Anime, type Genre } from '../assets/API/jikan';
+import { getAnimeBySeason, getAnimeGenres, getAnimePictures, getAnimeCharacters, type SeasonKey, type Anime, type Genre } from '../assets/API/jikan';
+import { translateText, translateTextDetailed } from '../assets/API/translate';
 import { useSettings } from '../state/settings';
 
 // Estilos
@@ -57,8 +61,12 @@ const ExploreSeasonsScreen: React.FC = () => {
 	const [hasMore, setHasMore] = useState<boolean>(true);
 	const scrollRef = useRef<HTMLDivElement | null>(null);
 	const sentinelRef = useRef<HTMLDivElement | null>(null);
-	const [openedInfo, setOpenedInfo] = useState<boolean>(false);
-	const [selectedAnime, setSelectedAnime] = useState<Anime | null>(null);
+    const [openedInfo, setOpenedInfo] = useState<boolean>(false);
+    const [selectedAnime, setSelectedAnime] = useState<Anime | null>(null);
+    const [animeSelectedPictures, setAnimeSelectedPictures] = useState<any>(null);
+    const [animeSelectedCharacters, setAnimeSelectedCharacters] = useState<any>(null);
+    const [translatedSynopsis, setTranslatedSynopsis] = useState<string | null>(null);
+    const [translateStatus, setTranslateStatus] = useState<string | null>(null);
 	const [showHentai, setShowHentai] = useState<boolean>(false);
 	const [genreOptions, setGenreOptions] = useState<{ value: string; label: string }[]>([]);
 	const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
@@ -68,17 +76,78 @@ const ExploreSeasonsScreen: React.FC = () => {
 	const [season, setSeason] = useState<SeasonKey>(getCurrentSeasonKey(now));
 
 	// Alertas (suave) para feedback de requisições
-	const [alertVisible, setAlertVisible] = useState(false);
-	const [alertMessage, setAlertMessage] = useState("");
-	const [alertType, setAlertType] = useState<'info' | 'warning' | 'error' | 'success'>('info');
+    const [alertVisible, setAlertVisible] = useState(false);
+    const [alertMessage, setAlertMessage] = useState("");
+    const [alertType, setAlertType] = useState<'info' | 'warning' | 'error' | 'success'>('info');
+    const isSmDown = useMediaQuery('(max-width: 640px)');
+    const isLgDown = useMediaQuery('(max-width: 1024px)');
+    const drawerSize = isLgDown ? '100%' : '35%';
+    const coverHeight = isSmDown ? 360 : isLgDown ? 480 : 600;
+    const carouselHeight = isSmDown ? 320 : isLgDown ? 420 : 600;
 
 	// Aplica paleta baseada no wallpaper
-	useEffect(() => {
-		if (!wallpaper) return;
-		extractPaletteFromImage(wallpaper)
-			.then(applyPaletteToCssVariables)
-			.catch(() => { /* ignora erros silenciosamente */ });
-	}, [wallpaper]);
+  useEffect(() => {
+      if (!wallpaper) return;
+      extractPaletteFromImage(wallpaper)
+          .then(applyPaletteToCssVariables)
+          .catch(() => { /* ignora erros silenciosamente */ });
+  }, [wallpaper]);
+
+  // Busca imagens e personagens quando um anime é selecionado
+  useEffect(() => {
+    let cancelled = false;
+    const run = async () => {
+      if (!selectedAnime) return;
+      try {
+        const [pics, chars] = await Promise.all([
+          getAnimePictures(selectedAnime.mal_id),
+          getAnimeCharacters(selectedAnime.mal_id),
+        ]);
+        if (!cancelled) {
+          setAnimeSelectedPictures(pics);
+          setAnimeSelectedCharacters(chars);
+        }
+      } catch {}
+    };
+    run();
+    return () => { cancelled = true; };
+  }, [selectedAnime]);
+
+  // Traduções
+  useEffect(() => {
+    let cancelled = false;
+    const run = async () => {
+      if (!selectedAnime || !selectedAnime.synopsis) { setTranslatedSynopsis(null); return; }
+      try {
+        const { text, translated } = await translateTextDetailed(selectedAnime.synopsis, 'en', 'pt-BR');
+        if (!cancelled) {
+          setTranslatedSynopsis(text);
+          setAlertType(translated ? 'success' : 'warning');
+          setAlertMessage(translated ? 'Sinopse traduzida com sucesso!' : 'Não foi possível traduzir. Mostrando o texto original.');
+          setAlertVisible(true);
+        }
+      } catch {
+        if (!cancelled) setTranslatedSynopsis(selectedAnime.synopsis);
+      }
+    };
+    run();
+    return () => { cancelled = true; };
+  }, [selectedAnime]);
+
+  useEffect(() => {
+    let cancelled = false;
+    const run = async () => {
+      if (!selectedAnime || !selectedAnime.status) { setTranslateStatus(null); return; }
+      try {
+        const t = await translateText(selectedAnime.status, 'en', 'pt-BR');
+        if (!cancelled) setTranslateStatus(t);
+      } catch {
+        if (!cancelled) setTranslateStatus(selectedAnime.status);
+      }
+    };
+    run();
+    return () => { cancelled = true; };
+  }, [selectedAnime]);
 
 	// Helper para derivar gêneros a partir da lista carregada de animes
 	function deriveGenreOptionsFromAnimes(list: Anime[]): { value: string; label: string }[] {
@@ -304,19 +373,16 @@ const ExploreSeasonsScreen: React.FC = () => {
 				{/* Conteúdo principal */}
 				<div
 					className="
-						relative z-10 w-full min-h-screen
-						max-w-[92vw] 2xl:max-w-[1900px] mx-auto align-top
-						px-4 sm:px-6 lg:px-12
+						container relative z-10 min-h-screen mx-auto
+						px-4 sm:px-6 lg:px-8 flex flex-col
 					"
 				>
 					<Title
 						className="
-							flex justify-center
-							pt-8
-							text-shadow-lg/20
-							text-(--color1)
-							uppercase
-							tracking-(--title-letter-spacing)
+							flex justify-center text-center pt-8
+							text-shadow-lg/20 text-(--color1)
+							uppercase tracking-(--title-letter-spacing)
+							text-2xl sm:text-3xl lg:text-4xl
 						"
 						style={{ fontFamily: 'var(--text-font-mono)' }}
 					>
@@ -325,7 +391,7 @@ const ExploreSeasonsScreen: React.FC = () => {
 
 					<Space h={50} />
 
-					<Group grow>
+					<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
 						<NumberInput
 							size="md"
 							label="Ano"
@@ -403,7 +469,7 @@ const ExploreSeasonsScreen: React.FC = () => {
 								pill: MultiSelectModule.pillMultiSelect,
 							}}
 						/>
-					</Group>
+					</div>
 
 					<Space h="md" />
 
@@ -417,9 +483,10 @@ const ExploreSeasonsScreen: React.FC = () => {
 							h-[70vh] overflow-hidden
 						"
 					>
-						<div ref={scrollRef} className="h-[calc(100%-0px)] overflow-auto rounded-md">
+						<div ref={scrollRef} className="h-[calc(100%-0px)] overflow-auto rounded-md overflow-x-auto">
 							<Table
 								highlightOnHover
+								className="min-w-[640px]"
 								classNames={{
 									table: TableModule.tableTable,
 									thead: TableModule.theadTable,
@@ -429,7 +496,7 @@ const ExploreSeasonsScreen: React.FC = () => {
 									caption: TableModule.captionTable,
 								}}
 							>
-								<Table.Thead>
+								<Table.Thead className="sticky top-0 z-10">
 									<Table.Tr>
 										<Table.Th style={{ width: 64 }}>#</Table.Th>
 										<Table.Th>Anime</Table.Th>
@@ -447,49 +514,323 @@ const ExploreSeasonsScreen: React.FC = () => {
 			</BackgroundImage>
 
 			{/* Drawer de informações do anime */}
-			<InfoDrawer
-				opened={openedInfo}
-				onClose={() => { setOpenedInfo(false); setSelectedAnime(null); }}
-				title={
-					<Title
-						order={2}
-						className="font-bold text-shadow-lg/20 text-(--colorTextWhite) uppercase tracking-(--title-letter-spacing)"
-						style={{ fontSize: 32, fontFamily: 'var(--text-font-mono)' }}
-					>
-						Informações do Anime
-					</Title>
-				}
-				position="right"
-				size="40%"
-				overlayProps={{ backgroundOpacity: 0.5, blur: 4 }}
-				classNames={{ root: DrawerModule.rootDrawer, header: DrawerModule.headerDrawer, body: DrawerModule.bodyDrawer }}
-				content={selectedAnime && (
-					<>
-						<Box>
-							<Image src={selectedAnime.images?.jpg?.image_url} radius="md" h={300} w="auto" className="mb-4" />
-							<Title size="xl" className="font-bold text-center text-shadow-lg/20 text-(--colorTextWhite) uppercase tracking-(--title-letter-spacing)" style={{ fontSize: 28, fontFamily: 'var(--text-font-mono)' }}>
-								{selectedAnime.title}
-							</Title>
-							<Space h="md" />
-							<Text style={{ color: 'var(--colorTextWhite)' }}>Score: {formatNumber(selectedAnime.score)} • Episódios: {formatNumber(selectedAnime.episodes)}</Text>
-							<Text style={{ color: 'var(--colorTextWhite)' }}>Status: {selectedAnime.status}</Text>
-						</Box>
+            <InfoDrawer
+                opened={openedInfo}
+                onClose={() => {
+                    setOpenedInfo(false);
+                    setSelectedAnime(null);
+                    setAnimeSelectedPictures(null);
+                    setAnimeSelectedCharacters(null);
+                }}
+                title={
+                    <Title
+                        order={2}
+                        className="font-bold text-shadow-lg/20 text-(--colorTextWhite) uppercase tracking-(--title-letter-spacing)"
+                        style={{ fontSize: 32, fontFamily: 'var(--text-font-mono)' }}
+                    >
+                        Informações do Anime
+                    </Title>
+                }
+                position="right"
+                size={drawerSize}
+                overlayProps={{ backgroundOpacity: 0.5, blur: 4 }}
+                classNames={{
+                    root: DrawerModule.rootDrawer,
+                    header: DrawerModule.headerDrawer,
+                    body: DrawerModule.bodyDrawer,
+                }}
+                content={selectedAnime && (
+                    <>
+                        <Box>
+                            <Image
+                                src={selectedAnime.images?.jpg?.image_url}
+                                radius="md"
+                                w="auto"
+                                h={coverHeight}
+                                className="
+                                    mb-4
+                                    flex items-center justify-center justify-self-center
+                                    shadow-lg/40
+                                "
+                            />
 
-						<Space h="lg" />
+                            <Space h="md" />
 
-						{selectedAnime?.synopsis && (
-							<Box>
-								<Text className="font-bold uppercase tracking-(--title-letter-spacing)" style={{ fontSize: 16, fontFamily: 'Raleway, sans-serif', color: 'var(--colorTextWhite)', marginRight: 6 }}>Sinopse:</Text>
-								<Text style={{ color: 'var(--colorTextWhite)' }}>{selectedAnime.synopsis}</Text>
-							</Box>
-						)}
+                            <Title
+                                size="xl"
+                                className="
+                                    font-bold text-center
+                                    text-shadow-lg/20
+                                    text-(--colorTextWhite)
+                                    uppercase
+                                    tracking-(--title-letter-spacing)
+                                "
+                                style={{ fontSize: 32, fontFamily: 'var(--text-font-mono)' }}
+                            >
+                                {selectedAnime.title}
+                            </Title>
 
-						{!selectedAnime?.synopsis && (
-							<LoaderBox message="Sem detalhes adicionais do anime." />
-						)}
-					</>
-				)}
-			/>
+                            <Space h="md" />
+
+                            <Box>
+                                <Text
+                                    component="span"
+                                    className="
+                                    font-bold
+                                    uppercase
+                                    tracking-(--title-letter-spacing)
+                                "
+                                    style={{
+                                        fontSize: 16,
+                                        fontFamily: 'Raleway, sans-serif',
+                                        color: 'var(--colorTextWhite)',
+                                        marginRight: 6
+                                    }}
+                                >
+                                    Sinopse:
+                                </Text>
+                                {translatedSynopsis === null && selectedAnime?.synopsis ? (
+                                    <LoaderBox message="Traduzindo sinopse..." />
+                                ) : (
+                                    <Text component="span" style={{ color: 'var(--colorTextWhite)' }}>
+                                        {translatedSynopsis ?? selectedAnime?.synopsis}
+                                    </Text>
+                                )}
+                            </Box>
+                        </Box>
+
+                        <Space h="lg" />
+
+                        <Box>
+                            <Text
+                                component="span"
+                                className="
+                                    font-bold
+                                    uppercase
+                                    tracking-(--title-letter-spacing)
+                                "
+                                style={{
+                                    fontSize: 16,
+                                    fontFamily: 'Raleway, sans-serif',
+                                    color: 'var(--colorTextWhite)',
+                                    marginRight: 6
+                                }}
+                            >
+                                Numero de Episódios:
+                            </Text>
+                            <Text component="span" style={{ color: 'var(--colorTextWhite)' }}>
+                                {selectedAnime.episodes}
+                            </Text>
+                        </Box>
+
+                        <Space h="lg" />
+
+                        <Box>
+                            <Text
+                                component="span"
+                                className="
+                                    font-bold
+                                    uppercase
+                                    tracking-(--title-letter-spacing)
+                                "
+                                style={{
+                                    fontSize: 16,
+                                    fontFamily: 'Raleway, sans-serif',
+                                    color: 'var(--colorTextWhite)',
+                                    marginRight: 6
+                                }}
+                            >
+                                Status do Anime:
+                            </Text>
+                            {translateStatus === null && selectedAnime?.status ? (
+                                <LoaderBox message="Traduzindo status..." />
+                            ) : (
+                                <Text component="span" style={{ color: 'var(--colorTextWhite)' }}>
+                                    {translateStatus ?? selectedAnime.status}
+                                </Text>
+                            )}
+                        </Box>
+
+                        <Space h="lg" />
+
+                        <Box>
+                            <Text
+                                component="span"
+                                className="
+                                    font-bold
+                                    uppercase
+                                    tracking-(--title-letter-spacing)
+                                "
+                                style={{
+                                    fontSize: 16,
+                                    fontFamily: 'Raleway, sans-serif',
+                                    color: 'var(--colorTextWhite)',
+                                    marginRight: 6
+                                }}
+                            >
+                                Nota do Anime:
+                            </Text>
+                            <Text component="span" style={{ color: 'var(--colorTextWhite)' }}>
+                                {selectedAnime.score}
+                            </Text>
+                        </Box>
+
+                        <Divider
+                            my="xl"
+                            label={
+                                <Text
+                                    component="span"
+                                    className="
+                                        font-bold
+                                        uppercase
+                                        tracking-(--title-letter-spacing)
+                                    "
+                                    style={{
+                                        fontSize: 16,
+                                        fontFamily: 'Raleway, sans-serif',
+                                        color: 'var(--colorTextWhite)',
+                                        marginRight: 6
+                                    }}
+                                >
+                                    Imagens do Anime
+                                </Text>
+                            }
+                            labelPosition="center"
+                        />
+
+                        <Carousel
+                            slideSize="70%"
+                            height={carouselHeight}
+                            withControls={false}
+                            withIndicators={false}
+                            slideGap="xs"
+                            emblaOptions={{
+                                loop: true,
+                                dragFree: true,
+                                align: 'center',
+                                slidesToScroll: 1,
+                            }}
+                            plugins={[Autoplay({ delay: 2500 })]}
+                        >
+                            {animeSelectedPictures && animeSelectedPictures.data.map((picture: any, index: number) => (
+                                <Carousel.Slide key={index}>
+                                    <Image src={picture.jpg.large_image_url} radius="md" h={carouselHeight} w="auto" />
+                                </Carousel.Slide>
+                            ))}
+                        </Carousel>
+
+                        {animeSelectedCharacters && Array.isArray(animeSelectedCharacters.data) &&
+                            animeSelectedCharacters.data.some((character: any) => character.role === 'Main') && (
+                                <>
+                                    <Divider
+                                        my="xl"
+                                        label={
+                                            <Text
+                                                component="span"
+                                                className="
+                                                font-bold
+                                                uppercase
+                                                tracking-(--title-letter-spacing)
+                                            "
+                                                style={{
+                                                    fontSize: 16,
+                                                    fontFamily: 'Raleway, sans-serif',
+                                                    color: 'var(--colorTextWhite)',
+                                                    marginRight: 6
+                                                }}
+                                            >
+                                                Personagens Principais
+                                            </Text>
+                                        }
+                                        labelPosition="center"
+                                    />
+                                    {Array.from(
+                                        { length: Math.ceil(animeSelectedCharacters.data.filter((character: any) => character.role === 'Main').length / 2) },
+                                        (_, rowIndex) => {
+                                            const mainCharacters = animeSelectedCharacters.data.filter((character: any) => character.role === 'Main');
+                                            const rowCharacters = mainCharacters.slice(rowIndex * 2, rowIndex * 2 + 2);
+                                            return (
+                                                <Grid key={rowIndex} gutter="md" mb="md">
+                                                    {rowCharacters.map((character: any, colIndex: number) => (
+                                                        <Grid.Col span={6} key={colIndex}>
+                                                            <Group>
+                                                                <Image
+                                                                    src={character.character.images.jpg.image_url}
+                                                                    radius="md"
+                                                                    h={120}
+                                                                    w={80}
+                                                                    alt={character.character.name}
+                                                                />
+                                                                <Text style={{ color: '#E8D4B7', fontWeight: 600 }}>
+                                                                    {character.character.name}
+                                                                </Text>
+                                                            </Group>
+                                                        </Grid.Col>
+                                                    ))}
+                                                </Grid>
+                                            );
+                                        }
+                                    )}
+                                </>
+                            )}
+
+                        {animeSelectedCharacters && Array.isArray(animeSelectedCharacters.data) &&
+                            animeSelectedCharacters.data.some((character: any) => character.role !== 'Main') && (
+                                <>
+                                    <Divider
+                                        my="xl"
+                                        label={
+                                            <Text
+                                                component="span"
+                                                className="
+                                                font-bold
+                                                uppercase
+                                                tracking-(--title-letter-spacing)
+                                            "
+                                                style={{
+                                                    fontSize: 16,
+                                                    fontFamily: 'Raleway, sans-serif',
+                                                    color: 'var(--colorTextWhite)',
+                                                    marginRight: 6
+                                                }}
+                                            >
+                                                Outros Personagens
+                                            </Text>
+                                        }
+                                        labelPosition="center"
+                                    />
+                                    {Array.from(
+                                        { length: Math.ceil(animeSelectedCharacters.data.filter((character: any) => character.role !== 'Main').length / 2) },
+                                        (_, rowIndex) => {
+                                            const otherCharacters = animeSelectedCharacters.data.filter((character: any) => character.role !== 'Main');
+                                            const rowCharacters = otherCharacters.slice(rowIndex * 2, rowIndex * 2 + 2);
+                                            return (
+                                                <Grid key={rowIndex} gutter="md" mb="md">
+                                                    {rowCharacters.map((character: any, colIndex: number) => (
+                                                        <Grid.Col span={6} key={colIndex}>
+                                                            <Group>
+                                                                <Image
+                                                                    src={character.character.images.jpg.image_url}
+                                                                    radius="md"
+                                                                    h={120}
+                                                                    w={80}
+                                                                    alt={character.character.name}
+                                                                />
+                                                                <Text style={{ color: 'var(--colorTextWhite)', fontWeight: 600 }}>
+                                                                    {character.character.name}
+                                                                </Text>
+                                                            </Group>
+                                                        </Grid.Col>
+                                                    ))}
+                                                </Grid>
+                                            );
+                                        }
+                                    )}
+                                </>
+                            )}
+                    </>
+                )}
+            />
 		</>
 	);
 };

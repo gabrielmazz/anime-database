@@ -106,7 +106,7 @@ const Sidebar: React.FC = () => {
 
 			{/* Overlay */}
 			<div
-				className={`fixed inset-0 z-20 bg-black/40 transition-opacity ${isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
+				className={`fixed inset-0 z-20 bg-black/40 backdrop-blur-[4px] transition-opacity ${isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
 				onClick={() => { setIsOpen(false); setCollapsed(false); }}
 			/>
 

@@ -47,39 +47,41 @@ const SelectionScreen: React.FC = () => {
                     max-w-[92vw] 2xl:max-w-[1900px] mx-auto align-top
                     px-4 sm:px-6 lg:px-12
                 "
-			>
-				<Title
-					className="
-                        flex justify-center pt-6
+                >
+                <Title
+                    className="
+                        pt-6
                         text-shadow-lg/20 text-(--color1)
                         uppercase tracking-(--title-letter-spacing)
                         text-[clamp(24px,4vw,42px)]
+                        text-center
                     "
-					style={{ fontFamily: 'var(--text-font-mono)' }}
-				>
-					AniDex — Selecione uma opção
-				</Title>
+                    style={{ fontFamily: 'var(--text-font-mono)' }}
+                >
+                    AniDex — Selecione uma opção
+                </Title>
 
 				<Space h="md" />
 
-				<Container
-					fluid
-					className="
+                <Container
+                    fluid
+                    className="
                         bg-black/40 rounded-lg backdrop-blur-sm border border-white/20 shadow-lg
                         w-full max-w-none mx-auto
                         p-4 sm:p-6 md:p-8
-                        mt-12 mb-0
-                        h-[80vh] overflow-hidden
+                        mt-6 sm:mt-10 lg:mt-12 mb-16 sm:mb-20 lg:mb-0
+                        h-auto lg:h-[80vh]
+                        overflow-visible lg:overflow-y-auto
                     "
-				>
-					<Box
-						className="
-                                grid gap-4 h-full
+                >
+                    <Box
+                        className="
+                                grid gap-4 h-auto lg:h-full
                                 grid-cols-1 md:grid-cols-2
                                 md:[grid-template-rows:repeat(3,minmax(220px,1fr))]
                                 pt-2 pb-2 pr-2 pl-2
                             "
-					>
+                    >
 						{/* Card 1: Buscar Anime */}
 						<Box
 							className="

@@ -57,19 +57,20 @@ const IntroScreen: React.FC = () => {
             {/* Overlay escuro por cima do wallpaper */}
             <div className="absolute inset-0 bg-black/60 pointer-events-none" />
 
-            {/* Conteúdo centralizado */}
+            {/* Conteúdo centralizado (responsivo) */}
             <div
                 className="
                     relative z-10 w-full min-h-screen
                     max-w-[92vw] 2xl:max-w-[1900px] mx-auto
                     px-4 sm:px-6 lg:px-12
-                    flex items-center justify-center
+                    flex items-start lg:items-center justify-center
+                    py-8 lg:py-0
                 "
             >
-                {/* Grid 2:3 com altura fixa e itens esticando */}
-                <div className="grid grid-cols-5 gap-4 items-stretch min-h-[70vh]">
+                {/* Grid responsiva: empilha no mobile e divide 2:3 no desktop */}
+                <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 items-stretch w-full min-h-0 lg:min-h-[70vh]">
 
-                    <div className="col-span-2 h-full">
+                    <div className="col-span-1 lg:col-span-2 h-auto lg:h-full">
 
                         <Container
                             fluid
@@ -81,12 +82,12 @@ const IntroScreen: React.FC = () => {
                                 "
                         >
 
-                            <Box className="flex flex-col items-center">
+                            <Box className="flex flex-col items-center justify-center h-full">
                                 <Image
                                     src={logo}
-                                    h={700}
                                     w="auto"
                                     alt="AniDex Logo"
+                                    className="h-36 sm:h-48 md:h-56 lg:h-[28rem] xl:h-[34rem]"
                                     style={{
                                         filter: 'drop-shadow(0 12px 26px rgba(0,0,0,0.55))',
                                     }}
@@ -96,18 +97,17 @@ const IntroScreen: React.FC = () => {
 
                                 <Title
                                     order={2}
-                                    className="text-shadow-lg/40 uppercase tracking-(--title-letter-spacing)"
+                                    className="text-shadow-lg/40 uppercase tracking-(--title-letter-spacing) text-center"
                                     style={{
                                         fontFamily: 'var(--text-font-mono)',
-                                        color: 'var(--color1)',
-                                        fontSize: 28,
+                                        color: 'var(--color1)'
                                     }}
                                 >
                                     Bem-vindo
                                 </Title>
 
                                 <Text
-                                    className="mt-2 opacity-90 uppercase tracking-(--title-letter-spacing) text-center"
+                                    className="mt-2 opacity-90 uppercase tracking-(--title-letter-spacing) text-center text-sm sm:text-base md:text-lg"
                                     style={{
                                         fontFamily: 'var(--text-font-body)',
                                         color: 'var(--colorTextWhite)'
@@ -134,26 +134,25 @@ const IntroScreen: React.FC = () => {
                         </Container>
                     </div>
 
-                    <div className="col-span-3 h-full">
+                    <div className="col-span-1 lg:col-span-3 h-auto lg:h-full mt-6 lg:mt-0">
                         <Container
                             fluid
                             className="
-                                w-full h-full max-w-none
+                                w-full h-auto lg:h-full max-w-none
                                 bg-black/40 rounded-lg 
                                 backdrop-blur-sm border border-white/20 shadow-lg 
-                                p-6
+                                p-4 sm:p-6 md:p-8
                                 flex items-center justify-center
                             "
-                            style={{ paddingLeft: 58, paddingRight: 58 }}
+                            
                         >
                             <div>
                                 <Title
                                     order={3}
-                                    className="text-shadow-lg/40 text-center uppercase tracking-(--title-letter-spacing)"
+                                    className="text-shadow-lg/40 text-center uppercase tracking-(--title-letter-spacing) text-xl sm:text-2xl md:text-3xl"
                                     style={{
                                         fontFamily: 'var(--text-font-mono)',
-                                        color: 'var(--color1)',
-                                        fontSize: 32,
+                                        color: 'var(--color1)'
                                     }}
                                 >
                                     Aviso importante
@@ -170,11 +169,11 @@ const IntroScreen: React.FC = () => {
                                     font-bold
                                     uppercase
                                     tracking-(--title-letter-spacing)
+                                    text-sm sm:text-base md:text-lg lg:text-xl
                                 "
                                     style={{
                                         fontFamily: 'var(--text-font-body)',
-                                        color: 'var(--colorTextWhite)',
-                                        fontSize: 24,
+                                        color: 'var(--colorTextWhite)'
                                     }}
                                 >
                                     Este é um projeto pessoal, sem fins lucrativos, concebido com finalidade exclusivamente educacional. Seu objetivo é explorar, validar e aprimorar práticas de desenvolvimento de software, design de interfaces e integração de serviços, sem qualquer intenção comercial.
@@ -194,11 +193,11 @@ const IntroScreen: React.FC = () => {
                                     font-bold
                                     uppercase
                                     tracking-(--title-letter-spacing)
+                                    text-sm sm:text-base md:text-lg lg:text-xl
                                 "
                                     style={{
                                         fontFamily: 'var(--text-font-body)',
-                                        color: 'var(--colorTextWhite)',
-                                        fontSize: 24,
+                                        color: 'var(--colorTextWhite)'
                                     }}
                                 >
                                     Este projeto utiliza a API não oficial do MyAnimeList (Jikan) para buscar informações sobre animes. 
