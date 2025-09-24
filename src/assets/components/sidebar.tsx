@@ -61,7 +61,7 @@ const Sidebar: React.FC = () => {
 	const [active, setActive] = useState<string>('dashboard');
 	const [aboutOpen, setAboutOpen] = useState<boolean>(false);
 	const [debugOpen, setDebugOpen] = useState<boolean>(false);
-	const { devModeEnabled, lastApiPayload, lastSearchPayload, lastPicturesPayload, lastCharactersPayload, lastTopCharactersPayload, lastCharactersSearchPayload } = useSettings();
+	const { devModeEnabled, lastApiPayload: _lastApiPayload, lastSearchPayload, lastPicturesPayload, lastCharactersPayload, lastTopCharactersPayload, lastCharactersSearchPayload } = useSettings();
 
     const items: Item[] = useMemo(() => ([
         { key: 'intro', label: 'Introdução', icon: <FaCubes />, link: '/introScreen' },

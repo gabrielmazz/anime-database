@@ -1,4 +1,4 @@
-import React from 'react';
+// React 19+ não precisa do import explícito
 import styled from 'styled-components';
 
 import { Text } from '@mantine/core';
