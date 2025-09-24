@@ -25,6 +25,7 @@ import { GrConfigure } from "react-icons/gr";
 import { FaTv, FaTrophy } from "react-icons/fa";
 import { MdMenuBook } from "react-icons/md";
 import { FaCubes } from "react-icons/fa";
+import { IoAccessibilityOutline } from "react-icons/io5";
 
 type Item = {
 	key: string;
@@ -70,6 +71,7 @@ const Sidebar: React.FC = () => {
         { key: 'searchManga', label: 'Buscar Manga', icon: <MdMenuBook />, link: '/searchScreenManga' },
         { key: 'seasons', label: 'Explorar Temporadas', icon: <FaCalendarAlt />, link: '/seasonScreen' },
         { key: 'searchCharacters', label: 'Buscar Personagem', icon: <IoSearch />, link: '/searchScreenCharacters' },
+        { key: 'searchProducers', label: 'Buscar Produtores', icon: <IoAccessibilityOutline />, link: '/searchScreenProducers' },
         { key: 'topAnimes', label: 'Top Animes', icon: <FaTrophy />, link: '/topAnimesScreen' },
         { key: 'debug', label: 'Debug', icon: <GrConfigure />, link: '/devConfigurationsScreen' },
     ]), []);

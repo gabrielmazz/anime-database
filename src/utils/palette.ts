@@ -114,10 +114,7 @@ function bucketKey(r: number, g: number, b: number, step: number): string {
     return `${br},${bg},${bb}`;
 }
 
-function toRgb(key: string): RGB {
-    const [r, g, b] = key.split(',').map((v) => parseInt(v, 10));
-    return { r, g, b };
-}
+// (legacy helper removido – não utilizado)
 
 export async function extractPaletteFromImage(
     src: string,

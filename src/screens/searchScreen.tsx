@@ -40,7 +40,7 @@ const SearchScreen: React.FC = () => {
 
     const [nameAnimerSearch, setNameAnimeSearch] = useState('');
     const { apiModalEnabled, setLastApiPayload, setLastSearchPayload, setLastPicturesPayload, setLastCharactersPayload } = useSettings();
-    const [wallpaper, setWallpaper] = useState<string>(() => getRandomWallpaper('search'));
+    const [wallpaper, _setWallpaper] = useState<string>(() => getRandomWallpaper('search'));
 
     // Extrai paleta baseada no wallpaper e aplica nas CSS variables
     useEffect(() => {
