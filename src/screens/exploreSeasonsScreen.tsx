@@ -1,7 +1,22 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 // UI base e layout
-import { BackgroundImage, Box, Container, Group, Image, NumberInput, Select, Space, Table, Text, Title, MultiSelect, Grid, Divider } from '@mantine/core';
+import {
+  BackgroundImage,
+  Box,
+  Container,
+  Divider,
+  Grid,
+  Group,
+  Image,
+  MultiSelect,
+  NumberInput,
+  Select,
+  Space,
+  Table,
+  Text,
+  Title,
+} from '@mantine/core';
 import { Carousel } from '@mantine/carousel';
 import Autoplay from 'embla-carousel-autoplay';
 import { useMediaQuery } from '@mantine/hooks';
@@ -51,7 +66,7 @@ function formatNumber(n?: number | null) {
 
 const ExploreSeasonsScreen: React.FC = () => {
 	const now = new Date();
-	const [wallpaper, setWallpaper] = useState<string>(() => getRandomWallpaper('seasons'));
+	const [wallpaper, _setWallpaper] = useState<string>(() => getRandomWallpaper('seasons'));
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const [rows, setRows] = useState<Anime[]>([]);
 	const [rawRows, setRawRows] = useState<Anime[]>([]);
@@ -67,7 +82,7 @@ const ExploreSeasonsScreen: React.FC = () => {
     const [animeSelectedCharacters, setAnimeSelectedCharacters] = useState<any>(null);
     const [translatedSynopsis, setTranslatedSynopsis] = useState<string | null>(null);
     const [translateStatus, setTranslateStatus] = useState<string | null>(null);
-	const [showHentai, setShowHentai] = useState<boolean>(false);
+	const [showHentai, _setShowHentai] = useState<boolean>(false);
 	const [genreOptions, setGenreOptions] = useState<{ value: string; label: string }[]>([]);
 	const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
 
@@ -358,7 +373,13 @@ const ExploreSeasonsScreen: React.FC = () => {
 		<>
 			<BackgroundImage
 				src={wallpaper}
-				className="relative text-white w-full min-h-screen bg-cover bg-no-repeat bg-center bg-fixed"
+				className="
+					relative
+					text-white
+					w-full
+					min-h-screen
+					bg-cover bg-no-repeat bg-center bg-fixed
+				"
 			>
 				{/* Overlay escurecedor */}
 				<div className="absolute inset-0 bg-black/60 pointer-events-none" />
@@ -373,15 +394,22 @@ const ExploreSeasonsScreen: React.FC = () => {
 				{/* Conteúdo principal */}
 				<div
 					className="
-						container relative z-10 min-h-screen mx-auto
-						px-4 sm:px-6 lg:px-8 flex flex-col
+						container
+						relative z-10
+						min-h-screen
+						mx-auto
+						px-4 sm:px-6 lg:px-8
+						flex flex-col
 					"
 				>
 					<Title
 						className="
-							flex justify-center text-center pt-8
-							text-shadow-lg/20 text-(--color1)
-							uppercase tracking-(--title-letter-spacing)
+							flex justify-center text-center
+							pt-8
+							text-shadow-lg/20
+							text-(--color1)
+							uppercase
+							tracking-(--title-letter-spacing)
 							text-2xl sm:text-3xl lg:text-4xl
 						"
 						style={{ fontFamily: 'var(--text-font-mono)' }}

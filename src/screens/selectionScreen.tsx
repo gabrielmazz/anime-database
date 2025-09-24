@@ -32,7 +32,12 @@ const SelectionScreen: React.FC = () => {
 	return (
 		<BackgroundImage
 			src={wallpaper}
-			className="relative w-full min-h-screen bg-cover bg-no-repeat bg-center bg-fixed"
+			className="
+				relative
+				w-full
+				min-h-screen
+				bg-cover bg-no-repeat bg-center bg-fixed
+			"
 		>
 			{/* Overlay escuro por cima do wallpaper */}
 			<div className="absolute inset-0 bg-black/60 pointer-events-none" />
@@ -43,11 +48,13 @@ const SelectionScreen: React.FC = () => {
 			{/* Container principal */}
 			<div
 				className="
-                    relative z-10 w-full min-h-screen
-                    max-w-[92vw] 2xl:max-w-[1900px] mx-auto align-top
-                    px-4 sm:px-6 lg:px-12
-                "
-                >
+					relative z-10
+					w-full min-h-screen
+					max-w-[92vw] 2xl:max-w-[1900px]
+					mx-auto
+					px-4 sm:px-6 lg:px-12
+				"
+			>
                 <Title
                     className="
                         pt-6

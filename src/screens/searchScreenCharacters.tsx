@@ -1,30 +1,54 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 
-// UI base e layout
-import { BackgroundImage, Box, Container, Group, Image, Space, Text, TextInput, Title } from '@mantine/core';
-import { Table } from '@mantine/core';
-import InfoDrawer from '../assets/components/infoDrawer.tsx';
-import DrawerModule from '../assets/inputInfos/Drawer.module.css';
-import LoaderBox from '../assets/components/loaderBox.tsx';
-import AlertBox from '../assets/components/alert.tsx';
-
-import TextInputModule from './../assets/inputInfos/TextInput.module.css';
-import SelectModule from '../assets/inputInfos/Select.module.css';
+// UI base (Mantine)
+import {
+  BackgroundImage,
+  Box,
+  Container,
+  Divider,
+  Group,
+  HoverCard,
+  Image,
+  Pill,
+  Space,
+  Table,
+  Text,
+  TextInput,
+  Title,
+} from '@mantine/core';
+import { useMediaQuery } from '@mantine/hooks';
 
 // Componentes compartilhados
 import Sidebar from '../assets/components/sidebar.tsx';
 import LoadingOverlayFullscreen from '../assets/components/overlay.tsx';
+import InfoDrawer from '../assets/components/infoDrawer.tsx';
+import AlertBox from '../assets/components/alert.tsx';
+import LoaderBox from '../assets/components/loaderBox.tsx';
+
+// CSS Modules (Inputs / Tabela / HoverCard)
+import TextInputModule from '../assets/inputInfos/TextInput.module.css';
+// import SelectModule from '../assets/inputInfos/Select.module.css';
+import MultiSelectModule from '../assets/inputInfos/MultiSelect.module.css';
+import HoverCardModule from '../assets/inputInfos/HoverCard.module.css';
+import TableModule from '../assets/inputInfos/Table.module.css';
+import DrawerModule from '../assets/inputInfos/Drawer.module.css';
 
 // Tema dinâmico
 import { applyPaletteToCssVariables, extractPaletteFromImage } from '../utils/palette';
 import { getRandomWallpaper } from '../utils/wallpaper';
 
 // APIs
-import { getTopCharacters, searchCharactersByName, getCharacterFull, type Character } from '../assets/API/jikan';
+import {
+  getTopCharacters,
+  searchCharactersByName,
+  getCharacterFull,
+  searchAnimeByName,
+  searchMangaByName,
+  type Character,
+  type Anime,
+  type Manga,
+} from '../assets/API/jikan';
 import { useSettings } from '../state/settings';
-
-// Estilos da Tabela no padrão do projeto
-import TableModule from '../assets/inputInfos/Table.module.css';
 
 function formatNumber(n?: number) {
 	if (typeof n !== 'number') return '-';
@@ -32,7 +56,7 @@ function formatNumber(n?: number) {
 }
 
 const SearchScreenCharacters: React.FC = () => {
-	const [wallpaper, setWallpaper] = useState<string>(() => getRandomWallpaper('characters'));
+	const [wallpaper, _setWallpaper] = useState<string>(() => getRandomWallpaper('characters'));
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const [query, setQuery] = useState<string>('');
 	const [rows, setRows] = useState<Character[]>([]);
@@ -44,8 +68,16 @@ const SearchScreenCharacters: React.FC = () => {
 	const scrollRef = useRef<HTMLDivElement | null>(null);
 	const sentinelRef = useRef<HTMLDivElement | null>(null);
 	const [openedCharacterInfo, setOpenedCharacterInfo] = useState<boolean>(false);
-	const [selectedCharacter, setSelectedCharacter] = useState<Character | null>(null);
-	const [selectedCharacterFull, setSelectedCharacterFull] = useState<any | null>(null);
+    const [selectedCharacter, setSelectedCharacter] = useState<Character | null>(null);
+    const [selectedCharacterFull, setSelectedCharacterFull] = useState<any | null>(null);
+    const [animeHoverCache, setAnimeHoverCache] = useState<Record<string, { status: 'loading' | 'success' | 'error'; data?: Anime | null }>>({});
+    const [mangaHoverCache, setMangaHoverCache] = useState<Record<string, { status: 'loading' | 'success' | 'error'; data?: Manga | null }>>({});
+
+	// Breakpoints responsivos
+	const isSmDown = useMediaQuery('(max-width: 640px)');
+	const isLgDown = useMediaQuery('(max-width: 1024px)');
+	const drawerSize = isLgDown ? '100%' : '35%';
+	const coverHeight = isSmDown ? 360 : isLgDown ? 480 : 600;
 
 	// Alertas (suave) para feedback de requisições
 	const [alertVisible, setAlertVisible] = useState(false);
@@ -210,7 +242,7 @@ const SearchScreenCharacters: React.FC = () => {
 		return () => observer.disconnect();
 	}, [mode, page, rows, query, apiModalEnabled, hasMore, isLoadingMore, charactersPageLimit]);
 
-	const tableRows = useMemo(() => {
+  const tableRows = useMemo(() => {
 		return rows.map((c, idx) => (
 			<Table.Tr
 				key={c.mal_id}
@@ -242,13 +274,47 @@ const SearchScreenCharacters: React.FC = () => {
 				</Table.Td>
 			</Table.Tr>
 		));
-	}, [rows]);
+  }, [rows]);
+
+  const ensureAnimeHoverInfo = async (title: string) => {
+    const key = (title || '').trim();
+    if (!key) return;
+    setAnimeHoverCache((prev) => (prev[key] ? prev : { ...prev, [key]: { status: 'loading' } }));
+    if (animeHoverCache[key]) return; // já em cache ou carregando
+    try {
+      const res = await searchAnimeByName(key);
+      const data = Array.isArray(res?.data) && res.data.length > 0 ? (res.data[0] as Anime) : null;
+      setAnimeHoverCache((prev) => ({ ...prev, [key]: { status: 'success', data } }));
+    } catch {
+      setAnimeHoverCache((prev) => ({ ...prev, [key]: { status: 'error', data: null } }));
+    }
+  };
+
+  const ensureMangaHoverInfo = async (title: string) => {
+    const key = (title || '').trim();
+    if (!key) return;
+    setMangaHoverCache((prev) => (prev[key] ? prev : { ...prev, [key]: { status: 'loading' } }));
+    if (mangaHoverCache[key]) return;
+    try {
+      const res = await searchMangaByName(key);
+      const data = Array.isArray(res?.data) && res.data.length > 0 ? (res.data[0] as Manga) : null;
+      setMangaHoverCache((prev) => ({ ...prev, [key]: { status: 'success', data } }));
+    } catch {
+      setMangaHoverCache((prev) => ({ ...prev, [key]: { status: 'error', data: null } }));
+    }
+  };
 
 	return (
 		<>
 			<BackgroundImage
 				src={wallpaper}
-				className="relative text-white w-full min-h-screen bg-cover bg-no-repeat bg-center bg-fixed"
+				className="
+					relative
+					text-white
+					w-full
+					min-h-screen
+					bg-cover bg-no-repeat bg-center bg-fixed
+				"
 			>
 				{/* Overlay escurecedor */}
 				<div className="absolute inset-0 bg-black/60 pointer-events-none" />
@@ -263,19 +329,23 @@ const SearchScreenCharacters: React.FC = () => {
 				{/* Conteúdo principal */}
 				<div
 					className="
-					relative z-10 w-full min-h-screen
-					max-w-[92vw] 2xl:max-w-[1900px] mx-auto align-top
-					px-4 sm:px-6 lg:px-12
-				"
+						container
+						relative z-10
+						min-h-screen
+						mx-auto
+						px-4 sm:px-6 lg:px-8
+						flex flex-col
+					"
 				>
 					<Title
 						className="
-							flex justify-center
+							flex justify-center text-center
 							pt-8
 							text-shadow-lg/20
 							text-(--color1)
 							uppercase
 							tracking-(--title-letter-spacing)
+							text-2xl sm:text-3xl lg:text-4xl
 						"
 						style={{ fontFamily: 'var(--text-font-mono)' }}
 					>
@@ -298,6 +368,9 @@ const SearchScreenCharacters: React.FC = () => {
 							}}
 							className="
 								mt-4
+								w-full
+								max-w-2xl
+								mx-auto
 							"
 							onChange={(e) => setQuery(e.currentTarget.value)}
 							onKeyDown={(e) => {
@@ -321,17 +394,18 @@ const SearchScreenCharacters: React.FC = () => {
 					<Container
 						fluid
 						className="
-						bg-black/40 rounded-lg backdrop-blur-sm border border-white/20 shadow-lg
-                        w-full max-w-none mx-auto
-                        p-4 sm:p-6 md:p-8
-                        mt-6 mb-0
-                        h-[70vh] overflow-hidden
-					"
+							bg-black/40 rounded-lg backdrop-blur-sm border border-white/20 shadow-lg
+							w-full max-w-none mx-auto
+							p-4 sm:p-6 md:p-8
+							mt-6 mb-0
+							h-[70vh] overflow-hidden
+						"
 					>
 
-						<div ref={scrollRef} className="h-[calc(100%-0px)] overflow-auto rounded-md">
+						<div ref={scrollRef} className="h-[calc(100%-0px)] overflow-auto rounded-md overflow-x-auto">
 							<Table
 								highlightOnHover
+								className="min-w-[640px]"
 								classNames={{
 									table: TableModule.tableTable,
 									thead: TableModule.theadTable,
@@ -341,7 +415,7 @@ const SearchScreenCharacters: React.FC = () => {
 									caption: TableModule.captionTable,
 								}}
 							>
-								<Table.Thead>
+								<Table.Thead className="sticky top-0 z-10">
 									<Table.Tr>
 										<Table.Th style={{ width: 64 }}>Rank</Table.Th>
 										<Table.Th>Character</Table.Th>
@@ -361,32 +435,94 @@ const SearchScreenCharacters: React.FC = () => {
 			{/* Drawer de informações do personagem */}
 			<InfoDrawer
 				opened={openedCharacterInfo}
-				onClose={() => { setOpenedCharacterInfo(false); setSelectedCharacter(null); setSelectedCharacterFull(null); }}
+				onClose={() => {
+					setOpenedCharacterInfo(false);
+					setSelectedCharacter(null);
+					setSelectedCharacterFull(null);
+				}}
 				title={
 					<Title
 						order={2}
-						className="font-bold text-shadow-lg/20 text-(--colorTextWhite) uppercase tracking-(--title-letter-spacing)"
+						className="
+							font-bold
+							text-shadow-lg/20
+							text-(--colorTextWhite)
+							uppercase
+							tracking-(--title-letter-spacing)
+						"
 						style={{ fontSize: 32, fontFamily: 'var(--text-font-mono)' }}
 					>
 						Informações do Personagem
 					</Title>
 				}
 				position="right"
-				size="40%"
+				size={drawerSize}
 				overlayProps={{ backgroundOpacity: 0.5, blur: 4 }}
 				classNames={{ root: DrawerModule.rootDrawer, header: DrawerModule.headerDrawer, body: DrawerModule.bodyDrawer }}
 				content={selectedCharacter && (
 					<>
 						<Box>
-							<Image src={selectedCharacter.images?.jpg?.image_url} radius="md" h={300} w="auto" className="mb-4" />
-							<Title size="xl" className="font-bold text-center text-shadow-lg/20 text-(--colorTextWhite) uppercase tracking-(--title-letter-spacing)" style={{ fontSize: 28, fontFamily: 'var(--text-font-mono)' }}>
+							<Image
+								src={selectedCharacter.images?.jpg?.image_url}
+								radius="md"
+								h={coverHeight}
+								w="auto"
+								className="
+									mb-4
+									flex items-center justify-center justify-self-center
+									shadow-lg/40
+								"
+							/>
+
+							<Title size="xl" className="font-bold text-center text-shadow-lg/20 text-(--colorTextWhite) uppercase tracking-(--title-letter-spacing)" style={{ fontSize: 32, fontFamily: 'var(--text-font-mono)' }}>
 								{selectedCharacter.name}
 							</Title>
-							<Space h="md" />
-							<Text style={{ color: 'var(--colorTextWhite)' }}>ID: {selectedCharacter.mal_id} • Favoritos: {formatNumber(selectedCharacter.favorites)}</Text>
-						</Box>
 
-						<Space h="lg" />
+							<Space h="md" />
+
+							<Text
+								component="span"
+								className="
+										font-bold
+										uppercase
+										tracking-(--title-letter-spacing)
+									"
+								style={{
+									fontSize: 16,
+									fontFamily: 'Raleway, sans-serif',
+									color: 'var(--colorTextWhite)',
+									marginRight: 6
+								}}
+							>
+								ID:
+							</Text>
+							<Text component="span" style={{ color: 'var(--colorTextWhite)' }}>
+								{selectedCharacter.mal_id}
+							</Text>
+						</Box>
+						<Space h="sm" />
+						<Box>
+							<Text
+								component="span"
+								className="
+										font-bold
+										uppercase
+										tracking-(--title-letter-spacing)
+									"
+								style={{
+									fontSize: 16,
+									fontFamily: 'Raleway, sans-serif',
+									color: 'var(--colorTextWhite)',
+									marginRight: 6
+								}}
+							>
+								Favoritos:
+							</Text>
+							<Text component="span" style={{ color: 'var(--colorTextWhite)' }}>
+								{formatNumber(selectedCharacter.favorites)}
+							</Text>
+						</Box>
+						<Space h="md" />
 
 						{!selectedCharacterFull && (
 							<LoaderBox message="Carregando detalhes do personagem..." />
@@ -396,34 +532,184 @@ const SearchScreenCharacters: React.FC = () => {
 							<>
 								{selectedCharacterFull?.about && (
 									<Box>
-										<Text className="font-bold uppercase tracking-(--title-letter-spacing)" style={{ fontSize: 16, fontFamily: 'Raleway, sans-serif', color: 'var(--colorTextWhite)', marginRight: 6 }}>Sobre:</Text>
-										<Text style={{ color: 'var(--colorTextWhite)' }}>{selectedCharacterFull.about}</Text>
+										<Text
+											component="span"
+											className="
+												font-bold
+												uppercase
+												tracking-(--title-letter-spacing)
+											"
+											style={{
+												fontSize: 16,
+												fontFamily: 'Raleway, sans-serif',
+												color: 'var(--colorTextWhite)',
+												marginRight: 6
+											}}
+										>
+											Sobre:
+										</Text>
+										<Text component="span" style={{ color: 'var(--colorTextWhite)' }}>
+											{selectedCharacterFull.about}
+										</Text>
 									</Box>
 								)}
 
-								<Space h="lg" />
+								<Divider
+									my="xl"
+									label={
+										<Text
+											component="span"
+											className="
+										font-bold
+										uppercase
+										tracking-(--title-letter-spacing)
+									"
+											style={{
+												fontSize: 16,
+												fontFamily: 'Raleway, sans-serif',
+												color: 'var(--colorTextWhite)',
+												marginRight: 6
+											}}
+										>
+											Animes em que aparece
+										</Text>
+									}
+									labelPosition="center"
+								/>
 
 								{Array.isArray(selectedCharacterFull?.anime) && selectedCharacterFull.anime.length > 0 && (
 									<Box>
-										<Text className="font-bold uppercase tracking-(--title-letter-spacing)" style={{ fontSize: 16, fontFamily: 'Raleway, sans-serif', color: 'var(--colorTextWhite)', marginRight: 6 }}>Animeography:</Text>
-										<ul style={{ paddingLeft: 16 }}>
-											{(selectedCharacterFull.anime as any[]).slice(0, 6).map((a, i) => (
-												<li key={i}><Text style={{ color: 'var(--colorTextWhite)' }}>{a?.anime?.title ?? '-'}</Text></li>
-											))}
-										</ul>
+										<div className="rounded-lg border border-white/20 bg-black/30 backdrop-blur-sm p-2">
+											<Pill.Group className="flex flex-wrap gap-2">
+                                {(selectedCharacterFull.anime as any[])
+                                    .map((a) => (a?.anime?.title ?? '').trim())
+                                    .filter((t: string) => t.length > 0)
+                                    .slice(0, 20)
+                                    .map((title: string, i: number) => {
+                                        const info = animeHoverCache[title];
+                                        return (
+                                            <HoverCard
+                                                key={i}
+                                                width={340}
+                                                shadow="md"
+                                                withinPortal
+                                                openDelay={250}
+                                                closeDelay={100}
+                                                classNames={{ dropdown: HoverCardModule.dropdownHoverCard }}
+                                            >
+                                                <HoverCard.Target>
+                                                    <Pill
+                                                        size="sm"
+                                                        radius="xl"
+                                                        onMouseEnter={() => ensureAnimeHoverInfo(title)}
+                                                        className={MultiSelectModule.pillMultiSelect}
+                                                        style={{ color: 'var(--colorTextWhite)', cursor: 'pointer' }}
+                                                    >
+                                                        {title}
+                                                    </Pill>
+                                                </HoverCard.Target>
+                                                <HoverCard.Dropdown>
+                                                    {!info || info.status === 'loading' ? (
+                                                        <Text size="sm" className={HoverCardModule.metaHoverCard}>Carregando informações...</Text>
+                                                    ) : info.status === 'error' || !info.data ? (
+                                                        <Text size="sm" className={HoverCardModule.metaHoverCard}>Não foi possível obter informações.</Text>
+                                                    ) : (
+                                                        <div className="flex gap-3 items-start">
+                                                            <Image src={info.data.images?.jpg?.image_url} w={72} h={96} radius="sm" alt={info.data.title} />
+                                                            <div className="min-w-0">
+                                                                <Text className={HoverCardModule.titleHoverCard}>{info.data.title}</Text>
+                                                                <Text size="sm" className={HoverCardModule.metaHoverCard}>Score: {formatNumber(info.data.score)}</Text>
+                                                                <Text size="sm" className={HoverCardModule.metaHoverCard}>Episódios: {formatNumber((info.data as any).episodes)}</Text>
+                                                                <Text size="sm" className={HoverCardModule.metaHoverCard}>Status: {(info.data as any).status}</Text>
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </HoverCard.Dropdown>
+                                            </HoverCard>
+                                        );
+                                    })}
+											</Pill.Group>
+										</div>
+
 									</Box>
 								)}
 
-								<Space h="lg" />
+								<Divider
+									my="xl"
+									label={
+										<Text
+											component="span"
+											className="
+												font-bold
+												uppercase
+												tracking-(--title-letter-spacing)
+											"
+											style={{
+												fontSize: 16,
+												fontFamily: 'Raleway, sans-serif',
+												color: 'var(--colorTextWhite)',
+												marginRight: 6
+											}}
+										>
+											Mangas em que aparece
+										</Text>
+									}
+									labelPosition="center"
+								/>
 
 								{Array.isArray(selectedCharacterFull?.manga) && selectedCharacterFull.manga.length > 0 && (
 									<Box>
-										<Text className="font-bold uppercase tracking-(--title-letter-spacing)" style={{ fontSize: 16, fontFamily: 'Raleway, sans-serif', color: 'var(--colorTextWhite)', marginRight: 6 }}>Mangagraphy:</Text>
-										<ul style={{ paddingLeft: 16 }}>
-											{(selectedCharacterFull.manga as any[]).slice(0, 6).map((m, i) => (
-												<li key={i}><Text style={{ color: 'var(--colorTextWhite)' }}>{m?.manga?.title ?? '-'}</Text></li>
-											))}
-										</ul>
+										<div className="rounded-lg border border-white/20 bg-black/30 backdrop-blur-sm p-2">
+											<Pill.Group className="flex flex-wrap gap-2">
+                                            {(selectedCharacterFull.manga as any[])
+                                                .map((m) => (m?.manga?.title ?? '').trim())
+                                                .filter((t: string) => t.length > 0)
+                                                .slice(0, 20)
+                                                .map((title: string, i: number) => {
+                                                    const info = mangaHoverCache[title];
+                                                    return (
+                                                        <HoverCard
+                                                            key={i}
+                                                            width={340}
+                                                            shadow="md"
+                                                            withinPortal
+                                                            openDelay={250}
+                                                            closeDelay={100}
+                                                            classNames={{ dropdown: HoverCardModule.dropdownHoverCard }}
+                                                        >
+                                                            <HoverCard.Target>
+                                                                <Pill
+                                                                    size="sm"
+                                                                    radius="xl"
+                                                                    onMouseEnter={() => ensureMangaHoverInfo(title)}
+                                                                    className={MultiSelectModule.pillMultiSelect}
+                                                                    style={{ color: 'var(--colorTextWhite)', cursor: 'pointer' }}
+                                                                >
+                                                                    {title}
+                                                                </Pill>
+                                                            </HoverCard.Target>
+                                                            <HoverCard.Dropdown>
+                                                                {!info || info.status === 'loading' ? (
+                                                                    <Text size="sm" className={HoverCardModule.metaHoverCard}>Carregando informações...</Text>
+                                                                ) : info.status === 'error' || !info.data ? (
+                                                                    <Text size="sm" className={HoverCardModule.metaHoverCard}>Não foi possível obter informações.</Text>
+                                                                ) : (
+                                                                    <div className="flex gap-3 items-start">
+                                                                        <Image src={info.data.images?.jpg?.image_url} w={72} h={96} radius="sm" alt={info.data.title} />
+                                                                        <div className="min-w-0">
+                                                                            <Text className={HoverCardModule.titleHoverCard}>{info.data.title}</Text>
+                                                                            <Text size="sm" className={HoverCardModule.metaHoverCard}>Score: {formatNumber((info.data as any).score)}</Text>
+                                                                            <Text size="sm" className={HoverCardModule.metaHoverCard}>Capítulos: {formatNumber((info.data as any).chapters)}</Text>
+                                                                            <Text size="sm" className={HoverCardModule.metaHoverCard}>Status: {(info.data as any).status}</Text>
+                                                                        </div>
+                                                                    </div>
+                                                                )}
+                                                            </HoverCard.Dropdown>
+                                                        </HoverCard>
+                                                    );
+                                                })}
+											</Pill.Group>
+										</div>
 									</Box>
 								)}
 							</>

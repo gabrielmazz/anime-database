@@ -1,0 +1,27 @@
+.rootHoverCard {
+  /* Keep default inline-block behavior */
+}
+
+.dropdownHoverCard {
+  background-color: var(--panel-bg);
+  color: var(--colorTextWhite);
+  border: 1px solid var(--panel-border);
+  border-radius: 12px;
+  padding: 12px;
+  backdrop-filter: blur(6px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+}
+
+.titleHoverCard {
+  color: var(--color1);
+  font-family: var(--text-font-mono);
+  letter-spacing: var(--title-letter-spacing);
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.metaHoverCard {
+  color: var(--colorTextWhite);
+  font-family: var(--text-font-body);
+}
+

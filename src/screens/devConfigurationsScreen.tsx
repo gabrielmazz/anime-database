@@ -1,18 +1,19 @@
 import React, { useEffect, useState } from 'react';
 
-// Layout e UI base (igual SearchScreen)
-import { BackgroundImage } from '@mantine/core';
-import { Box } from '@mantine/core';
-import { Space } from '@mantine/core';
-import { Text } from '@mantine/core';
-import { Title } from '@mantine/core';
-import { Container } from '@mantine/core';
-import { Group } from '@mantine/core';
-import { NumberInput } from '@mantine/core';
+// UI base (Mantine)
+import {
+  BackgroundImage,
+  Container,
+  Group,
+  NumberInput,
+  Space,
+  Switch,
+  Text,
+  Title,
+} from '@mantine/core';
 import NumberInputModule from '../assets/inputInfos/NumberInput.module.css';
 
-// Componentes de input
-import { Switch } from '@mantine/core';
+// Componentes / Estado global
 import SwitchModule from '../assets/inputInfos/Switch.module.css';
 import { useSettings } from '../state/settings';
 
@@ -26,7 +27,7 @@ import { applyPaletteToCssVariables, extractPaletteFromImage } from '../utils/pa
 import { getRandomWallpaper } from '../utils/wallpaper';
 
 const DevConfigurationsScreen: React.FC = () => {
-    const [wallpaper, setWallpaper] = useState<string>(() => getRandomWallpaper('dev'));
+    const [wallpaper, _setWallpaper] = useState<string>(() => getRandomWallpaper('dev'));
     const { apiModalEnabled, setApiModalEnabled, devModeEnabled, setDevModeEnabled, animesPageLimit, setAnimesPageLimit, charactersPageLimit, setCharactersPageLimit } = useSettings();
 
     // Extrai paleta baseada no wallpaper e aplica nas CSS variables
@@ -41,7 +42,13 @@ const DevConfigurationsScreen: React.FC = () => {
 
         <BackgroundImage
             src={wallpaper}
-            className="relative text-white w-full min-h-screen bg-cover bg-no-repeat bg-center bg-fixed"
+            className="
+                relative
+                text-white
+                w-full
+                min-h-screen
+                bg-cover bg-no-repeat bg-center bg-fixed
+            "
         >
             {/* Overlay escuro por cima do wallpaper */}
             <div className="absolute inset-0 bg-black/60 pointer-events-none" />
@@ -52,18 +59,16 @@ const DevConfigurationsScreen: React.FC = () => {
             {/* Container base para conteúdo da página (responsivo) */}
             <div
                 className="
-                    relative z-10 w-full min-h-screen
-                    max-w-[92vw] 2xl:max-w-[1900px] mx-auto align-top
-                    px-4 sm:px-6 lg:px-12
-                    pl-[1200px]
+                    container relative z-10 min-h-screen mx-auto
+                    px-4 sm:px-6 lg:px-8 flex flex-col
                 "
             >
                 <Title
                     className="
-                        flex justify-center pt-8
+                        flex justify-center text-center pt-8
                         text-shadow-lg/20 text-(--color1)
                         uppercase tracking-(--title-letter-spacing)
-                        text-[clamp(24px,4vw,42px)]
+                        text-2xl sm:text-3xl lg:text-4xl
                     "
                     style={{ fontFamily: 'var(--text-font-mono)' }}
                 >
@@ -78,8 +83,9 @@ const DevConfigurationsScreen: React.FC = () => {
                         bg-black/40 rounded-lg backdrop-blur-sm border border-white/20 shadow-lg
                         w-full max-w-none mx-auto
                         p-4 sm:p-6 md:p-8
-                        mt-4 mb-0
-                        h-[80vh] overflow-hidden
+                        mt-4 mb-12 lg:mb-0
+                        h-auto lg:h-[80vh]
+                        overflow-visible lg:overflow-y-auto
                     "
                 >
                     <Text style={{ color: 'var(--colorTextWhite)' }}>
@@ -103,8 +109,10 @@ const DevConfigurationsScreen: React.FC = () => {
 
                         <Space h="md" />
 
-                        <Group grow>
-
+                        <Group
+                            grow
+                            className="!flex !flex-col gap-6 sm:!flex-row"
+                        >
                             {/* Switch para ativar o Dev Mode (mostra o menu/botão de debug) */}
                             <Switch
                                 size="xl"
@@ -142,9 +150,6 @@ const DevConfigurationsScreen: React.FC = () => {
                                     thumb: SwitchModule.thumbSwitch,
                                 }}
                             />
-
-
-
                         </Group>
 
                         <Space h="md" />

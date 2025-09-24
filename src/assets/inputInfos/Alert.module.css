@@ -1,0 +1,39 @@
+.rootAlert {
+  position: relative;
+  background-color: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  color: var(--colorTextWhite);
+  border-radius: 12px;
+  backdrop-filter: blur(6px);
+  box-shadow: 0 8px 26px rgba(0, 0, 0, 0.45);
+  padding: 12px 14px 12px 14px;
+}
+
+.rootAlert::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  border-radius: 12px 0 0 12px;
+  background: var(--alert-accent, var(--color1));
+}
+
+.titleAlert {
+  color: var(--color1);
+  font-family: var(--text-font-mono);
+  letter-spacing: var(--title-letter-spacing);
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+.messageAlert {
+  color: var(--colorTextWhite);
+  font-family: var(--text-font-body);
+}
+
+.iconAlert {
+  color: var(--alert-accent, var(--color1));
+}
+

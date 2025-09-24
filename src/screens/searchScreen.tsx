@@ -1,40 +1,31 @@
-import React, { useEffect } from 'react';
-import { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
-// Componentes principais, montagem da tela
-import { Drawer } from '@mantine/core';
-import DrawerModule from './../assets/inputInfos/Drawer.module.css';
+// UI base (Mantine)
+import {
+  BackgroundImage,
+  Box,
+  Divider,
+  Grid,
+  Group,
+  Image,
+  Space,
+  Text,
+  TextInput,
+  Title,
+} from '@mantine/core';
+import { Carousel } from '@mantine/carousel';
+import { useMediaQuery } from '@mantine/hooks';
+import Autoplay from 'embla-carousel-autoplay';
 
+// Componentes compartilhados
+import Sidebar from '../assets/components/sidebar.tsx';
 import LoadingOverlayFullscreen from '../assets/components/overlay.tsx';
-import Sidebar from '../assets/components/sidebar.tsx'
 import LoaderBox from '../assets/components/loaderBox.tsx';
 import AlertBox from '../assets/components/alert.tsx';
 import InfoDrawer from '../assets/components/infoDrawer.tsx';
-import { useSettings } from '../state/settings';
-
-// Componente de carrossel
-import { Carousel } from '@mantine/carousel';
-import Autoplay from 'embla-carousel-autoplay';
-
-// Componentes de layout
-import { Grid } from '@mantine/core';
-import { Container } from '@mantine/core';
-import { Flex } from '@mantine/core';
-import { Box } from '@mantine/core';
-import { Group } from '@mantine/core';
-import { Divider } from '@mantine/core';
-import { Space } from '@mantine/core';
-import { BackgroundImage } from '@mantine/core';
-import { Image } from '@mantine/core';
-import { useMediaQuery } from '@mantine/hooks';
-
-// Componentes de texto
-import { Text } from '@mantine/core';
-import { Title } from '@mantine/core';
-
-// Componentes de input
-import { TextInput } from '@mantine/core';
+import DrawerModule from './../assets/inputInfos/Drawer.module.css';
 import TextInputModule from './../assets/inputInfos/TextInput.module.css';
+import { useSettings } from '../state/settings';
 
 // Utilitários, funções gerais
 import { getRandomWallpaper } from '../utils/wallpaper';
@@ -75,11 +66,27 @@ const SearchScreen: React.FC = () => {
         try {
             const data = await searchAnimeByName(nameAnimerSearch);
             setAnimeDatabase(data);
+
+            const count = Array.isArray(data?.data) ? data.data.length : 0;
+            if (count === 0) {
+                setAlertType('warning');
+                setAlertMessage('Nenhum anime encontrado para a busca.');
+                setAlertVisible(true);
+            } else {
+                setAlertType('success');
+                setAlertMessage(`Foram encontrados ${count} animes para a busca "${nameAnimerSearch}".`);
+                setAlertVisible(true);
+            }
+
             if (apiModalEnabled) {
                 const payload = { endpoint: 'searchAnimeByName', query: nameAnimerSearch, response: data };
                 setLastApiPayload(payload);
                 setLastSearchPayload(payload);
             }
+        } catch {
+            setAlertType('error');
+            setAlertMessage('Falha ao buscar animes. Verifique sua conexão.');
+            setAlertVisible(true);
         } finally {
             setIsLoading(false);
         }
@@ -140,7 +147,6 @@ const SearchScreen: React.FC = () => {
 
     // Breakpoints (alinhados aos do Tailwind) para ajustes responsivos
     const isSmDown = useMediaQuery('(max-width: 640px)');
-    const isMdDown = useMediaQuery('(max-width: 768px)');
     const isLgDown = useMediaQuery('(max-width: 1024px)');
     const drawerSize = isLgDown ? '100%' : '35%';
     const coverHeight = isSmDown ? 360 : isLgDown ? 480 : 600;
@@ -155,7 +161,7 @@ const SearchScreen: React.FC = () => {
                 return;
             }
             try {
-                const { text, translated, provider } = await translateTextDetailed(selectedAnime.synopsis, 'en', 'pt-BR');
+                const { text, translated } = await translateTextDetailed(selectedAnime.synopsis, 'en', 'pt-BR');
                 if (!cancelled) {
                     setTranslatedSynopsis(text);
                     if (translated) {
@@ -212,7 +218,13 @@ const SearchScreen: React.FC = () => {
         // aleatorizando uma imagem do fundo conforme a função getRandomWallpaper
         <BackgroundImage
             src={wallpaper}
-            className="relative text-white w-full min-h-screen bg-cover bg-no-repeat bg-center bg-fixed"
+            className="
+                relative
+                text-white
+                w-full
+                min-h-screen
+                bg-cover bg-no-repeat bg-center bg-fixed
+            "
         >
             {/* Overlay escurecedor colocado por cima do BackgroundImage */}
             <div className="absolute inset-0 bg-black/60 pointer-events-none" />
@@ -279,7 +291,13 @@ const SearchScreen: React.FC = () => {
                                 const v = (e.currentTarget.value || '').trim();
                                 setNameAnimeSearch(v);
                                 e.currentTarget.blur();
-                                if (v) searchAnime();
+                                if (!v) {
+                                    setAlertType('warning');
+                                    setAlertMessage('Digite um nome para buscar.');
+                                    setAlertVisible(true);
+                                    return;
+                                }
+                                searchAnime();
                             }
                         }}
                         onBlur={(e) => {
@@ -558,7 +576,7 @@ const SearchScreen: React.FC = () => {
                             height={carouselHeight}
                             withControls={false}
                             withIndicators={false}
-                            slideGap="xs"
+                            slideGap="md"
                             emblaOptions={{
                                 loop: true,
                                 dragFree: true,
@@ -569,7 +587,15 @@ const SearchScreen: React.FC = () => {
                         >
                             {animeSelectedPictures && animeSelectedPictures.data.map((picture: any, index: number) => (
                                 <Carousel.Slide key={index}>
-                                    <Image src={picture.jpg.large_image_url} radius="md" h={carouselHeight} w="auto" />
+                                    <div className="h-full w-full flex items-center justify-center">
+                                        <Image
+                                            src={picture.jpg.large_image_url}
+                                            radius="md"
+                                            h="100%"
+                                            w="100%"
+                                            fit="contain"
+                                        />
+                                    </div>
                                 </Carousel.Slide>
                             ))}
                         </Carousel>

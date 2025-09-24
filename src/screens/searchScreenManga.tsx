@@ -1,28 +1,46 @@
 import React, { useEffect, useState } from 'react';
 
-// Componentes principais, montagem da tela
-import { Drawer, Grid, Container, Flex, Box, Group, Divider, Space, BackgroundImage, Image, Text, Title, TextInput } from '@mantine/core';
-import DrawerModule from './../assets/inputInfos/Drawer.module.css';
+// UI base (Mantine)
+import {
+  BackgroundImage,
+  Box,
+  Divider,
+  Grid,
+  Group,
+  Image,
+  Space,
+  Text,
+  TextInput,
+  Title,
+} from '@mantine/core';
+import { Carousel } from '@mantine/carousel';
+import { useMediaQuery } from '@mantine/hooks';
+import Autoplay from 'embla-carousel-autoplay';
 
+// Componentes compartilhados
+import Sidebar from '../assets/components/sidebar.tsx';
 import LoadingOverlayFullscreen from '../assets/components/overlay.tsx';
-import Sidebar from '../assets/components/sidebar.tsx'
 import LoaderBox from '../assets/components/loaderBox.tsx';
 import AlertBox from '../assets/components/alert.tsx';
 import InfoDrawer from '../assets/components/infoDrawer.tsx';
+
+// CSS Modules
+import DrawerModule from './../assets/inputInfos/Drawer.module.css';
 import TextInputModule from './../assets/inputInfos/TextInput.module.css';
 
-// Carrossel
-import { Carousel } from '@mantine/carousel';
-import Autoplay from 'embla-carousel-autoplay';
-import { useMediaQuery } from '@mantine/hooks';
-
-// Utilitários, funções gerais
+// Utilitários / estado global
 import { getRandomWallpaper } from '../utils/wallpaper';
 import { applyPaletteToCssVariables, extractPaletteFromImage } from '../utils/palette';
 import { useSettings } from '../state/settings';
 
 // API Jikan (mangá)
-import { searchMangaByName, getMangaPictures, getMangaCharacters, type Manga, type MangaApiSearchResponse } from '../assets/API/jikan';
+import {
+  searchMangaByName,
+  getMangaPictures,
+  getMangaCharacters,
+  type Manga,
+  type MangaApiSearchResponse,
+} from '../assets/API/jikan';
 import { translateText, translateTextDetailed } from '../assets/API/translate';
 
 const SearchScreenManga: React.FC = () => {
@@ -45,20 +63,36 @@ const SearchScreenManga: React.FC = () => {
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const [revealCount, setRevealCount] = useState<number>(0);
 
-	const searchManga = async () => {
-		setIsLoading(true);
-		try {
-			const data = await searchMangaByName(query);
-			setMangaDatabase(data);
-			if (apiModalEnabled) {
-				const payload = { endpoint: 'searchMangaByName', query, response: data };
-				setLastApiPayload?.(payload);
-				setLastSearchPayload?.(payload);
-			}
-		} finally {
-			setIsLoading(false);
-		}
-	};
+    const searchManga = async () => {
+        setIsLoading(true);
+        try {
+            const data = await searchMangaByName(query);
+            setMangaDatabase(data);
+
+            const count = Array.isArray(data?.data) ? data.data.length : 0;
+            if (count === 0) {
+                setAlertType('warning');
+                setAlertMessage('Nenhum mangá encontrado para a busca.');
+                setAlertVisible(true);
+            } else {
+                setAlertType('success');
+                setAlertMessage(`Foram encontrados ${count} mangás para a busca "${query}".`);
+                setAlertVisible(true);
+            }
+
+            if (apiModalEnabled) {
+                const payload = { endpoint: 'searchMangaByName', query, response: data };
+                setLastApiPayload?.(payload);
+                setLastSearchPayload?.(payload);
+            }
+        } catch {
+            setAlertType('error');
+            setAlertMessage('Falha ao buscar mangás. Verifique sua conexão.');
+            setAlertVisible(true);
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
 	useEffect(() => {
 		if (!mangaDatabase || !mangaDatabase.data) return;
@@ -151,15 +185,41 @@ const SearchScreenManga: React.FC = () => {
 	}, [selectedManga]);
 
 	return (
-		<BackgroundImage src={wallpaper} className="relative text-white w-full min-h-screen bg-cover bg-no-repeat bg-center bg-fixed">
+		<BackgroundImage
+			src={wallpaper}
+			className="
+				relative
+				text-white
+				w-full
+				min-h-screen
+				bg-cover bg-no-repeat bg-center bg-fixed
+			"
+		>
 			<div className="absolute inset-0 bg-black/60 pointer-events-none" />
 			<LoadingOverlayFullscreen visible={isLoading} message="Buscando mangás..." />
 			<AlertBox visible={alertVisible} message={alertMessage} type={alertType} />
 			<Sidebar />
 
-			<div className="container relative z-10 min-h-screen mx-auto px-4 sm:px-6 lg:px-8 flex flex-col">
+			<div
+				className="
+					container
+					relative z-10
+					min-h-screen
+					mx-auto
+					px-4 sm:px-6 lg:px-8
+					flex flex-col
+				"
+			>
 				<Title
-					className="flex justify-center text-center pt-8 text-shadow-lg/20 text-(--color1) uppercase tracking-(--title-letter-spacing) text-2xl sm:text-3xl lg:text-4xl"
+					className="
+						flex justify-center text-center
+						pt-8
+						text-shadow-lg/20
+						text-(--color1)
+						uppercase
+						tracking-(--title-letter-spacing)
+						text-2xl sm:text-3xl lg:text-4xl
+					"
 					style={{ fontFamily: 'var(--text-font-mono)' }}
 				>
 					AniDex - Pesquise seu mangá
@@ -181,15 +241,21 @@ const SearchScreenManga: React.FC = () => {
 						}}
 						className="mt-4 w-full max-w-2xl mx-auto"
 						onChange={(e) => { setMangaDatabase(null); setQuery(e.currentTarget.value); }}
-						onKeyDown={(e) => {
-							if (e.key === 'Enter') {
-								e.preventDefault();
-								const v = (e.currentTarget.value || '').trim();
-								setQuery(v);
-								e.currentTarget.blur();
-								if (v) searchManga();
-							}
-						}}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                                e.preventDefault();
+                                const v = (e.currentTarget.value || '').trim();
+                                setQuery(v);
+                                e.currentTarget.blur();
+                                if (!v) {
+                                    setAlertType('warning');
+                                    setAlertMessage('Digite um nome para buscar.');
+                                    setAlertVisible(true);
+                                    return;
+                                }
+                                searchManga();
+                            }
+                        }}
 						onBlur={(e) => {
 							const v = (e.currentTarget.value || '').trim();
 							if (v !== query) setQuery(v);

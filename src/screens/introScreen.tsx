@@ -6,13 +6,20 @@ import { getRandomWallpaper } from '../utils/wallpaper';
 import { applyPaletteToCssVariables, extractPaletteFromImage } from '../utils/palette';
 
 // Componentes do Mantine
-import { BackgroundImage, Container, Title, Text, Box, Space, Divider } from '@mantine/core';
-import { Image } from '@mantine/core';
-import { Group } from '@mantine/core';
-import { ThemeIcon } from '@mantine/core';
-import { List } from '@mantine/core';
-
-import { ActionIcon } from '@mantine/core';
+import {
+  ActionIcon,
+  BackgroundImage,
+  Box,
+  Container,
+  Divider,
+  Group,
+  Image,
+  List,
+  Space,
+  Text,
+  ThemeIcon,
+  Title,
+} from '@mantine/core';
 import ActionIconModule from './../assets/inputInfos/ActionIcon.module.css';
 
 import { Tooltip } from '@mantine/core';
@@ -27,16 +34,16 @@ import LogoBaseboard from '../assets/components/logoBaseboard.tsx';
 // Importação do icones
 import { FaGithub } from "react-icons/fa";
 import { FaInfo } from "react-icons/fa6";
-import { MdOutlineBiotech, MdApi, MdViewCarousel } from "react-icons/md";
+import { MdOutlineBiotech, MdApi } from "react-icons/md";
 import { FaReact } from "react-icons/fa";
-import { TbBrandVite, TbBrandTailwind, TbBrandTypescript, TbRoute, TbPalette, TbIcons } from "react-icons/tb";
-import { SiStyledcomponents, SiEslint, SiPostcss, SiReactrouter } from "react-icons/si";
+import { TbBrandVite, TbBrandTailwind, TbBrandTypescript, TbPalette, TbIcons } from "react-icons/tb";
+import { SiReactrouter } from "react-icons/si";
 
 // Importação do modal centralizado
 import CenteredModal from '../assets/components/centerModal.tsx';
 
 const IntroScreen: React.FC = () => {
-    const [wallpaper, setWallpaper] = useState<string>(() => getRandomWallpaper('intro'));
+    const [wallpaper, _setWallpaper] = useState<string>(() => getRandomWallpaper('intro'));
 
 
     const [aboutOpen, setAboutOpen] = useState<boolean>(false);
@@ -52,7 +59,13 @@ const IntroScreen: React.FC = () => {
     return (
         <BackgroundImage
             src={wallpaper}
-            className="relative text-white w-full min-h-screen bg-cover bg-no-repeat bg-center bg-fixed"
+            className="
+                relative
+                text-white
+                w-full
+                min-h-screen
+                bg-cover bg-no-repeat bg-center bg-fixed
+            "
         >
             {/* Overlay escuro por cima do wallpaper */}
             <div className="absolute inset-0 bg-black/60 pointer-events-none" />
