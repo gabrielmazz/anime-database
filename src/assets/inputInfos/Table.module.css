@@ -1,13 +1,12 @@
 .tableTable {
-	background-color: var(--panel-bg);
-	color: var(--color1);
-	border: 1px solid var(--panel-border);
-	border-radius: 8px;
-	overflow: hidden;
+  color: var(--color1);
+  border-radius: 8px;
+  overflow: hidden;
+  backdrop-filter: blur(4px);
 }
 
 .theadTable {
-	background-color: color-mix(in srgb, var(--panel-bg) 90%, var(--color1) 10%);
+  border-bottom: 1px solid var(--panel-border);
 }
 
 .thTable {
@@ -24,12 +23,12 @@
 }
 
 .trTable:hover {
-	background-color: color-mix(in srgb, var(--panel-bg) 94%, #fff 6%);
+  background-color: color-mix(in oklab, var(--accent) 12%, transparent);
 }
 
 .tdTable {
-	color: var(--colorTextWhite);
-	border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  color: var(--colorTextWhite);
+  border-bottom: 1px solid var(--panel-border);
 }
 
 .captionTable {

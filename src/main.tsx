@@ -19,6 +19,7 @@ import IntroScreen from './screens/introScreen.tsx'
 import SearchScreenCharacters from './screens/searchScreenCharacters.tsx'
 import TopAnimesScreen from './screens/topAnimesScreen.tsx'
 import ExploreSeasonsScreen from './screens/exploreSeasonsScreen.tsx'
+import SearchScreenProducers from './screens/searchScreenProducers.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -26,20 +27,21 @@ createRoot(document.getElementById('root')!).render(
       <SettingsProvider>
         <BrowserRouter>
           <Routes>
-            {/* Default route: Intro as home */}
+            {/* Default route: Rota padrão: IntroScreen */}
             <Route path="/" element={<IntroScreen />} />
 
-            {/* Explicit routes for each screen */}
+            {/* Rotas para as outras telas */}
             <Route path="/introScreen" element={<IntroScreen />} />
             <Route path="/selectionScreen" element={<SelectionScreen />} />
             <Route path="/searchScreen" element={<SearchScreen />} />
             <Route path="/devConfigurationsScreen" element={<DevConfigurationsScreen />} />
             <Route path="/searchScreenManga" element={<SearchScreenManga />} />
             <Route path="/searchScreenCharacters" element={<SearchScreenCharacters />} />
+            <Route path="/searchScreenProducers" element={<SearchScreenProducers />} />
             <Route path="/topAnimesScreen" element={<TopAnimesScreen />} />
             <Route path="/seasonScreen" element={<ExploreSeasonsScreen />} />
 
-            {/* Fallback to home */}
+            {/* Fallback route: Redireciona para a tela inicial se a rota não for encontrada */}
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </BrowserRouter>

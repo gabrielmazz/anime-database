@@ -19,7 +19,7 @@ import { getRandomWallpaper } from '../utils/wallpaper';
 import { applyPaletteToCssVariables, extractPaletteFromImage } from '../utils/palette';
 
 const SelectionScreen: React.FC = () => {
-	const [wallpaper, setWallpaper] = useState<string>(() => getRandomWallpaper('selection'));
+	const [wallpaper, _setWallpaper] = useState<string>(() => getRandomWallpaper('selection'));
 
 	// Extrai paleta baseada no wallpaper e aplica nas CSS variables (mesmo padrão das outras telas)
 	useEffect(() => {
@@ -220,6 +220,7 @@ const SelectionScreen: React.FC = () => {
                                     min-h-[220px] md:min-h-[240px]
                                 "
 							style={{ borderColor: 'var(--color1)' }}
+							onClick={() => { window.location.href = '/searchScreenProducers'; }}
 						>
 							<BackgroundImage
 								src={imgCard04}

@@ -47,7 +47,7 @@ const SearchScreenManga: React.FC = () => {
 	const [query, setQuery] = useState('');
 	const { apiModalEnabled, setLastApiPayload, setLastSearchPayload, setLastPicturesPayload, setLastCharactersPayload } = useSettings();
 
-	const [wallpaper, setWallpaper] = useState<string>(() => getRandomWallpaper('manga'));
+	const [wallpaper, _setWallpaper] = useState<string>(() => getRandomWallpaper('manga'));
 
 	useEffect(() => {
 		if (!wallpaper) return;

@@ -319,3 +319,55 @@ export async function getCharacterFull(id: number): Promise<CharacterFullRespons
   if (!response.ok) throw new Error('Falha ao buscar detalhes do personagem');
   return response.json();
 }
+
+// =============================
+// Producers endpoints
+// =============================
+
+export type Producer = {
+  mal_id: number;
+  name: string;
+  favorites?: number | null;
+  established?: string | null;
+  images?: {
+    jpg?: {
+      image_url?: string;
+    };
+  };
+};
+
+export type ProducersResponse = { data: Producer[] };
+
+export type ProducerFullResponse = {
+  data: {
+    mal_id: number;
+    name: string;
+    established?: string | null;
+    favorites?: number | null;
+    about?: string | null;
+    images?: any;
+    anime?: Array<{ title?: string }>; // lista simples de obras
+  };
+};
+
+export async function getProducers(page: number = 1, limit: number = 25): Promise<ProducersResponse> {
+  const response = await fetch(`${BASE_URL}/producers?page=${page}&limit=${Math.min(limit, MAX_JIKAN_LIMIT)}`);
+  if (!response.ok) throw new Error('Falha ao listar produtores');
+  return response.json();
+}
+
+export async function searchProducersByName(name: string, page: number = 1, limit: number = 25): Promise<ProducersResponse> {
+  const q = (name || '').trim();
+  const url = q
+    ? `${BASE_URL}/producers?q=${encodeURIComponent(q)}&page=${page}&limit=${Math.min(limit, MAX_JIKAN_LIMIT)}`
+    : `${BASE_URL}/producers?page=${page}&limit=${Math.min(limit, MAX_JIKAN_LIMIT)}`;
+  const response = await fetch(url);
+  if (!response.ok) throw new Error('Falha ao buscar produtores');
+  return response.json();
+}
+
+export async function getProducerFull(id: number): Promise<ProducerFullResponse> {
+  const response = await fetch(`${BASE_URL}/producers/${id}/full`);
+  if (!response.ok) throw new Error('Falha ao buscar detalhes do produtor');
+  return response.json();
+}

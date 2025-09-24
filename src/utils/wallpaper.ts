@@ -3,7 +3,7 @@
 // IMPORTANT: import.meta.glob precisa de padrões estáticos (sem variáveis dinâmicas).
 // Por isso, declaramos explicitamente cada pasta suportada e selecionamos via "key".
 
-type WallpaperKey = 'search' | 'dev' | 'selection' | 'manga' | 'intro' | 'characters' | 'topAnimes' | 'seasons';
+type WallpaperKey = 'search' | 'dev' | 'selection' | 'manga' | 'intro' | 'characters' | 'topAnimes' | 'seasons' | 'producers';
 
 // Coleção: Search Screen
 const SEARCH_MODULES = import.meta.glob(
@@ -53,6 +53,12 @@ const SEASONS_SCREEN_MODULES = import.meta.glob(
   { eager: true, import: 'default' }
 );
 
+// Coleção: Producers Search Screen
+const PRODUCERS_MODULES = import.meta.glob(
+  '../assets/images/wallpaperSearchProducers/*.{png,jpg,jpeg,webp,avif}',
+  { eager: true, import: 'default' }
+);
+
 const COLLECTIONS: Record<WallpaperKey, string[]> = {
   search: Object.values(SEARCH_MODULES) as string[],
   dev: Object.values(DEV_MODULES) as string[],
@@ -62,6 +68,7 @@ const COLLECTIONS: Record<WallpaperKey, string[]> = {
   characters: Object.values(CHARACTERS_MODULES) as string[],
   topAnimes: Object.values(TOP_ANIMES_MODULES) as string[],
   seasons: Object.values(SEASONS_SCREEN_MODULES) as string[],
+  producers: Object.values(PRODUCERS_MODULES) as string[],
 };
 
 export function getAllWallpapers(key: WallpaperKey = 'search'): string[] {
