@@ -21,11 +21,14 @@ import TopAnimesScreen from './screens/topAnimesScreen.tsx'
 import ExploreSeasonsScreen from './screens/exploreSeasonsScreen.tsx'
 import SearchScreenProducers from './screens/searchScreenProducers.tsx'
 
+// Ajusta basename para funcionar em GitHub Pages (usa base do Vite)
+const basename = import.meta.env.BASE_URL.replace(/\/$/, '');
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <MantineProvider>
       <SettingsProvider>
-        <BrowserRouter>
+        <BrowserRouter basename={basename}>
           <Routes>
             {/* Default route: Rota padrão: IntroScreen */}
             <Route path="/" element={<IntroScreen />} />
