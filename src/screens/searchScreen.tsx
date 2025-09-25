@@ -263,7 +263,7 @@ const SearchScreen: React.FC = () => {
                         fontFamily: 'var(--text-font-mono)',
                     }}
                 >
-                    AniDex - Pesquise seu anime
+                    Pesquise seu anime
                 </Title>
 
                 <Space h={33} />

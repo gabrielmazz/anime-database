@@ -65,7 +65,7 @@ const SelectionScreen: React.FC = () => {
                     "
                     style={{ fontFamily: 'var(--text-font-mono)' }}
                 >
-                    AniDex — Selecione uma opção
+                    Menu de opções
                 </Title>
 
 				<Space h="md" />

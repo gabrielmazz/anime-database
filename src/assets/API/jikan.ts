@@ -326,7 +326,11 @@ export async function getCharacterFull(id: number): Promise<CharacterFullRespons
 
 export type Producer = {
   mal_id: number;
-  name: string;
+  // A lista básica de produtores (GET /producers) não retorna "name",
+  // e sim um array de "titles" com o título Default/Japanese/Synonym.
+  // Já o endpoint de detalhes (/producers/{id}/full) retorna "name".
+  name?: string;
+  titles?: Array<{ type?: string; title?: string }>;
   favorites?: number | null;
   established?: string | null;
   images?: {
@@ -334,6 +338,8 @@ export type Producer = {
       image_url?: string;
     };
   };
+  url?: string;
+  count?: number;
 };
 
 export type ProducersResponse = { data: Producer[] };
