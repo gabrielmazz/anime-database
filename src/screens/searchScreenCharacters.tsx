@@ -349,7 +349,7 @@ const SearchScreenCharacters: React.FC = () => {
 						"
 						style={{ fontFamily: 'var(--text-font-mono)' }}
 					>
-						Personagens — Top e Busca
+						Pesquise seu personagem
 					</Title>
 
 					<Space h={33} />

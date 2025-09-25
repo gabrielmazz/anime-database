@@ -222,7 +222,7 @@ const SearchScreenManga: React.FC = () => {
 					"
 					style={{ fontFamily: 'var(--text-font-mono)' }}
 				>
-					AniDex - Pesquise seu mangá
+					Pesquise seu mangá
 				</Title>
 
 				<Space h={33} />

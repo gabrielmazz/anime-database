@@ -296,7 +296,7 @@ const TopAnimesScreen: React.FC = () => {
 						"
 						style={{ fontFamily: 'var(--text-font-mono)' }}
 					>
-						Animes — Top
+						Top rank de Animes
 					</Title>
 
 					<Space h="md" />

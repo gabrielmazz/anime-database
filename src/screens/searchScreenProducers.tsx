@@ -36,6 +36,7 @@ import { getRandomWallpaper } from '../utils/wallpaper';
 // API
 import { getProducers, searchProducersByName, getProducerFull, type Producer } from '../assets/API/jikan';
 import LoaderBox from '../assets/components/loaderBox.tsx';
+import { translateTextDetailed } from '../assets/API/translate';
 
 const SearchScreenProducers: React.FC = () => {
 	const [wallpaper, _setWallpaper] = useState<string>(() => getRandomWallpaper('producers'));
@@ -51,6 +52,7 @@ const SearchScreenProducers: React.FC = () => {
 	const [opened, setOpened] = useState(false);
 	const [selected, setSelected] = useState<Producer | null>(null);
 	const [selectedFull, setSelectedFull] = useState<any | null>(null);
+    const [translatedAbout, setTranslatedAbout] = useState<string | null>(null);
 
 	const isLgDown = useMediaQuery('(max-width: 1024px)');
 	const isSmDown = useMediaQuery('(max-width: 640px)');
@@ -60,6 +62,64 @@ const SearchScreenProducers: React.FC = () => {
 	const [alertVisible, setAlertVisible] = useState(false);
 	const [alertMessage, setAlertMessage] = useState('');
 	const [alertType, setAlertType] = useState<'info' | 'warning' | 'error' | 'success'>('info');
+
+	// Helper para obter o nome do produtor a partir dos dados da lista
+	const getProducerName = (p: Producer | null | undefined) => {
+		if (!p) return '';
+		return (
+			p.name ||
+			p.titles?.find?.((t) => (t?.type || '').toLowerCase() === 'default')?.title ||
+			p.titles?.[0]?.title ||
+			''
+		);
+	};
+
+	function formatNumber(n?: number | null) {
+		if (typeof n !== 'number') return '-';
+		try { return new Intl.NumberFormat('pt-BR').format(n); } catch { return String(n); }
+	}
+
+	function formatDate(iso?: string | null) {
+		if (!iso) return '-';
+		try {
+			const d = new Date(iso);
+			if (Number.isNaN(d.getTime())) return '-';
+			return new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' }).format(d);
+		} catch { return '-'; }
+	}
+
+	// Tradução do campo "about" quando os detalhes forem carregados
+	useEffect(() => {
+		let cancelled = false;
+		const run = async () => {
+			if (!selectedFull?.about) { setTranslatedAbout(null); return; }
+			try {
+				const { text, translated } = await translateTextDetailed(selectedFull.about, 'en', 'pt-BR');
+				if (!cancelled) {
+					setTranslatedAbout(text);
+					// Alerta de resultado da tradução
+					if (translated) {
+						setAlertType('success');
+						setAlertMessage('Informações sobre a produtora foram traduzidas.');
+						setAlertVisible(true);
+					} else {
+						setAlertType('warning');
+						setAlertMessage('Não foi possível traduzir as informações sobre a produtora.');
+						setAlertVisible(true);
+					}
+				}
+			} catch {
+				if (!cancelled) {
+					setTranslatedAbout(selectedFull.about);
+					setAlertType('error');
+					setAlertMessage('Falha ao traduzir o Sobre.');
+					setAlertVisible(true);
+				}
+			}
+		};
+		run();
+		return () => { cancelled = true; };
+	}, [selectedFull?.about]);
 
 	// Paleta dinâmica
 	useEffect(() => {
@@ -172,6 +232,7 @@ const SearchScreenProducers: React.FC = () => {
 				setSelected(p);
 				setOpened(true);
 				setSelectedFull(null);
+                setTranslatedAbout(null);
 				getProducerFull(p.mal_id).then((full) => setSelectedFull((full as any)?.data ?? full)).catch(() => {
 					setAlertType('error');
 					setAlertMessage('Falha ao carregar detalhes do produtor.');
@@ -185,10 +246,10 @@ const SearchScreenProducers: React.FC = () => {
 			<Table.Td className={TableModule.tdTable}>
 				<Group wrap="nowrap" gap="sm" align="center">
 					{p.images?.jpg?.image_url && (
-						<Image src={p.images.jpg.image_url} w={56} h={56} radius="sm" fit="contain" alt={p.name} />
+						<Image src={p.images.jpg.image_url} w={56} h={56} radius="sm" fit="contain" alt={getProducerName(p)} />
 					)}
 					<Box>
-						<Text style={{ color: 'var(--colorTextWhite)' }}>{p.name}</Text>
+						<Text style={{ color: 'var(--colorTextWhite)' }}>{getProducerName(p)}</Text>
 						{typeof p.favorites === 'number' && (
 							<Text size="xs" c="dimmed">Favorites: {p.favorites}</Text>
 						)}
@@ -212,7 +273,7 @@ const SearchScreenProducers: React.FC = () => {
 						className="flex justify-center text-center pt-8 text-shadow-lg/20 text-(--color1) uppercase tracking-(--title-letter-spacing) text-2xl sm:text-3xl lg:text-4xl"
 						style={{ fontFamily: 'var(--text-font-mono)' }}
 					>
-						Produtores — Busca
+						Pesquise o seu estúdio/produtor
 					</Title>
 
 					<Space h={33} />
@@ -264,20 +325,26 @@ const SearchScreenProducers: React.FC = () => {
 
 			<InfoDrawer
 				opened={opened}
-				onClose={() => { setOpened(false); setSelected(null); setSelectedFull(null); }}
+				onClose={() => { setOpened(false); setSelected(null); setSelectedFull(null); setTranslatedAbout(null); }}
 				title={<Title order={2} className="font-bold text-shadow-lg/20 text-(--colorTextWhite) uppercase tracking-(--title-letter-spacing)" style={{ fontSize: 32, fontFamily: 'var(--text-font-mono)' }}>Informações do Produtor</Title>}
 				position="right"
 				size={drawerSize}
 				overlayProps={{ backgroundOpacity: 0.5, blur: 4 }}
-				classNames={{ root: DrawerModule.rootDrawer, header: DrawerModule.headerDrawer, body: DrawerModule.bodyDrawer }}
+				classNames={{ root: DrawerModule.rootDrawer, header: DrawerModule.headerDrawer, body: DrawerModule.bodyDrawer, content: DrawerModule.contentDrawer }}
 				content={selected && (
 					<>
 						<Box>
 							{selected.images?.jpg?.image_url && (
-								<Image src={selected.images.jpg.image_url} radius="md" h={logoHeight} w="auto" className="mb-4" />
+								<Image
+									src={selected.images.jpg.image_url}
+									radius="md"
+									h={logoHeight}
+									w="auto"
+									className="mb-4 flex items-center justify-center justify-self-center shadow-lg/40"
+								/>
 							)}
-							<Title size="xl" className="font-bold text-center text-shadow-lg/20 text-(--colorTextWhite) uppercase tracking-(--title-letter-spacing)" style={{ fontSize: 28, fontFamily: 'var(--text-font-mono)' }}>
-								{selected.name}
+							<Title size="xl" className="font-bold text-center text-shadow-lg/20 text-(--colorTextWhite) uppercase tracking-(--title-letter-spacing)" style={{ fontSize: 32, fontFamily: 'var(--text-font-mono)' }}>
+								{selectedFull?.name || getProducerName(selected)}
 							</Title>
 						</Box>
 
@@ -287,10 +354,66 @@ const SearchScreenProducers: React.FC = () => {
 
 						{selectedFull && (
 							<>
+								{/* Detalhes em linhas, sem box extra */}
+								<Box>
+									<Text component="span" className="font-bold uppercase tracking-(--title-letter-spacing)" style={{ fontSize: 16, fontFamily: 'Raleway, sans-serif', color: 'var(--colorTextWhite)', marginRight: 6 }}>Fundação:</Text>
+									<Text component="span" style={{ color: 'var(--colorTextWhite)' }}>{formatDate(selectedFull?.established || selected?.established)}</Text>
+								</Box>
+
+								<Space h="lg" />
+
+								<Box>
+									<Text component="span" className="font-bold uppercase tracking-(--title-letter-spacing)" style={{ fontSize: 16, fontFamily: 'Raleway, sans-serif', color: 'var(--colorTextWhite)', marginRight: 6 }}>Favoritos:</Text>
+									<Text component="span" style={{ color: 'var(--colorTextWhite)' }}>{formatNumber(selectedFull?.favorites ?? selected?.favorites ?? undefined)}</Text>
+								</Box>
+
+								<Space h="lg" />
+
+								<Box>
+									<Text component="span" className="font-bold uppercase tracking-(--title-letter-spacing)" style={{ fontSize: 16, fontFamily: 'Raleway, sans-serif', color: 'var(--colorTextWhite)', marginRight: 6 }}>Obras catalogadas:</Text>
+									<Text component="span" style={{ color: 'var(--colorTextWhite)' }}>{formatNumber((selected as any)?.count ?? (selectedFull?.anime?.length ?? 0))}</Text>
+								</Box>
+
+								{Array.isArray(selected?.titles) && selected.titles.filter((t) => (t?.type || '').toLowerCase() !== 'default').length > 0 && (
+									<>
+										<Space h="lg" />
+										<Box className="flex flex-wrap items-center gap-2">
+											<Text component="span" className="font-bold uppercase tracking-(--title-letter-spacing)" style={{ fontSize: 16, fontFamily: 'Raleway, sans-serif', color: 'var(--colorTextWhite)' }}>Também conhecido como:</Text>
+											<Pill.Group className="flex flex-wrap gap-2 items-center">
+												{selected.titles
+														.filter((t) => (t?.title || '').trim().length > 0)
+														.filter((t) => (t?.type || '').toLowerCase() !== 'default')
+														.slice(0, 8)
+														.map((t, i) => (
+															<Pill key={i} size="sm" radius="xl" className={MultiSelectModule.pillMultiSelect} style={{ color: 'var(--colorTextWhite)' }}>
+																{t.title}
+															</Pill>
+														))}
+											</Pill.Group>
+										</Box>
+									</>
+								)}
+
+								{selected?.url && (
+									<>
+										<Space h="lg" />
+										<Box>
+											<Text component="span" className="font-bold uppercase tracking-(--title-letter-spacing)" style={{ fontSize: 16, fontFamily: 'Raleway, sans-serif', color: 'var(--colorTextWhite)', marginRight: 6 }}>Página no MAL:</Text>
+											<a href={selected.url} target="_blank" rel="noreferrer" className="underline" style={{ color: 'var(--colorTextWhite)' }}>{selected.url}</a>
+										</Box>
+									</>
+								)}
+
+								<Space h="lg" />
+
 								{selectedFull?.about && (
 									<Box>
 										<Text component="span" className="font-bold uppercase tracking-(--title-letter-spacing)" style={{ fontSize: 16, fontFamily: 'Raleway, sans-serif', color: 'var(--colorTextWhite)', marginRight: 6 }}>Sobre:</Text>
-										<Text component="span" style={{ color: 'var(--colorTextWhite)' }}>{selectedFull.about}</Text>
+										{translatedAbout === null ? (
+                                        <LoaderBox message="Traduzindo informações..." />
+                                    ) : (
+                                        <Text component="span" style={{ color: 'var(--colorTextWhite)' }}>{translatedAbout || selectedFull.about}</Text>
+                                    )}
 									</Box>
 								)}
 
@@ -299,13 +422,11 @@ const SearchScreenProducers: React.FC = () => {
 								{Array.isArray(selectedFull?.anime) && selectedFull.anime.length > 0 && (
 									<>
 										<Divider my="xl" label={<Text component="span" className="font-bold uppercase tracking-(--title-letter-spacing)" style={{ fontSize: 16, fontFamily: 'Raleway, sans-serif', color: 'var(--colorTextWhite)', marginRight: 6 }}>Principais Obras</Text>} labelPosition="center" />
-										<div className="rounded-lg border border-white/20 bg-black/30 backdrop-blur-sm p-2">
-											<Pill.Group className="flex flex-wrap gap-2">
-												{(selectedFull.anime as any[]).slice(0, 24).map((a: any, i: number) => (
-													<Pill key={i} size="sm" radius="xl" className={MultiSelectModule.pillMultiSelect} style={{ color: 'var(--colorTextWhite)' }}>{a?.title ?? '-'}</Pill>
-												))}
-											</Pill.Group>
-										</div>
+									<Pill.Group className="flex flex-wrap gap-2">
+										{(selectedFull.anime as any[]).slice(0, 24).map((a: any, i: number) => (
+											<Pill key={i} size="sm" radius="xl" className={MultiSelectModule.pillMultiSelect} style={{ color: 'var(--colorTextWhite)' }}>{a?.title ?? '-'}</Pill>
+										))}
+									</Pill.Group>
 									</>
 								)}
 							</>
