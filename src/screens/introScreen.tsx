@@ -391,8 +391,8 @@ const IntroScreen: React.FC = () => {
 
             </div>
 
-            {/* Rodapé com logo e créditos */}
-            <div className="absolute bottom-4 left-0 right-0 flex flex-col items-center justify-center pointer-events-none">
+            {/* Rodapé com logo e créditos (escondido em dispositivos mobile) */}
+            <div className="absolute bottom-4 left-0 right-0 hidden sm:flex flex-col items-center justify-center pointer-events-none">
                 <LogoBaseboard />
             </div>
 
