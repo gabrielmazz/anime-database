@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Space, Text, Title } from '@mantine/core';
 import CenteredModal from './centerModal';
 import LogoBaseboard from './logoBaseboard';
@@ -57,6 +58,7 @@ const IconClose = () => (
 
 
 const Sidebar: React.FC = () => {
+	const navigate = useNavigate();
 	const [collapsed, setCollapsed] = useState<boolean>(true);
 	const [isOpen, setIsOpen] = useState<boolean>(false);
 	const [active, setActive] = useState<string>('dashboard');
@@ -166,10 +168,9 @@ const Sidebar: React.FC = () => {
 										${isActive ? 'border-[var(--panel-border)]' : 'border-transparent'} 
 										hover:border-[var(--panel-border)] text-(--color1)`}
 								onClickCapture={(e) => {
-									// Navegação simples sem react-router
+									// Navegação usando React Router
 									e.preventDefault();
-									window.location.href = it.link;
-
+									navigate(it.link);
 								}}
 								style={{
 									// um leve gradiente para o ativo

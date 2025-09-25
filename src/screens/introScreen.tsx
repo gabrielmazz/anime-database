@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 // Imagens e utilitários
 import logo from '../assets/images/imgLogo/logo.png';
@@ -43,8 +44,8 @@ import { SiReactrouter } from "react-icons/si";
 import CenteredModal from '../assets/components/centerModal.tsx';
 
 const IntroScreen: React.FC = () => {
+    const navigate = useNavigate();
     const [wallpaper, _setWallpaper] = useState<string>(() => getRandomWallpaper('intro'));
-
 
     const [aboutOpen, setAboutOpen] = useState<boolean>(false);
     const [techOpen, setTechOpen] = useState<boolean>(false);
@@ -138,7 +139,7 @@ const IntroScreen: React.FC = () => {
                                     classNames={{
                                         root: ButtonModule.rootButton,
                                     }}
-                                    onClick={() => { window.location.href = '/selectionScreen'; }}
+                                    onClick={() => { navigate('/selectionScreen'); }}
                                 >
                                     Entrar
                                 </Button>
