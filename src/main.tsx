@@ -20,6 +20,8 @@ import SearchScreenCharacters from './screens/searchScreenCharacters.tsx'
 import TopAnimesScreen from './screens/topAnimesScreen.tsx'
 import ExploreSeasonsScreen from './screens/exploreSeasonsScreen.tsx'
 import SearchScreenProducers from './screens/searchScreenProducers.tsx'
+import RandomAnimeScreen from './screens/randomAnimeScreen.tsx'
+import RandomMangaScreen from './screens/randomMangaScreen.tsx'
 
 // Ajusta basename para funcionar em GitHub Pages (usa base do Vite)
 const basename = import.meta.env.BASE_URL.replace(/\/$/, '');
@@ -43,6 +45,8 @@ createRoot(document.getElementById('root')!).render(
             <Route path="/searchScreenProducers" element={<SearchScreenProducers />} />
             <Route path="/topAnimesScreen" element={<TopAnimesScreen />} />
             <Route path="/seasonScreen" element={<ExploreSeasonsScreen />} />
+            <Route path="/randomAnimeScreen" element={<RandomAnimeScreen />} />
+            <Route path="/randomMangaScreen" element={<RandomMangaScreen />} />
 
             {/* Fallback route: Redireciona para a tela inicial se a rota não for encontrada */}
             <Route path="*" element={<Navigate to="/" replace />} />

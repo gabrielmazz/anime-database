@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useRef, useState, useEffect } from 'react';
 import { Space, Text, Title } from '@mantine/core';
 import CenteredModal from './centerModal';
 import LogoBaseboard from './logoBaseboard';
@@ -27,6 +27,8 @@ import { FaTv, FaTrophy } from "react-icons/fa";
 import { MdMenuBook } from "react-icons/md";
 import { FaCubes } from "react-icons/fa";
 import { IoAccessibilityOutline } from "react-icons/io5";
+import { GiPerspectiveDiceSixFacesFive } from "react-icons/gi";
+import { GiPerspectiveDiceSixFacesOne } from "react-icons/gi";
 
 type Item = {
 	key: string;
@@ -63,8 +65,28 @@ const Sidebar: React.FC = () => {
 	const [active, setActive] = useState<string>('dashboard');
 	const [aboutOpen, setAboutOpen] = useState<boolean>(false);
 	const [debugOpen, setDebugOpen] = useState<boolean>(false);
+
+	// Estado para exibir tooltip em dispositivos touch (primeiro toque)
+	const [peekedItem, setPeekedItem] = useState<string | null>(null);
+	const peekTimeoutRef = useRef<number | null>(null);
 	const { devModeEnabled, lastApiPayload: _lastApiPayload, lastSearchPayload, lastPicturesPayload, lastCharactersPayload, lastTopCharactersPayload, lastCharactersSearchPayload } = useSettings();
     const navigate = useNavigate();
+
+	// Detecta se o dispositivo é touch/coarse pointer
+	const isTouchDevice = useMemo(() => {
+		if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return false;
+		try {
+			return window.matchMedia('(hover: none), (pointer: coarse)').matches;
+		} catch (_) {
+			return false;
+		}
+	}, []);
+
+	useEffect(() => {
+		return () => {
+			if (peekTimeoutRef.current) window.clearTimeout(peekTimeoutRef.current);
+		};
+	}, []);
 
     const items: Item[] = useMemo(() => ([
         { key: 'intro', label: 'Introdução', icon: <FaCubes />, link: '/introScreen' },
@@ -75,6 +97,8 @@ const Sidebar: React.FC = () => {
         { key: 'searchCharacters', label: 'Buscar Personagem', icon: <IoSearch />, link: '/searchScreenCharacters' },
         { key: 'searchProducers', label: 'Buscar Produtores', icon: <IoAccessibilityOutline />, link: '/searchScreenProducers' },
         { key: 'topAnimes', label: 'Top Animes', icon: <FaTrophy />, link: '/topAnimesScreen' },
+		{ key: 'randomAnime', label: 'Anime Aleatório', icon: <GiPerspectiveDiceSixFacesFive />, link: '/randomAnimeScreen' },
+		{ key: 'randomManga', label: 'Manga Aleatório', icon: <GiPerspectiveDiceSixFacesOne />, link: '/randomMangaScreen' },
         { key: 'debug', label: 'Debug', icon: <GrConfigure />, link: '/devConfigurationsScreen' },
     ]), []);
 
@@ -161,18 +185,50 @@ const Sidebar: React.FC = () => {
 					{items.map((it) => {
 						const isActive = it.key === active;
 						return (
+							<Tooltip
+								label={it.label}
+								position="right"
+								withinPortal
+								offset={8}
+								openDelay={150}
+								closeDelay={80}
+								disabled={!collapsed}
+								opened={collapsed && isTouchDevice ? peekedItem === it.key : undefined}
+								classNames={{ tooltip: TooltipModule.tooltip, arrow: TooltipModule.arrow }}
+							>
 							<button
 								onClick={() => setActive(it.key)}
 								className={`group w-full flex items-center ${collapsed ? 'justify-center' : 'justify-start'} gap-3 
 										rounded-2xl px-3 py-2 border transition-colors 
 										${isActive ? 'border-[var(--panel-border)]' : 'border-transparent'} 
 										hover:border-[var(--panel-border)] text-(--color1)`}
-							onClickCapture={(e) => {
-								// Usa React Router para navegação SPA
-								e.preventDefault();
-								navigate(it.link);
-								setIsOpen(false);
-								setCollapsed(false);
+								aria-label={it.label}
+								title={collapsed ? it.label : undefined}
+								onTouchStart={(e) => {
+									// Evita navegação imediata no primeiro toque quando colapsado
+									if (collapsed && isTouchDevice && peekedItem !== it.key) {
+										e.preventDefault();
+										e.stopPropagation();
+										setPeekedItem(it.key);
+										if (peekTimeoutRef.current) window.clearTimeout(peekTimeoutRef.current);
+										peekTimeoutRef.current = window.setTimeout(() => setPeekedItem(null), 1600);
+									}
+								}}
+								onClickCapture={(e) => {
+									// Usa React Router para navegação SPA
+									e.preventDefault();
+									// Em dispositivos touch, primeiro toque apenas mostra o label; segundo toque navega
+									if (collapsed && isTouchDevice && peekedItem !== it.key) {
+										setPeekedItem(it.key);
+										if (peekTimeoutRef.current) window.clearTimeout(peekTimeoutRef.current);
+										peekTimeoutRef.current = window.setTimeout(() => setPeekedItem(null), 1600);
+										return;
+									}
+
+									navigate(it.link);
+									setIsOpen(false);
+									setCollapsed(false);
+									setPeekedItem(null);
 							}}
 								style={{
 									// um leve gradiente para o ativo
@@ -201,6 +257,7 @@ const Sidebar: React.FC = () => {
 									</span>
 								)}
 							</button>
+							</Tooltip>
 						);
 					})}
 				</nav>

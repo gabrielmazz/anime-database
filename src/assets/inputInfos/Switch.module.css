@@ -1,170 +1,138 @@
-.rootSwitch:focus-within {
-    border-color: var(--color1);
-    outline: none;
+
+.rootSwitch:has(input:disabled) {
+	cursor: not-allowed;
 }
 
-.labelWrapperSwitch {
-    color: var(--colorTextWhite);
-    font-family: var(--text-font-body);
-    letter-spacing: var(--text-letter-spacing);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    order: 1;
+.rootSwitch:has(input:disabled):hover {
+	transform: none;
+}
+.rootSwitch {
+
 }
 
-.descriptionSwitch {
-    color: var(--colorTextWhite);
-    font-size: 0.8rem;
-    font-family: var(--text-font-body);
-    letter-spacing: var(--text-letter-spacing);
-    margin-top: 4px;
-    pointer-events: none;
-    max-width: 600px;
-    overflow: hidden;
-    text-overflow: ellipsis;
+.rootSwitch:hover {
+	transform: translateY(-1px);
+	transition: transform 150ms ease;
 }
 
 .trackSwitch {
-    --h: 30px;
-    --r: 5px;
-    --pad: 3px;
-    --bw: 1px;
+	border-radius: 6px;
+	border: 1px solid var(--panel-border);
+	box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
+	background-color: transparent;
 
-    height: var(--h);
-    min-width: calc(var(--h) * 1.9);
-    background-color: transparent;
-    border: var(--bw) solid var(--color1-shadow);
-    border-radius: var(--r);
-    transition: background-color 160ms ease, border-color 160ms ease;
+	input:checked+& {
+		background: var(--color5);
+		border-color: var(--accent);
 
-    input:checked+& {
-        background-color: var(--accent);
-        border-color: var(--accent);
+		&>.thumbSwitch {
+			transition: 150ms ease, transform 150ms ease;
 
-        &>.thumb {
-            background-color: var(--color1);
+			&::before {
+				background-color: var(--color3);
+			}
+		}
+	}
 
-            &::before {
-                background-color: var(--color1);
-            }
-        }
-    }
 }
 
-.trackSwitch:hover {
-    border-color: var(--color1);
+.trackSwitch2 {
+	border-radius: 6px;
+	background: var(--color4);
+	border: 1px solid var(--color1-shadow);
+	box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
+	background-color: transparent;
+
+
+	input:checked+& {
+		background: var(--color5);
+		/* border-color: var(--accent); */
+
+		&>.thumbSwitch {
+			transition: 150ms ease, transform 150ms ease;
+
+			&::before {
+				background-color: var(--color1);
+			}
+		}
+	}
+
 }
 
-.trackSwitchField[data-checked="true"] {
-    background-color: color-mix(in oklab, var(--accent) 35%, transparent);
-    border-color: var(--accent);
-}
-
-/* Thumb personalizado mais "quadrado" */
 .thumbSwitch {
-    height: calc(var(--h) - var(--pad) * 2);
-    width: calc(var(--h) - var(--pad) * 2);
-    margin: var(--pad);
-    background: var(--color1);
-    border-radius: 8px;
-    /* mesmo raio do outro switch */
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35), inset 0 0 0 1px var(--panel-border);
+	border-radius: 6px;
 }
 
-/* Quando ligado, o thumb acompanha o track; o Mantine aplica transform automaticamente.
-   Aqui apenas refinamos cor/sombra. */
-.trackSwitch[data-checked="true"] .thumbSwitch {
-    background: #fff;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.4), inset 0 0 0 1px color-mix(in oklab, var(--accent) 40%, #0000);
+.thumbSwitch[data-checked="true"] {
+	background: var(--color4);
+	box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
 }
 
-/* Estiliza o indicador interno padrão do Mantine (pseudo ::before do thumb) */
-.thumbSwitch[data-with-thumb-indicator]::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 40%;
-    height: 40%;
-    border-radius: 999px;
-    transform: translate(-50%, -50%);
-    box-shadow: inset 0 0 0 1px var(--panel-border);
-    transition: background-color 160ms ease, box-shadow 160ms ease;
-    pointer-events: none;
+.labelSwitch {
+	font-family: var(--text-font-body);
+	font-size: 12px;
+	letter-spacing: var(--text-letter-spacing);
+	text-transform: uppercase;
+	color: var(--colorTextWhite);
 }
 
-.trackSwitch[data-checked="true"] .thumbSwitch[data-with-thumb-indicator]::before {
-    background-color: var(--accent);
-    box-shadow: 0 0 6px var(--accent), 0 0 12px var(--accent), inset 0 0 0 1px color-mix(in oklab, var(--accent) 40%, transparent);
+.descriptionSwitch {
+	color: var(--colorTextWhite);
+	font-size: 0.8rem;
+	font-family: var(--text-font-body);
+	letter-spacing: var(--text-letter-spacing);
+	margin-top: 4px;
 }
 
-/* Labels ON/OFF dentro do track (se usados) */
-.trackSwitch span {
-    color: var(--color1);
-    font-weight: 600;
-    letter-spacing: 0.06em;
+.labelSwitch2 {
+	color: var(--colorTextWhite);
+	font-size: 1.2rem;
+	font-family: var(--text-font-body);
+	letter-spacing: var(--text-letter-spacing);
+	pointer-events: none;
 }
 
-/* Estado desabilitado (robusto: aplica via root e via track) */
-.rootSwitch[data-disabled],
-.trackSwitch[data-disabled] {
-    cursor: not-allowed;
+.descriptionlabel2 {
+	color: var(--colorTextWhite);
+	font-size: 0.8rem;
+	font-family: var(--text-font-body);
+	letter-spacing: var(--text-letter-spacing);
+	margin-top: 4px;
 }
 
-.rootSwitch[data-disabled] .trackSwitch,
-.trackSwitch[data-disabled] {
-    background-color: color-mix(in srgb, var(--panel-bg) 65%, #9aa0a6 35%);
-    border-color: color-mix(in srgb, var(--panel-border) 50%, #9aa0a6 50%);
-    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.03);
-    filter: grayscale(0.5);
-    opacity: 1;
+
+.rootSwitch input:disabled + .trackSwitch,
+.rootSwitch input:disabled + .trackSwitch2 {
+	background: color-mix(in srgb, #5a6069 40%, #151a22 60%);
+	border-color: color-mix(in srgb, #6b7079 55%, #1d232b 45%);
+	box-shadow: none;
+	cursor: not-allowed;
+	pointer-events: none;
 }
 
-/* Fallback: quando somente o input recebe disabled */
-.rootSwitch input[disabled]~.trackSwitch,
-.rootSwitch input[disabled]~* .trackSwitch {
-    background-color: color-mix(in srgb, var(--panel-bg) 65%, #9aa0a6 35%);
-    border-color: color-mix(in srgb, var(--panel-border) 50%, #9aa0a6 50%);
-    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.03);
-    filter: grayscale(0.5);
+.rootSwitch input:disabled + .trackSwitch .thumbSwitch,
+.rootSwitch input:disabled + .trackSwitch2 .thumbSwitch {
+	background: color-mix(in srgb, #d7dbe0 65%, #7e848d 35%);
+	box-shadow: none;
 }
 
-.rootSwitch[data-disabled] .thumbSwitch,
-.trackSwitch[data-disabled] .thumbSwitch {
-    background: color-mix(in srgb, var(--colorTextWhite) 35%, #9aa0a6 65%);
-    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--panel-border) 50%, #9aa0a6 50%);
+.rootSwitch input:disabled + .trackSwitch .thumbSwitch::before,
+.rootSwitch input:disabled + .trackSwitch2 .thumbSwitch::before {
+	background: color-mix(in srgb, #c5cad0 45%, #8a909a 55%);
 }
 
-.rootSwitch[data-disabled] .trackSwitch:hover {
-    border-color: color-mix(in srgb, var(--panel-border) 80%, #9aa0a6 20%);
+.labelSwitch[data-disabled],
+.labelSwitch2[data-disabled],
+.descriptionSwitch[data-disabled],
+.descriptionlabel2[data-disabled] {
+	color: color-mix(in srgb, var(--colorTextWhite) 35%, #8f96a1 65%);
 }
 
-.rootSwitch[data-disabled] .labelWrapperSwitch,
-.rootSwitch[data-disabled] .descriptionSwitch {
-    color: color-mix(in srgb, var(--colorTextWhite) 35%, #9aa0a6 65%);
+.rootSwitch input:disabled + .trackSwitch span,
+.rootSwitch input:disabled + .trackSwitch2 span {
+	color: color-mix(in srgb, #f8f9fa 25%, #7b828d 75%);
 }
 
-.rootSwitch input[disabled]~.labelWrapperSwitch,
-.rootSwitch input[disabled]~* .labelWrapperSwitch,
-.rootSwitch input[disabled]~.descriptionSwitch,
-.rootSwitch input[disabled]~* .descriptionSwitch {
-    color: color-mix(in srgb, var(--colorTextWhite) 35%, #9aa0a6 65%);
-}
-
-.rootSwitch[data-disabled] .trackSwitch span {
-    color: color-mix(in srgb, var(--color1) 35%, #9aa0a6 65%);
-}
-
-/* Foco (quando o input dentro do root recebe focus) */
-.rootSwitch:focus-within .trackSwitch {
-    box-shadow: 0 0 0 2px color-mix(in oklab, var(--accent) 40%, transparent);
-}
-
-/* Alinha o corpo (thumb + textos) na mesma linha e centraliza verticalmente */
-.bodySwitch {
-    display: inline-flex;
-    align-items: center;
-    gap: 12px;
-    /* espaço entre switch e textos */
+.rootSwitch .labelWrapperSwitch[data-disabled] .descriptionSwitch {
+	color: color-mix(in srgb, var(--colorTextWhite) 35%, #8f96a1 65%);
 }
