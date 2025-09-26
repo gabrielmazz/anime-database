@@ -10,6 +10,7 @@ import imgCard06 from '../assets/images/imgSelectionScreen/imgCard06.jpg';
 
 // Importação dos componentes do mantine
 import { BackgroundImage, Container, Space, Title, Text, Box } from '@mantine/core';
+import { useNavigate } from 'react-router-dom';
 
 // import { ScrollArea } from '@mantine/core';
 
@@ -20,6 +21,7 @@ import { applyPaletteToCssVariables, extractPaletteFromImage } from '../utils/pa
 
 const SelectionScreen: React.FC = () => {
 	const [wallpaper, _setWallpaper] = useState<string>(() => getRandomWallpaper('selection'));
+    const navigate = useNavigate();
 
 	// Extrai paleta baseada no wallpaper e aplica nas CSS variables (mesmo padrão das outras telas)
 	useEffect(() => {
@@ -98,7 +100,7 @@ const SelectionScreen: React.FC = () => {
                                 min-h-[220px] md:min-h-[240px]
                                 "
 							style={{ borderColor: 'var(--color1)' }}
-							onClick={() => { window.location.href = '/searchScreen'; }}
+	onClick={() => navigate('/searchScreen')}
 						>
 							<BackgroundImage
 								src={imgCard01}
@@ -138,7 +140,7 @@ const SelectionScreen: React.FC = () => {
                                 min-h-[220px] md:min-h-[240px]
                             "
 							style={{ borderColor: 'var(--color1)' }}
-							onClick={() => { window.location.href = '/searchScreenManga'; }}
+	onClick={() => navigate('/searchScreenManga')}
 						>
 							<BackgroundImage
 								src={imgCard03}
@@ -179,7 +181,7 @@ const SelectionScreen: React.FC = () => {
 								min-h-[220px] md:min-h-[240px]
 							"
 							style={{ borderColor: 'var(--color1)' }}
-							onClick={() => { window.location.href = '/searchScreenCharacters'; }}
+	onClick={() => navigate('/searchScreenCharacters')}
 						>
 							<BackgroundImage
 								src={imgCard02}
@@ -220,7 +222,7 @@ const SelectionScreen: React.FC = () => {
                                     min-h-[220px] md:min-h-[240px]
                                 "
 							style={{ borderColor: 'var(--color1)' }}
-							onClick={() => { window.location.href = '/searchScreenProducers'; }}
+	onClick={() => navigate('/searchScreenProducers')}
 						>
 							<BackgroundImage
 								src={imgCard04}
@@ -261,7 +263,7 @@ const SelectionScreen: React.FC = () => {
                                 min-h-[220px] md:min-h-[240px]
                             "
 							style={{ borderColor: 'var(--color1)' }}
-							onClick={() => { window.location.href = '/seasonScreen'; }}
+	onClick={() => navigate('/seasonScreen')}
 						>
 							<BackgroundImage
 								src={imgCard05}
@@ -295,7 +297,7 @@ const SelectionScreen: React.FC = () => {
                                 min-h-[220px] md:min-h-[240px]
                             "
 							style={{ borderColor: 'var(--color1)' }}
-							onClick={() => { window.location.href = '/topAnimesScreen'; }}
+	onClick={() => navigate('/topAnimesScreen')}
 						>
 							<BackgroundImage
 								src={imgCard06}

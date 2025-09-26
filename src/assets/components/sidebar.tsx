@@ -5,6 +5,7 @@ import LogoBaseboard from './logoBaseboard';
 import InfoDrawer from './infoDrawer';
 import DrawerModule from '../inputInfos/Drawer.module.css';
 import { useSettings } from '../../state/settings';
+import { useNavigate } from 'react-router-dom';
 
 // Importação dos componentes de Input
 import { JsonInput } from '@mantine/core';
@@ -63,6 +64,7 @@ const Sidebar: React.FC = () => {
 	const [aboutOpen, setAboutOpen] = useState<boolean>(false);
 	const [debugOpen, setDebugOpen] = useState<boolean>(false);
 	const { devModeEnabled, lastApiPayload: _lastApiPayload, lastSearchPayload, lastPicturesPayload, lastCharactersPayload, lastTopCharactersPayload, lastCharactersSearchPayload } = useSettings();
+    const navigate = useNavigate();
 
     const items: Item[] = useMemo(() => ([
         { key: 'intro', label: 'Introdução', icon: <FaCubes />, link: '/introScreen' },
@@ -165,12 +167,13 @@ const Sidebar: React.FC = () => {
 										rounded-2xl px-3 py-2 border transition-colors 
 										${isActive ? 'border-[var(--panel-border)]' : 'border-transparent'} 
 										hover:border-[var(--panel-border)] text-(--color1)`}
-								onClickCapture={(e) => {
-									// Navegação simples sem react-router
-									e.preventDefault();
-									window.location.href = it.link;
-
-								}}
+							onClickCapture={(e) => {
+								// Usa React Router para navegação SPA
+								e.preventDefault();
+								navigate(it.link);
+								setIsOpen(false);
+								setCollapsed(false);
+							}}
 								style={{
 									// um leve gradiente para o ativo
 									background: isActive ? 'linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02))' : 'transparent'
