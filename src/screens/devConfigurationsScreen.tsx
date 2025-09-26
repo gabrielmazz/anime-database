@@ -2,14 +2,14 @@ import React, { useEffect, useState } from 'react';
 
 // UI base (Mantine)
 import {
-  BackgroundImage,
-  Container,
-  Group,
-  NumberInput,
-  Space,
-  Switch,
-  Text,
-  Title,
+    BackgroundImage,
+    Container,
+    Group,
+    NumberInput,
+    Space,
+    Switch,
+    Text,
+    Title,
 } from '@mantine/core';
 import NumberInputModule from '../assets/inputInfos/NumberInput.module.css';
 
@@ -124,11 +124,10 @@ const DevConfigurationsScreen: React.FC = () => {
                                 onChange={(e) => setDevModeEnabled(e.currentTarget.checked)}
                                 classNames={{
                                     root: SwitchModule.rootSwitch,
-                                    body: SwitchModule.bodySwitch,
-                                    labelWrapper: SwitchModule.labelWrapperSwitch,
-                                    description: SwitchModule.descriptionSwitch,
-                                    track: SwitchModule.trackSwitch,
+                                    track: SwitchModule.trackSwitch2,
                                     thumb: SwitchModule.thumbSwitch,
+                                    label: SwitchModule.labelSwitch2,
+                                    description: SwitchModule.descriptionlabel2,
                                 }}
                             />
 
@@ -143,11 +142,10 @@ const DevConfigurationsScreen: React.FC = () => {
                                 onChange={(e) => setApiModalEnabled(e.currentTarget.checked)}
                                 classNames={{
                                     root: SwitchModule.rootSwitch,
-                                    body: SwitchModule.bodySwitch,
-                                    labelWrapper: SwitchModule.labelWrapperSwitch,
-                                    description: SwitchModule.descriptionSwitch,
-                                    track: SwitchModule.trackSwitch,
+                                    track: SwitchModule.trackSwitch2,
                                     thumb: SwitchModule.thumbSwitch,
+                                    label: SwitchModule.labelSwitch2,
+                                    description: SwitchModule.descriptionlabel2,
                                 }}
                             />
                         </Group>

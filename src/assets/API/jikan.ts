@@ -7,6 +7,7 @@ export type Anime = {
     episodes: number;
     status: string;
     score: number;
+    rating?: string; // e.g., 'PG-13', 'R - 17+', 'Rx - Hentai'
     images: {
         jpg: {
             image_url: string;
@@ -16,6 +17,10 @@ export type Anime = {
 
 export type AnimeApiSearchResponse = {
 	data: Anime[];
+};
+
+export type AnimeRandomResponse = {
+  data: Anime;
 };
 
 export type AnimePicturesResponse = {
@@ -70,6 +75,12 @@ export async function searchAnimeByName(name: string): Promise<AnimeApiSearchRes
 	const response = await fetch(`${BASE_URL}/anime?q=${encodeURIComponent(name)}`);
 	if (!response.ok) throw new Error('Falha ao buscar animes');
 	return response.json();
+}
+
+export async function getRandomAnime(): Promise<AnimeRandomResponse> {
+  const response = await fetch(`${BASE_URL}/random/anime`);
+  if (!response.ok) throw new Error('Falha ao sortear anime');
+  return response.json();
 }
 
 // Top Animes endpoints
@@ -161,6 +172,9 @@ export type Manga = {
     chapters: number | null;
     status: string;
     score: number | null;
+    genres?: Array<{ mal_id: number; name: string; type?: string }>;
+    explicit_genres?: Array<{ mal_id: number; name: string; type?: string }>;
+    themes?: Array<{ mal_id: number; name: string; type?: string }>;
     images: {
         jpg: {
             image_url: string;
@@ -170,6 +184,10 @@ export type Manga = {
 
 export type MangaApiSearchResponse = {
     data: Manga[];
+};
+
+export type MangaRandomResponse = {
+  data: Manga;
 };
 
 export type MangaPicturesResponse = {
@@ -212,6 +230,12 @@ export async function getMangaCharacters(id: number): Promise<MangaCharactersRes
     const response = await fetch(`${BASE_URL}/manga/${id}/characters`);
     if (!response.ok) throw new Error('Falha ao buscar personagens do mangá');
     return response.json();
+}
+
+export async function getRandomManga(): Promise<MangaRandomResponse> {
+  const response = await fetch(`${BASE_URL}/random/manga`);
+  if (!response.ok) throw new Error('Falha ao sortear mangá');
+  return response.json();
 }
 
 // =============================
