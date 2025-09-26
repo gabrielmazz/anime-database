@@ -41,6 +41,7 @@ import { SiReactrouter } from "react-icons/si";
 
 // Importação do modal centralizado
 import CenteredModal from '../assets/components/centerModal.tsx';
+import { useNavigate } from 'react-router-dom';
 
 const IntroScreen: React.FC = () => {
     const [wallpaper, _setWallpaper] = useState<string>(() => getRandomWallpaper('intro'));
@@ -48,6 +49,9 @@ const IntroScreen: React.FC = () => {
 
     const [aboutOpen, setAboutOpen] = useState<boolean>(false);
     const [techOpen, setTechOpen] = useState<boolean>(false);
+
+    // Hook de navegação do React Router
+    const navigate = useNavigate();
 
     useEffect(() => {
         if (!wallpaper) return;
@@ -135,10 +139,8 @@ const IntroScreen: React.FC = () => {
                                     size="md"
                                     radius="md"
                                     variant="filled"
-                                    classNames={{
-                                        root: ButtonModule.rootButton,
-                                    }}
-                                    onClick={() => { window.location.href = '/selectionScreen'; }}
+                                    classNames={{ root: ButtonModule.rootButton }}
+                                    onClick={() => navigate('/selectionScreen')}
                                 >
                                     Entrar
                                 </Button>
