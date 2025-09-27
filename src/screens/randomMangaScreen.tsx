@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { BackgroundImage, Box, Button, Group, Image, Space, Switch, Text, Title } from '@mantine/core';
+import { BackgroundImage, Box, Button, Image, Space, Switch, Text, Title } from '@mantine/core';
 import Sidebar from '../assets/components/sidebar.tsx';
 import LoadingOverlayFullscreen from '../assets/components/overlay.tsx';
 import AlertBox from '../assets/components/alert.tsx';
@@ -102,12 +102,10 @@ const RandomMangaScreen: React.FC = () => {
 
 				<Space h="md" />
 
-				<Box className="bg-black/40 rounded-lg backdrop-blur-sm border border-white/20 shadow-lg w-full max-w-none mx-auto p-4 sm:p-6 md:p-8 mt-6 sm:mt-10 lg:mt-12 mb-16 h-[560px] md:h-[640px] lg:h-[720px]">
+					<Box className="bg-black/40 rounded-lg backdrop-blur-sm border border-white/20 shadow-lg w-full max-w-none mx-auto p-4 sm:p-6 md:p-8 mt-6 sm:mt-10 lg:mt-12 mb-16 h-auto sm:h-[560px] md:h-[640px] lg:h-[720px]">
 					<div className="relative h-full flex items-center justify-center">
 						{(phase === 'idle' || phase === 'rolling') && !selected && (
-							<div className="w-full h-full border-2 rounded-xl border-[var(--panel-border)] flex items-center justify-center animate-pulse">
-								<Text className="text-(--colorTextWhite) text-xl">Preparando sorteio...</Text>
-							</div>
+							<div className="w-full h-full border-2 rounded-xl border-[var(--panel-border)] flex items-center justify-center animate-pulse" />
 						)}
 
 						{selected && (
@@ -131,28 +129,37 @@ const RandomMangaScreen: React.FC = () => {
 											<Stat label="Nota" value={selected.score ?? '-'} />
 											<Stat label="Conteúdo" value={isAdultManga(selected) ? 'Adulto' : 'Padrão'} />
 										</div>
-										<Group className="mt-auto items-center justify-between flex-wrap gap-3">
+										<div className="mt-auto flex flex-col sm:flex-row gap-3 sm:gap-4 w-full items-stretch sm:items-center sm:justify-start">
 											{malUrl && (
-												<Button component="a" href={malUrl} target="_blank" rel="noopener noreferrer" classNames={{ root: ButtonModule.rootButton }}>
+												<Button
+													component="a"
+													href={malUrl}
+													target="_blank"
+													rel="noopener noreferrer"
+													className="w-full sm:w-auto"
+													classNames={{ root: ButtonModule.rootButton }}
+												>
 													Ver na MyAnimeList
 												</Button>
 											)}
-											<Button onClick={draw} classNames={{ root: ButtonModule.rootButton }}>
+											<Button onClick={draw} className="w-full sm:w-auto" classNames={{ root: ButtonModule.rootButton }}>
 												Sortear novamente
 											</Button>
-											<Switch
-												checked={allowAdult}
-												onChange={(e) => setAllowAdult(e.currentTarget.checked)}
-												label="Adulto (+17/+18)"
-												size="xl"
-												classNames={{
-													root: SwitchModule.rootSwitch,
-													track: SwitchModule.trackSwitch,
-													thumb: SwitchModule.thumbSwitch,
-													label: SwitchModule.labelSwitch,
-												}}
-											/>
-										</Group>
+											<div className="w-full sm:w-auto flex justify-center sm:justify-start">
+												<Switch
+													checked={allowAdult}
+													onChange={(e) => setAllowAdult(e.currentTarget.checked)}
+													label="Adulto (+17/+18)"
+													size="xl"
+													classNames={{
+														root: SwitchModule.rootSwitch,
+														track: SwitchModule.trackSwitch,
+														thumb: SwitchModule.thumbSwitch,
+														label: SwitchModule.labelSwitch,
+													}}
+												/>
+											</div>
+										</div>
 									</div>
 								</div>
 							</div>
