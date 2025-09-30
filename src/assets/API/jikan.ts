@@ -457,6 +457,7 @@ export type PersonVoiceEntry = {
 	};
 	character?: {
 		name?: string | null;
+		favorites?: number | null;
 		images?: PersonImages;
 	};
 };

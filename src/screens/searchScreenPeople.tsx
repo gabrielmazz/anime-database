@@ -57,6 +57,8 @@ const VOICE_CHARACTERS_PER_ROW = 2;
 const VOICE_CHARACTERS_INITIAL_COUNT = 20;
 const VOICE_CHARACTERS_STEP = 50;
 
+type VoiceCharacterWithFavorites = PersonVoiceEntry['character'] & { favorites?: number | null };
+
 function formatNumber(value?: number | null) {
     if (typeof value !== 'number') return '-';
     try {
@@ -445,7 +447,7 @@ const SearchScreenPeople: React.FC = () => {
                 </Container>
 
                 {isLoadingMore && (
-                    <Text size="sm" align="center" mt="sm" c="dimmed">
+                    <Text size="sm" ta="center" mt="sm" c="dimmed">
                         Carregando mais pessoas...
                     </Text>
                 )}
@@ -631,7 +633,7 @@ const SearchScreenPeople: React.FC = () => {
                                 {voiceCharacterRows.map((row, rowIndex) => (
                                     <Grid key={`voice-row-${rowIndex}`} gutter={isSmDown ? 'sm' : 'md'} mb="md">
                                         {row.map((voiceEntry, colIndex) => {
-                                                const character = voiceEntry.character ?? undefined;
+                                                const character = voiceEntry.character as VoiceCharacterWithFavorites | null | undefined;
                                                 const characterImages = character?.images ?? undefined;
                                                 const imageUrl = characterImages?.jpg?.image_url ?? characterImages?.webp?.image_url ?? '';
                                                 const characterName = character?.name ?? 'Personagem desconhecido';
@@ -658,7 +660,7 @@ const SearchScreenPeople: React.FC = () => {
                                                                 className="flex items-center justify-center bg-white/5 border border-white/10"
                                                                 style={{ borderRadius: 12 }}
                                                             >
-                                                                <Text size="xs" align="center" c="dimmed">
+                                                                <Text size="xs" ta="center" c="dimmed">
                                                                     Sem imagem
                                                                 </Text>
                                                             </Box>
