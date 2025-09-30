@@ -9,6 +9,7 @@ import imgCard05 from '../assets/images/imgSelectionScreen/imgCard05.jpg';
 import imgCard06 from '../assets/images/imgSelectionScreen/imgCard06.jpg';
 import imgCard07 from '../assets/images/imgSelectionScreen/imgCard07.jpg';
 import imgCard08 from '../assets/images/imgSelectionScreen/imgCard08.jpg';
+import imgCard09 from '../assets/images/imgSelectionScreen/imgCard09.png';
 
 // Importação dos componentes do mantine
 import { BackgroundImage, Container, Space, Title, Text, Box, Pagination } from '@mantine/core';
@@ -50,7 +51,7 @@ const SelectionScreen: React.FC = () => {
         return () => window.clearTimeout(outT);
     }, [page, renderedPage]);
 
-	const placeholderCards = Array.from({ length: 4 }, (_, idx) => (
+	const placeholderCards = Array.from({ length: 3 }, (_, idx) => (
 		<Box
 			key={`placeholder-${idx}`}
 			className="
@@ -363,6 +364,33 @@ const SelectionScreen: React.FC = () => {
 						style={{ fontFamily: 'var(--text-font-mono)', color: 'var(--colorTextWhite)', fontSize: 28 }}
 					>
 						Sortear Mangá
+					</Text>
+				</BackgroundImage>
+			</Box>
+
+			{/* Card 9: Buscar Pessoas */}
+			<Box
+				className="
+					border-2 rounded-lg shadow-lg/30 overflow-hidden cursor-pointer
+					transition-all duration-300 ease-out
+					hover:scale-[1.01]
+					min-h-[220px] md:min-h-[240px]
+				"
+				style={{ borderColor: 'var(--color1)' }}
+				onClick={() => navigate('/searchScreenPeople')}
+			>
+				<BackgroundImage
+					src={imgCard09}
+					className="
+						w-full h-full flex items-center justify-center
+						brightness-60 hover:brightness-100 transition duration-300
+					"
+				>
+					<Text
+						className="p-4 flex items-center justify-center h-full w-full text-center text-shadow-lg/60 font-bold uppercase tracking-(--title-letter-spacing)"
+						style={{ fontFamily: 'var(--text-font-mono)', color: 'var(--colorTextWhite)', fontSize: 28 }}
+					>
+						Buscar Pessoas
 					</Text>
 				</BackgroundImage>
 			</Box>

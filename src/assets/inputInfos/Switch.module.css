@@ -22,8 +22,8 @@
 	background-color: transparent;
 
 	input:checked+& {
-		background: var(--color5);
-		border-color: var(--accent);
+		background: var(--color4);
+		border-color: var(--panel-border);
 
 		&>.thumbSwitch {
 			transition: 150ms ease, transform 150ms ease;

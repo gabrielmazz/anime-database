@@ -56,6 +56,7 @@ const SearchScreenProducers: React.FC = () => {
 
 	const isLgDown = useMediaQuery('(max-width: 1024px)');
 	const isSmDown = useMediaQuery('(max-width: 640px)');
+	const tableWidthClass = isSmDown ? 'w-full' : 'min-w-[640px]';
 	const drawerSize = isLgDown ? '100%' : '35%';
 	const logoHeight = isSmDown ? 120 : 160;
 
@@ -223,7 +224,9 @@ const SearchScreenProducers: React.FC = () => {
 	}, [page, query, isLoadingMore, hasMore]);
 
 	// Linhas da tabela
-	const tableRows = useMemo(() => rows.map((p, idx) => (
+	const tableRows = useMemo(() => {
+		const imageSize = isSmDown ? 48 : 56;
+		return rows.map((p, idx) => (
 		<Table.Tr
 			key={p.mal_id}
 			className={TableModule.trTable}
@@ -240,24 +243,25 @@ const SearchScreenProducers: React.FC = () => {
 				});
 			}}
 		>
-			<Table.Td className={TableModule.tdTable} width={64}>
+			<Table.Td className={TableModule.tdTable} width={isSmDown ? 48 : 64}>
 				<Text style={{ color: 'var(--color1)', fontWeight: 700 }}>{idx + 1}</Text>
 			</Table.Td>
 			<Table.Td className={TableModule.tdTable}>
-				<Group wrap="nowrap" gap="sm" align="center">
+				<Group wrap={isSmDown ? 'wrap' : 'nowrap'} gap={isSmDown ? 'xs' : 'sm'} align="center">
 					{p.images?.jpg?.image_url && (
-						<Image src={p.images.jpg.image_url} w={56} h={56} radius="sm" fit="contain" alt={getProducerName(p)} />
+						<Image src={p.images.jpg.image_url} w={imageSize} h={imageSize} radius="sm" fit="contain" alt={getProducerName(p)} />
 					)}
-					<Box>
-						<Text style={{ color: 'var(--colorTextWhite)' }}>{getProducerName(p)}</Text>
+					<Box style={{ flex: 1, minWidth: isSmDown ? '100%' : 0 }}>
+						<Text style={{ color: 'var(--colorTextWhite)', fontSize: isSmDown ? 14 : undefined, wordBreak: 'break-word' }}>{getProducerName(p)}</Text>
 						{typeof p.favorites === 'number' && (
-							<Text size="xs" c="dimmed">Favorites: {p.favorites}</Text>
+							<Text size={isSmDown ? 'xs' : 'sm'} c="dimmed">Favorites: {p.favorites}</Text>
 						)}
 					</Box>
 				</Group>
 			</Table.Td>
 		</Table.Tr>
-	)), [rows]);
+		));
+	}, [rows, isSmDown]);
 
 	return (
 		<>
@@ -308,10 +312,14 @@ const SearchScreenProducers: React.FC = () => {
 
 					<Container fluid className="bg-black/40 rounded-lg backdrop-blur-sm border border-white/20 shadow-lg w-full max-w-none mx-auto p-4 sm:p-6 md:p-8 mt-6 mb-0 h-[70vh] overflow-hidden">
 						<div ref={scrollRef} className="h-[calc(100%-0px)] overflow-auto rounded-md overflow-x-auto">
-							<Table highlightOnHover className="min-w-[640px]" classNames={{ table: TableModule.tableTable, thead: TableModule.theadTable, th: TableModule.thTable, tr: TableModule.trTable, td: TableModule.tdTable, caption: TableModule.captionTable }}>
+							<Table
+								highlightOnHover
+								className={tableWidthClass}
+								classNames={{ table: TableModule.tableTable, thead: TableModule.theadTable, th: TableModule.thTable, tr: TableModule.trTable, td: TableModule.tdTable, caption: TableModule.captionTable }}
+							>
 								<Table.Thead className="sticky top-0 z-10">
 									<Table.Tr>
-										<Table.Th style={{ width: 64 }}>#</Table.Th>
+										<Table.Th style={{ width: isSmDown ? 48 : 64 }}>#</Table.Th>
 										<Table.Th>Produtor</Table.Th>
 									</Table.Tr>
 								</Table.Thead>

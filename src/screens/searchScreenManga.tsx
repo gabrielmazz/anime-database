@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 // UI base (Mantine)
 import {
   BackgroundImage,
   Box,
+  Button,
   Divider,
   Grid,
   Group,
@@ -27,6 +28,8 @@ import InfoDrawer from '../assets/components/infoDrawer.tsx';
 // CSS Modules
 import DrawerModule from './../assets/inputInfos/Drawer.module.css';
 import TextInputModule from './../assets/inputInfos/TextInput.module.css';
+import CharacterHoverCard from '../assets/components/characterHoverCard';
+import ButtonModule from './../assets/inputInfos/Button.module.css';
 
 // Utilitários / estado global
 import { getRandomWallpaper } from '../utils/wallpaper';
@@ -42,6 +45,21 @@ import {
   type MangaApiSearchResponse,
 } from '../assets/API/jikan';
 import { translateText, translateTextDetailed } from '../assets/API/translate';
+
+const SECONDARY_INITIAL_COUNT = 10;
+const SECONDARY_STEP = 50;
+const CHARACTERS_PER_ROW = 2;
+
+function chunkIntoRows<T>(items: T[], itemsPerRow: number): T[][] {
+  if (itemsPerRow <= 0) {
+    return [];
+  }
+  const rows: T[][] = [];
+  for (let index = 0; index < items.length; index += itemsPerRow) {
+    rows.push(items.slice(index, index + itemsPerRow));
+  }
+  return rows;
+}
 
 const SearchScreenManga: React.FC = () => {
 	const [query, setQuery] = useState('');
@@ -62,6 +80,7 @@ const SearchScreenManga: React.FC = () => {
 	const [mangaSelectedCharacters, setMangaSelectedCharacters] = useState<any>(null);
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const [revealCount, setRevealCount] = useState<number>(0);
+	const [otherCharactersVisibleCount, setOtherCharactersVisibleCount] = useState<number>(SECONDARY_INITIAL_COUNT);
 
     const searchManga = async () => {
         setIsLoading(true);
@@ -128,6 +147,10 @@ const SearchScreenManga: React.FC = () => {
 		}
 	};
 
+	useEffect(() => {
+		setOtherCharactersVisibleCount(SECONDARY_INITIAL_COUNT);
+	}, [mangaSelectedCharacters]);
+
 	const [openedCardInformation, setOpenedCardInformation] = useState(false);
 	const [selectedManga, setSelectedManga] = useState<Manga | null>(null);
 	const [translatedSynopsis, setTranslatedSynopsis] = useState<string | null>(null);
@@ -142,6 +165,48 @@ const SearchScreenManga: React.FC = () => {
 	const drawerSize = isLgDown ? '100%' : '35%';
 	const coverHeight = isSmDown ? 360 : isLgDown ? 480 : 600;
 	const carouselHeight = isSmDown ? 320 : isLgDown ? 420 : 600;
+
+	const mainCharacters = useMemo(() => {
+		if (!mangaSelectedCharacters || !Array.isArray(mangaSelectedCharacters.data)) {
+			return [];
+		}
+		return mangaSelectedCharacters.data.filter((character: any) => character.role === 'Main');
+	}, [mangaSelectedCharacters]);
+
+	const otherCharacters = useMemo(() => {
+		if (!mangaSelectedCharacters || !Array.isArray(mangaSelectedCharacters.data)) {
+			return [];
+		}
+		return mangaSelectedCharacters.data.filter((character: any) => character.role !== 'Main');
+	}, [mangaSelectedCharacters]);
+
+	const mainCharacterRows = useMemo(
+		() => chunkIntoRows(mainCharacters, CHARACTERS_PER_ROW),
+		[mainCharacters]
+	);
+
+	const visibleOtherCharacters = useMemo(
+		() => otherCharacters.slice(0, otherCharactersVisibleCount),
+		[otherCharacters, otherCharactersVisibleCount]
+	);
+
+	const otherCharacterRows = useMemo(
+		() => chunkIntoRows(visibleOtherCharacters, CHARACTERS_PER_ROW),
+		[visibleOtherCharacters]
+	);
+
+	const hasMoreOtherCharacters = otherCharacters.length > otherCharactersVisibleCount;
+	const remainingOtherCharacters = otherCharacters.length - otherCharactersVisibleCount;
+	const nextOtherCharactersIncrement = Math.min(
+		SECONDARY_STEP,
+		Math.max(remainingOtherCharacters, 0)
+	);
+
+	const handleShowMoreOtherCharacters = () => {
+		setOtherCharactersVisibleCount((prev) =>
+			Math.min(prev + SECONDARY_STEP, otherCharacters.length)
+		);
+	};
 
 	useEffect(() => {
 		let cancelled = false;
@@ -306,7 +371,7 @@ const SearchScreenManga: React.FC = () => {
 				position="right"
 				size={drawerSize}
 				overlayProps={{ backgroundOpacity: 0.5, blur: 4 }}
-				classNames={{ root: DrawerModule.rootDrawer, header: DrawerModule.headerDrawer, body: DrawerModule.bodyDrawer }}
+				classNames={{ root: DrawerModule.rootDrawer, header: DrawerModule.headerDrawer, body: DrawerModule.bodyDrawer, content: DrawerModule.contentDrawer }}
 				content={selectedManga && (
 					<>
 						<Box>
@@ -385,62 +450,57 @@ const SearchScreenManga: React.FC = () => {
 							))}
 						</Carousel>
 
-            {mangaSelectedCharacters && Array.isArray(mangaSelectedCharacters.data) &&
-              mangaSelectedCharacters.data.some((character: any) => character.role === 'Main') && (
-              <>
-                <Divider my="xl" label={
-                  <Text component="span" className="font-bold uppercase tracking-(--title-letter-spacing)" style={{ fontSize: 16, fontFamily: 'Raleway, sans-serif', color: 'var(--colorTextWhite)', marginRight: 6 }}>
-                    Personagens Principais
-                  </Text>
-                } labelPosition="center" />
+	            {mainCharacters.length > 0 && (
+	              <>
+	                <Divider my="xl" label={
+	                  <Text component="span" className="font-bold uppercase tracking-(--title-letter-spacing)" style={{ fontSize: 16, fontFamily: 'Raleway, sans-serif', color: 'var(--colorTextWhite)', marginRight: 6 }}>
+	                    Personagens Principais
+	                  </Text>
+	                } labelPosition="center" />
 
-                {Array.from({ length: Math.ceil(mangaSelectedCharacters.data.filter((c: any) => c.role === 'Main').length / 2) }, (_, rowIndex) => {
-                  const mainCharacters = mangaSelectedCharacters.data.filter((c: any) => c.role === 'Main');
-                  const rowCharacters = mainCharacters.slice(rowIndex * 2, rowIndex * 2 + 2);
-                  return (
-                    <Grid key={rowIndex} gutter="md" mb="md">
-                      {rowCharacters.map((character: any, colIndex: number) => (
-                        <Grid.Col span={6} key={colIndex}>
-                          <Group>
-                            <Image src={character.character.images.jpg.image_url} radius="md" h={120} w={80} alt={character.character.name} />
-                            <Text style={{ color: '#E8D4B7', fontWeight: 600 }}>
-                              {character.character.name}
-                            </Text>
-                          </Group>
-                        </Grid.Col>
-                      ))}
-                    </Grid>
-                  );
-                })}
-              </>
-            )}
+                                {mainCharacterRows.map((rowCharacters, rowIndex) => (
+                                  <Grid key={rowIndex} gutter={{ base: 'sm', sm: 'md' }} mb="md">
+                                    {rowCharacters.map((characterEntry: any, colIndex: number) => (
+                                      <Grid.Col span={{ base: 12, sm: 6 }} key={colIndex}>
+                                        <CharacterHoverCard characterEntry={characterEntry} nameColor="#E8D4B7" />
+                                      </Grid.Col>
+                                    ))}
+                                  </Grid>
+                                ))}
+                              </>
+                            )}
 
-						{mangaSelectedCharacters && Array.isArray(mangaSelectedCharacters.data) &&
-							mangaSelectedCharacters.data.some((character: any) => character.role !== 'Main') && (
+							{otherCharacters.length > 0 && (
 								<>
 									<Divider my="xl" label={
 										<Text component="span" className="font-bold uppercase tracking-(--title-letter-spacing)" style={{ fontSize: 16, fontFamily: 'Raleway, sans-serif', color: 'var(--colorTextWhite)', marginRight: 6 }}>
 											Outros Personagens
 										</Text>
 									} labelPosition="center" />
-									{Array.from({ length: Math.ceil(mangaSelectedCharacters.data.filter((c: any) => c.role !== 'Main').length / 2) }, (_, rowIndex) => {
-										const otherCharacters = mangaSelectedCharacters.data.filter((c: any) => c.role !== 'Main');
-										const rowCharacters = otherCharacters.slice(rowIndex * 2, rowIndex * 2 + 2);
-										return (
-											<Grid key={rowIndex} gutter="md" mb="md">
-												{rowCharacters.map((character: any, colIndex: number) => (
-													<Grid.Col span={6} key={colIndex}>
-														<Group>
-															<Image src={character.character.images.jpg.image_url} radius="md" h={120} w={80} alt={character.character.name} />
-															<Text style={{ color: 'var(--colorTextWhite)', fontWeight: 600 }}>
-																{character.character.name}
-															</Text>
-														</Group>
-													</Grid.Col>
-												))}
-											</Grid>
-										);
-									})}
+                                {otherCharacterRows.map((rowCharacters, rowIndex) => (
+                                    <Grid key={rowIndex} gutter={{ base: 'sm', sm: 'md' }} mb="md">
+                                        {rowCharacters.map((characterEntry: any, colIndex: number) => (
+                                            <Grid.Col span={{ base: 12, sm: 6 }} key={colIndex}>
+                                                <CharacterHoverCard characterEntry={characterEntry} />
+                                            </Grid.Col>
+                                        ))}
+                                    </Grid>
+                                ))}
+
+									{hasMoreOtherCharacters && (
+										<Group justify="center" mt="md">
+											<Button
+												variant="transparent"
+												color="yellow"
+												onClick={handleShowMoreOtherCharacters}
+												classNames={{
+                                                	root: ButtonModule.rootButton2
+                                           		}}
+											>
+												Mostrar mais {nextOtherCharactersIncrement} personagens
+											</Button>
+										</Group>
+									)}
 								</>
 							)}
 					</>

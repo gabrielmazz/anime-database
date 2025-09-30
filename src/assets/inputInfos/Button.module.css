@@ -14,3 +14,13 @@
     transform: translateY(-1px);
     transition: background 150ms ease, transform 150ms ease;
 }
+
+.rootButton2 {
+    color: var(--colorTextWhite);
+}
+
+.rootButton2:hover {
+    color: var(--color4);
+    transform: translateY(-1px);
+    transition: background 150ms ease, transform 150ms ease;
+}
