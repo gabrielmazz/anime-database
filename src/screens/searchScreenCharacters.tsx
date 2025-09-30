@@ -2,19 +2,19 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 // UI base (Mantine)
 import {
-  BackgroundImage,
-  Box,
-  Container,
-  Divider,
-  Group,
-  HoverCard,
-  Image,
-  Pill,
-  Space,
-  Table,
-  Text,
-  TextInput,
-  Title,
+	BackgroundImage,
+	Box,
+	Container,
+	Divider,
+	Group,
+	HoverCard,
+	Image,
+	Pill,
+	Space,
+	Table,
+	Text,
+	TextInput,
+	Title,
 } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
 
@@ -27,7 +27,6 @@ import LoaderBox from '../assets/components/loaderBox.tsx';
 
 // CSS Modules (Inputs / Tabela / HoverCard)
 import TextInputModule from '../assets/inputInfos/TextInput.module.css';
-// import SelectModule from '../assets/inputInfos/Select.module.css';
 import MultiSelectModule from '../assets/inputInfos/MultiSelect.module.css';
 import HoverCardModule from '../assets/inputInfos/HoverCard.module.css';
 import TableModule from '../assets/inputInfos/Table.module.css';
@@ -39,14 +38,14 @@ import { getRandomWallpaper } from '../utils/wallpaper';
 
 // APIs
 import {
-  getTopCharacters,
-  searchCharactersByName,
-  getCharacterFull,
-  searchAnimeByName,
-  searchMangaByName,
-  type Character,
-  type Anime,
-  type Manga,
+	getTopCharacters,
+	searchCharactersByName,
+	getCharacterFull,
+	searchAnimeByName,
+	searchMangaByName,
+	type Character,
+	type Anime,
+	type Manga,
 } from '../assets/API/jikan';
 import { useSettings } from '../state/settings';
 
@@ -68,14 +67,15 @@ const SearchScreenCharacters: React.FC = () => {
 	const scrollRef = useRef<HTMLDivElement | null>(null);
 	const sentinelRef = useRef<HTMLDivElement | null>(null);
 	const [openedCharacterInfo, setOpenedCharacterInfo] = useState<boolean>(false);
-    const [selectedCharacter, setSelectedCharacter] = useState<Character | null>(null);
-    const [selectedCharacterFull, setSelectedCharacterFull] = useState<any | null>(null);
-    const [animeHoverCache, setAnimeHoverCache] = useState<Record<string, { status: 'loading' | 'success' | 'error'; data?: Anime | null }>>({});
-    const [mangaHoverCache, setMangaHoverCache] = useState<Record<string, { status: 'loading' | 'success' | 'error'; data?: Manga | null }>>({});
+	const [selectedCharacter, setSelectedCharacter] = useState<Character | null>(null);
+	const [selectedCharacterFull, setSelectedCharacterFull] = useState<any | null>(null);
+	const [animeHoverCache, setAnimeHoverCache] = useState<Record<string, { status: 'loading' | 'success' | 'error'; data?: Anime | null }>>({});
+	const [mangaHoverCache, setMangaHoverCache] = useState<Record<string, { status: 'loading' | 'success' | 'error'; data?: Manga | null }>>({});
 
 	// Breakpoints responsivos
 	const isSmDown = useMediaQuery('(max-width: 640px)');
 	const isLgDown = useMediaQuery('(max-width: 1024px)');
+	const tableWidthClass = isSmDown ? 'w-full' : 'min-w-[640px]';
 	const drawerSize = isLgDown ? '100%' : '35%';
 	const coverHeight = isSmDown ? 360 : isLgDown ? 480 : 600;
 
@@ -242,7 +242,8 @@ const SearchScreenCharacters: React.FC = () => {
 		return () => observer.disconnect();
 	}, [mode, page, rows, query, apiModalEnabled, hasMore, isLoadingMore, charactersPageLimit]);
 
-  const tableRows = useMemo(() => {
+	const tableRows = useMemo(() => {
+		const imageSize = isSmDown ? 48 : 56;
 		return rows.map((c, idx) => (
 			<Table.Tr
 				key={c.mal_id}
@@ -257,52 +258,52 @@ const SearchScreenCharacters: React.FC = () => {
 						.catch(() => setSelectedCharacterFull(null));
 				}}
 			>
-				<Table.Td className={TableModule.tdTable} width={64}>
+				<Table.Td className={TableModule.tdTable} width={isSmDown ? 48 : 64}>
 					<Text style={{ color: 'var(--color1)', fontWeight: 700 }}>{idx + 1}</Text>
 				</Table.Td>
 				<Table.Td className={TableModule.tdTable}>
-					<Group wrap="nowrap" gap="sm" align="center">
-						<Image src={c.images?.jpg?.image_url} w={56} h={56} radius="sm" fit="cover" alt={c.name} />
-						<Box>
-							<Text style={{ color: 'var(--colorTextWhite)' }}>{c.name}</Text>
-							<Text size="xs" c="dimmed">ID: {c.mal_id}</Text>
+					<Group wrap={isSmDown ? 'wrap' : 'nowrap'} gap={isSmDown ? 'xs' : 'sm'} align="center">
+						<Image src={c.images?.jpg?.image_url} w={imageSize} h={imageSize} radius="sm" fit="cover" alt={c.name} />
+						<Box style={{ flex: 1, minWidth: isSmDown ? '100%' : 0 }}>
+							<Text style={{ color: 'var(--colorTextWhite)', fontSize: isSmDown ? 14 : undefined, wordBreak: 'break-word' }}>{c.name}</Text>
+							<Text size={isSmDown ? 'xs' : 'sm'} c="dimmed">ID: {c.mal_id}</Text>
+							{typeof c.favorites === 'number' && (
+								<Text size={isSmDown ? 'xs' : 'sm'} c="dimmed">Favoritos: {formatNumber(c.favorites)}</Text>
+							)}
 						</Box>
 					</Group>
 				</Table.Td>
-				<Table.Td className={TableModule.tdTable} style={{ textAlign: 'right' }}>
-					<Text style={{ color: 'var(--colorTextWhite)' }}>{formatNumber(c.favorites)}</Text>
-				</Table.Td>
 			</Table.Tr>
 		));
-  }, [rows]);
+	}, [rows, isSmDown]);
 
-  const ensureAnimeHoverInfo = async (title: string) => {
-    const key = (title || '').trim();
-    if (!key) return;
-    setAnimeHoverCache((prev) => (prev[key] ? prev : { ...prev, [key]: { status: 'loading' } }));
-    if (animeHoverCache[key]) return; // já em cache ou carregando
-    try {
-      const res = await searchAnimeByName(key);
-      const data = Array.isArray(res?.data) && res.data.length > 0 ? (res.data[0] as Anime) : null;
-      setAnimeHoverCache((prev) => ({ ...prev, [key]: { status: 'success', data } }));
-    } catch {
-      setAnimeHoverCache((prev) => ({ ...prev, [key]: { status: 'error', data: null } }));
-    }
-  };
+	const ensureAnimeHoverInfo = async (title: string) => {
+		const key = (title || '').trim();
+		if (!key) return;
+		setAnimeHoverCache((prev) => (prev[key] ? prev : { ...prev, [key]: { status: 'loading' } }));
+		if (animeHoverCache[key]) return; // já em cache ou carregando
+		try {
+			const res = await searchAnimeByName(key);
+			const data = Array.isArray(res?.data) && res.data.length > 0 ? (res.data[0] as Anime) : null;
+			setAnimeHoverCache((prev) => ({ ...prev, [key]: { status: 'success', data } }));
+		} catch {
+			setAnimeHoverCache((prev) => ({ ...prev, [key]: { status: 'error', data: null } }));
+		}
+	};
 
-  const ensureMangaHoverInfo = async (title: string) => {
-    const key = (title || '').trim();
-    if (!key) return;
-    setMangaHoverCache((prev) => (prev[key] ? prev : { ...prev, [key]: { status: 'loading' } }));
-    if (mangaHoverCache[key]) return;
-    try {
-      const res = await searchMangaByName(key);
-      const data = Array.isArray(res?.data) && res.data.length > 0 ? (res.data[0] as Manga) : null;
-      setMangaHoverCache((prev) => ({ ...prev, [key]: { status: 'success', data } }));
-    } catch {
-      setMangaHoverCache((prev) => ({ ...prev, [key]: { status: 'error', data: null } }));
-    }
-  };
+	const ensureMangaHoverInfo = async (title: string) => {
+		const key = (title || '').trim();
+		if (!key) return;
+		setMangaHoverCache((prev) => (prev[key] ? prev : { ...prev, [key]: { status: 'loading' } }));
+		if (mangaHoverCache[key]) return;
+		try {
+			const res = await searchMangaByName(key);
+			const data = Array.isArray(res?.data) && res.data.length > 0 ? (res.data[0] as Manga) : null;
+			setMangaHoverCache((prev) => ({ ...prev, [key]: { status: 'success', data } }));
+		} catch {
+			setMangaHoverCache((prev) => ({ ...prev, [key]: { status: 'error', data: null } }));
+		}
+	};
 
 	return (
 		<>
@@ -405,7 +406,7 @@ const SearchScreenCharacters: React.FC = () => {
 						<div ref={scrollRef} className="h-[calc(100%-0px)] overflow-auto rounded-md overflow-x-auto">
 							<Table
 								highlightOnHover
-								className="min-w-[640px]"
+								className={tableWidthClass}
 								classNames={{
 									table: TableModule.tableTable,
 									thead: TableModule.theadTable,
@@ -417,9 +418,8 @@ const SearchScreenCharacters: React.FC = () => {
 							>
 								<Table.Thead className="sticky top-0 z-10">
 									<Table.Tr>
-										<Table.Th style={{ width: 64 }}>Rank</Table.Th>
+										<Table.Th style={{ width: isSmDown ? 48 : 64 }}>Rank</Table.Th>
 										<Table.Th>Character</Table.Th>
-										<Table.Th style={{ width: 140, textAlign: 'right' }}>Favorites</Table.Th>
 									</Table.Tr>
 								</Table.Thead>
 								<Table.Tbody>
@@ -458,7 +458,7 @@ const SearchScreenCharacters: React.FC = () => {
 				position="right"
 				size={drawerSize}
 				overlayProps={{ backgroundOpacity: 0.5, blur: 4 }}
-				classNames={{ root: DrawerModule.rootDrawer, header: DrawerModule.headerDrawer, body: DrawerModule.bodyDrawer }}
+				classNames={{ root: DrawerModule.rootDrawer, header: DrawerModule.headerDrawer, body: DrawerModule.bodyDrawer, content: DrawerModule.contentDrawer }}
 				content={selectedCharacter && (
 					<>
 						<Box>
@@ -579,58 +579,55 @@ const SearchScreenCharacters: React.FC = () => {
 
 								{Array.isArray(selectedCharacterFull?.anime) && selectedCharacterFull.anime.length > 0 && (
 									<Box>
-										<div className="rounded-lg border border-white/20 bg-black/30 backdrop-blur-sm p-2">
-											<Pill.Group className="flex flex-wrap gap-2">
-                                {(selectedCharacterFull.anime as any[])
-                                    .map((a) => (a?.anime?.title ?? '').trim())
-                                    .filter((t: string) => t.length > 0)
-                                    .slice(0, 20)
-                                    .map((title: string, i: number) => {
-                                        const info = animeHoverCache[title];
-                                        return (
-                                            <HoverCard
-                                                key={i}
-                                                width={340}
-                                                shadow="md"
-                                                withinPortal
-                                                openDelay={250}
-                                                closeDelay={100}
-                                                classNames={{ dropdown: HoverCardModule.dropdownHoverCard }}
-                                            >
-                                                <HoverCard.Target>
-                                                    <Pill
-                                                        size="sm"
-                                                        radius="xl"
-                                                        onMouseEnter={() => ensureAnimeHoverInfo(title)}
-                                                        className={MultiSelectModule.pillMultiSelect}
-                                                        style={{ color: 'var(--colorTextWhite)', cursor: 'pointer' }}
-                                                    >
-                                                        {title}
-                                                    </Pill>
-                                                </HoverCard.Target>
-                                                <HoverCard.Dropdown>
-                                                    {!info || info.status === 'loading' ? (
-                                                        <Text size="sm" className={HoverCardModule.metaHoverCard}>Carregando informações...</Text>
-                                                    ) : info.status === 'error' || !info.data ? (
-                                                        <Text size="sm" className={HoverCardModule.metaHoverCard}>Não foi possível obter informações.</Text>
-                                                    ) : (
-                                                        <div className="flex gap-3 items-start">
-                                                            <Image src={info.data.images?.jpg?.image_url} w={72} h={96} radius="sm" alt={info.data.title} />
-                                                            <div className="min-w-0">
-                                                                <Text className={HoverCardModule.titleHoverCard}>{info.data.title}</Text>
-                                                                <Text size="sm" className={HoverCardModule.metaHoverCard}>Score: {formatNumber(info.data.score)}</Text>
-                                                                <Text size="sm" className={HoverCardModule.metaHoverCard}>Episódios: {formatNumber((info.data as any).episodes)}</Text>
-                                                                <Text size="sm" className={HoverCardModule.metaHoverCard}>Status: {(info.data as any).status}</Text>
-                                                            </div>
-                                                        </div>
-                                                    )}
-                                                </HoverCard.Dropdown>
-                                            </HoverCard>
-                                        );
-                                    })}
-											</Pill.Group>
-										</div>
-
+										<Pill.Group className="flex flex-wrap gap-2">
+											{(selectedCharacterFull.anime as any[])
+												.map((a) => (a?.anime?.title ?? '').trim())
+												.filter((t: string) => t.length > 0)
+												.slice(0, 20)
+												.map((title: string, i: number) => {
+													const info = animeHoverCache[title];
+													return (
+														<HoverCard
+															key={i}
+															width={340}
+															shadow="md"
+															withinPortal
+															openDelay={250}
+															closeDelay={100}
+															classNames={{ dropdown: HoverCardModule.dropdownHoverCard }}
+														>
+															<HoverCard.Target>
+																<Pill
+																	size="sm"
+																	radius="xl"
+																	onMouseEnter={() => ensureAnimeHoverInfo(title)}
+																	className={MultiSelectModule.pillMultiSelect}
+																	style={{ color: 'var(--colorTextWhite)', cursor: 'pointer' }}
+																>
+																	{title}
+																</Pill>
+															</HoverCard.Target>
+															<HoverCard.Dropdown>
+																{!info || info.status === 'loading' ? (
+																	<Text size="sm" className={HoverCardModule.metaHoverCard}>Carregando informações...</Text>
+																) : info.status === 'error' || !info.data ? (
+																	<Text size="sm" className={HoverCardModule.metaHoverCard}>Não foi possível obter informações.</Text>
+																) : (
+																	<div className="flex gap-3 items-start">
+																		<Image src={info.data.images?.jpg?.image_url} w={72} h={96} radius="sm" alt={info.data.title} />
+																		<div className="min-w-0">
+																			<Text className={HoverCardModule.titleHoverCard}>{info.data.title}</Text>
+																			<Text size="sm" className={HoverCardModule.metaHoverCard}>Score: {formatNumber(info.data.score)}</Text>
+																			<Text size="sm" className={HoverCardModule.metaHoverCard}>Episódios: {formatNumber((info.data as any).episodes)}</Text>
+																			<Text size="sm" className={HoverCardModule.metaHoverCard}>Status: {(info.data as any).status}</Text>
+																		</div>
+																	</div>
+																)}
+															</HoverCard.Dropdown>
+														</HoverCard>
+													);
+												})}
+										</Pill.Group>
 									</Box>
 								)}
 
@@ -659,57 +656,55 @@ const SearchScreenCharacters: React.FC = () => {
 
 								{Array.isArray(selectedCharacterFull?.manga) && selectedCharacterFull.manga.length > 0 && (
 									<Box>
-										<div className="rounded-lg border border-white/20 bg-black/30 backdrop-blur-sm p-2">
-											<Pill.Group className="flex flex-wrap gap-2">
-                                            {(selectedCharacterFull.manga as any[])
-                                                .map((m) => (m?.manga?.title ?? '').trim())
-                                                .filter((t: string) => t.length > 0)
-                                                .slice(0, 20)
-                                                .map((title: string, i: number) => {
-                                                    const info = mangaHoverCache[title];
-                                                    return (
-                                                        <HoverCard
-                                                            key={i}
-                                                            width={340}
-                                                            shadow="md"
-                                                            withinPortal
-                                                            openDelay={250}
-                                                            closeDelay={100}
-                                                            classNames={{ dropdown: HoverCardModule.dropdownHoverCard }}
-                                                        >
-                                                            <HoverCard.Target>
-                                                                <Pill
-                                                                    size="sm"
-                                                                    radius="xl"
-                                                                    onMouseEnter={() => ensureMangaHoverInfo(title)}
-                                                                    className={MultiSelectModule.pillMultiSelect}
-                                                                    style={{ color: 'var(--colorTextWhite)', cursor: 'pointer' }}
-                                                                >
-                                                                    {title}
-                                                                </Pill>
-                                                            </HoverCard.Target>
-                                                            <HoverCard.Dropdown>
-                                                                {!info || info.status === 'loading' ? (
-                                                                    <Text size="sm" className={HoverCardModule.metaHoverCard}>Carregando informações...</Text>
-                                                                ) : info.status === 'error' || !info.data ? (
-                                                                    <Text size="sm" className={HoverCardModule.metaHoverCard}>Não foi possível obter informações.</Text>
-                                                                ) : (
-                                                                    <div className="flex gap-3 items-start">
-                                                                        <Image src={info.data.images?.jpg?.image_url} w={72} h={96} radius="sm" alt={info.data.title} />
-                                                                        <div className="min-w-0">
-                                                                            <Text className={HoverCardModule.titleHoverCard}>{info.data.title}</Text>
-                                                                            <Text size="sm" className={HoverCardModule.metaHoverCard}>Score: {formatNumber((info.data as any).score)}</Text>
-                                                                            <Text size="sm" className={HoverCardModule.metaHoverCard}>Capítulos: {formatNumber((info.data as any).chapters)}</Text>
-                                                                            <Text size="sm" className={HoverCardModule.metaHoverCard}>Status: {(info.data as any).status}</Text>
-                                                                        </div>
-                                                                    </div>
-                                                                )}
-                                                            </HoverCard.Dropdown>
-                                                        </HoverCard>
-                                                    );
-                                                })}
-											</Pill.Group>
-										</div>
+										<Pill.Group className="flex flex-wrap gap-2">
+											{(selectedCharacterFull.manga as any[])
+												.map((m) => (m?.manga?.title ?? '').trim())
+												.filter((t: string) => t.length > 0)
+												.slice(0, 20)
+												.map((title: string, i: number) => {
+													const info = mangaHoverCache[title];
+													return (
+														<HoverCard
+															key={i}
+															width={340}
+															shadow="md"
+															withinPortal
+															openDelay={250}
+															closeDelay={100}
+															classNames={{ dropdown: HoverCardModule.dropdownHoverCard }}
+														>
+															<HoverCard.Target>
+																<Pill
+																	size="sm"
+																	radius="xl"
+																	onMouseEnter={() => ensureMangaHoverInfo(title)}
+																	className={MultiSelectModule.pillMultiSelect}
+																	style={{ color: 'var(--colorTextWhite)', cursor: 'pointer' }}
+																>
+																	{title}
+																</Pill>
+															</HoverCard.Target>
+															<HoverCard.Dropdown>
+																{!info || info.status === 'loading' ? (
+																	<Text size="sm" className={HoverCardModule.metaHoverCard}>Carregando informações...</Text>
+																) : info.status === 'error' || !info.data ? (
+																	<Text size="sm" className={HoverCardModule.metaHoverCard}>Não foi possível obter informações.</Text>
+																) : (
+																	<div className="flex gap-3 items-start">
+																		<Image src={info.data.images?.jpg?.image_url} w={72} h={96} radius="sm" alt={info.data.title} />
+																		<div className="min-w-0">
+																			<Text className={HoverCardModule.titleHoverCard}>{info.data.title}</Text>
+																			<Text size="sm" className={HoverCardModule.metaHoverCard}>Score: {formatNumber((info.data as any).score)}</Text>
+																			<Text size="sm" className={HoverCardModule.metaHoverCard}>Capítulos: {formatNumber((info.data as any).chapters)}</Text>
+																			<Text size="sm" className={HoverCardModule.metaHoverCard}>Status: {(info.data as any).status}</Text>
+																		</div>
+																	</div>
+																)}
+															</HoverCard.Dropdown>
+														</HoverCard>
+													);
+												})}
+										</Pill.Group>
 									</Box>
 								)}
 							</>

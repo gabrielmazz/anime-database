@@ -4,6 +4,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
     BackgroundImage,
     Box,
+    Button,
     Container,
     Divider,
     Grid,
@@ -37,6 +38,22 @@ import { useMediaQuery } from '@mantine/hooks';
 
 // Estilos da Tabela no padrão do projeto
 import TableModule from '../assets/inputInfos/Table.module.css';
+import CharacterHoverCard from '../assets/components/characterHoverCard';
+
+const SECONDARY_INITIAL_COUNT = 10;
+const SECONDARY_STEP = 50;
+const CHARACTERS_PER_ROW = 2;
+
+function chunkIntoRows<T>(items: T[], itemsPerRow: number): T[][] {
+    if (itemsPerRow <= 0) {
+        return [];
+    }
+    const rows: T[][] = [];
+    for (let index = 0; index < items.length; index += itemsPerRow) {
+        rows.push(items.slice(index, index + itemsPerRow));
+    }
+    return rows;
+}
 
 function formatNumber(n?: number | null) {
     if (typeof n !== 'number') return '-';
@@ -59,17 +76,61 @@ const TopAnimesScreen: React.FC = () => {
     const [animeSelectedCharacters, setAnimeSelectedCharacters] = useState<any>(null);
     const [translatedSynopsis, setTranslatedSynopsis] = useState<string | null>(null);
     const [translateStatus, setTranslateStatus] = useState<string | null>(null);
+    const [otherCharactersVisibleCount, setOtherCharactersVisibleCount] = useState<number>(SECONDARY_INITIAL_COUNT);
 
     // Breakpoints e dimensões responsivas
     const isSmDown = useMediaQuery('(max-width: 640px)');
+    const tableWidthClass = isSmDown ? 'w-full' : 'min-w-[640px]';
     const isLgDown = useMediaQuery('(max-width: 1024px)');
-    const drawerSize = isLgDown ? '100%' : '35%';
-    const coverHeight = isSmDown ? 360 : isLgDown ? 480 : 600;
+   const drawerSize = isLgDown ? '100%' : '35%';
+   const coverHeight = isSmDown ? 360 : isLgDown ? 480 : 600;
 
-    // Alertas (suave) para feedback de requisições
-    const [alertVisible, setAlertVisible] = useState(false);
-    const [alertMessage, setAlertMessage] = useState("");
-    const [alertType, setAlertType] = useState<'info' | 'warning' | 'error' | 'success'>('info');
+   // Alertas (suave) para feedback de requisições
+   const [alertVisible, setAlertVisible] = useState(false);
+   const [alertMessage, setAlertMessage] = useState("");
+   const [alertType, setAlertType] = useState<'info' | 'warning' | 'error' | 'success'>('info');
+
+    const mainCharacters = useMemo(() => {
+        if (!animeSelectedCharacters || !Array.isArray(animeSelectedCharacters.data)) {
+            return [];
+        }
+        return animeSelectedCharacters.data.filter((character: any) => character.role === 'Main');
+    }, [animeSelectedCharacters]);
+
+    const otherCharacters = useMemo(() => {
+        if (!animeSelectedCharacters || !Array.isArray(animeSelectedCharacters.data)) {
+            return [];
+        }
+        return animeSelectedCharacters.data.filter((character: any) => character.role !== 'Main');
+    }, [animeSelectedCharacters]);
+
+    const mainCharacterRows = useMemo(
+        () => chunkIntoRows(mainCharacters, CHARACTERS_PER_ROW),
+        [mainCharacters]
+    );
+
+    const visibleOtherCharacters = useMemo(
+        () => otherCharacters.slice(0, otherCharactersVisibleCount),
+        [otherCharacters, otherCharactersVisibleCount]
+    );
+
+    const otherCharacterRows = useMemo(
+        () => chunkIntoRows(visibleOtherCharacters, CHARACTERS_PER_ROW),
+        [visibleOtherCharacters]
+    );
+
+    const hasMoreOtherCharacters = otherCharacters.length > otherCharactersVisibleCount;
+    const remainingOtherCharacters = otherCharacters.length - otherCharactersVisibleCount;
+    const nextOtherCharactersIncrement = Math.min(
+        SECONDARY_STEP,
+        Math.max(remainingOtherCharacters, 0)
+    );
+
+    const handleShowMoreOtherCharacters = () => {
+        setOtherCharactersVisibleCount((prev) =>
+            Math.min(prev + SECONDARY_STEP, otherCharacters.length)
+        );
+    };
 
     // Aplica paleta baseada no wallpaper
     useEffect(() => {
@@ -144,6 +205,10 @@ const TopAnimesScreen: React.FC = () => {
         run();
         return () => { cancelled = true; };
     }, [selectedAnime]);
+
+    useEffect(() => {
+        setOtherCharactersVisibleCount(SECONDARY_INITIAL_COUNT);
+    }, [animeSelectedCharacters]);
 
     // Carrega Top Animes no primeiro render e quando o limite muda
     useEffect(() => {
@@ -229,6 +294,7 @@ const TopAnimesScreen: React.FC = () => {
     }, [page, rows, apiModalEnabled, hasMore, isLoadingMore, animesPageLimit]);
 
     const tableRows = useMemo(() => {
+        const imageSize = isSmDown ? 48 : 56;
         return rows.map((a, idx) => (
             <Table.Tr
                 key={a.mal_id}
@@ -239,24 +305,24 @@ const TopAnimesScreen: React.FC = () => {
                     setOpenedInfo(true);
                 }}
             >
-                <Table.Td className={TableModule.tdTable} width={64}>
+                <Table.Td className={TableModule.tdTable} width={isSmDown ? 48 : 64}>
                     <Text style={{ color: 'var(--color1)', fontWeight: 700 }}>{idx + 1}</Text>
                 </Table.Td>
                 <Table.Td className={TableModule.tdTable}>
-                    <Group wrap="nowrap" gap="sm" align="center">
-                        <Image src={a.images?.jpg?.image_url} w={56} h={56} radius="sm" fit="cover" alt={a.title} />
-                        <Box>
-                            <Text style={{ color: 'var(--colorTextWhite)' }}>{a.title}</Text>
-                            <Text size="xs" c="dimmed">ID: {a.mal_id}</Text>
+                    <Group wrap={isSmDown ? 'wrap' : 'nowrap'} gap={isSmDown ? 'xs' : 'sm'} align="center">
+                        <Image src={a.images?.jpg?.image_url} w={imageSize} h={imageSize} radius="sm" fit="cover" alt={a.title} />
+                        <Box style={{ flex: 1, minWidth: isSmDown ? '100%' : 0 }}>
+                            <Text style={{ color: 'var(--colorTextWhite)', fontSize: isSmDown ? 14 : undefined, wordBreak: 'break-word' }}>{a.title}</Text>
+                            <Text size={isSmDown ? 'xs' : 'sm'} c="dimmed">ID: {a.mal_id}</Text>
                         </Box>
                     </Group>
                 </Table.Td>
                 <Table.Td className={TableModule.tdTable} style={{ textAlign: 'right' }}>
-                    <Text style={{ color: 'var(--colorTextWhite)' }}>{formatNumber(a.score)}</Text>
+                    <Text style={{ color: 'var(--colorTextWhite)', fontSize: isSmDown ? 14 : undefined }}>{formatNumber(a.score)}</Text>
                 </Table.Td>
             </Table.Tr>
         ));
-    }, [rows]);
+    }, [rows, isSmDown]);
 
     return (
         <>
@@ -321,7 +387,7 @@ const TopAnimesScreen: React.FC = () => {
                         <div ref={scrollRef} className="h-[calc(100%-0px)] overflow-auto rounded-md overflow-x-auto">
                             <Table
                                 highlightOnHover
-                                className="min-w-[640px]"
+                                className={tableWidthClass}
                                 classNames={{
                                     table: TableModule.tableTable,
                                     thead: TableModule.theadTable,
@@ -333,9 +399,9 @@ const TopAnimesScreen: React.FC = () => {
                             >
                                 <Table.Thead className="sticky top-0 z-10">
                                     <Table.Tr>
-                                        <Table.Th style={{ width: 64 }}>Rank</Table.Th>
+                                        <Table.Th style={{ width: isSmDown ? 48 : 64 }}>Rank</Table.Th>
                                         <Table.Th>Anime</Table.Th>
-                                        <Table.Th style={{ width: 140, textAlign: 'right' }}>Score</Table.Th>
+                                        <Table.Th style={{ width: isSmDown ? 96 : 140, textAlign: 'right' }}>Score</Table.Th>
                                     </Table.Tr>
                                 </Table.Thead>
                                 <Table.Tbody>
@@ -349,7 +415,7 @@ const TopAnimesScreen: React.FC = () => {
             </BackgroundImage>
 
             {/* Drawer de informações do anime */}
-            <InfoDrawer
+			<InfoDrawer
                 opened={openedInfo}
                 onClose={() => { setOpenedInfo(false); setSelectedAnime(null); }}
                 title={
@@ -364,7 +430,7 @@ const TopAnimesScreen: React.FC = () => {
                 position="right"
                 size={drawerSize}
                 overlayProps={{ backgroundOpacity: 0.5, blur: 4 }}
-                classNames={{ root: DrawerModule.rootDrawer, header: DrawerModule.headerDrawer, body: DrawerModule.bodyDrawer }}
+				classNames={{ root: DrawerModule.rootDrawer, header: DrawerModule.headerDrawer, body: DrawerModule.bodyDrawer, content: DrawerModule.contentDrawer }}
                 content={selectedAnime && (
                     <>
                         <Box>
@@ -439,51 +505,63 @@ const TopAnimesScreen: React.FC = () => {
                             ))}
                         </Carousel>
 
-                        {animeSelectedCharacters && Array.isArray(animeSelectedCharacters.data) &&
-                            animeSelectedCharacters.data.some((character: any) => character.role === 'Main') && (
-                                <>
-                                    <Divider my="xl" label={<Text component="span" className="font-bold uppercase tracking-(--title-letter-spacing)" style={{ fontSize: 16, fontFamily: 'Raleway, sans-serif', color: 'var(--colorTextWhite)', marginRight: 6 }}>Personagens Principais</Text>} labelPosition="center" />
-                                    {Array.from({ length: Math.ceil(animeSelectedCharacters.data.filter((c: any) => c.role === 'Main').length / 2) }, (_, rowIndex) => {
-                                        const mainCharacters = animeSelectedCharacters.data.filter((c: any) => c.role === 'Main');
-                                        const rowCharacters = mainCharacters.slice(rowIndex * 2, rowIndex * 2 + 2);
-                                        return (
-                                            <Grid key={rowIndex} gutter="md" mb="md">
-                                                {rowCharacters.map((character: any, colIndex: number) => (
-                                                    <Grid.Col span={6} key={colIndex}>
-                                                        <Group>
-                                                            <Image src={character.character.images.jpg.image_url} radius="md" h={120} w={80} alt={character.character.name} />
-                                                            <Text style={{ color: '#E8D4B7', fontWeight: 600 }}>{character.character.name}</Text>
-                                                        </Group>
-                                                    </Grid.Col>
-                                                ))}
-                                            </Grid>
-                                        );
-                                    })}
-                                </>
-                            )}
+                        {mainCharacters.length > 0 && (
+                            <>
+                                <Divider
+                                    my="xl"
+                                    label={
+                                        <Text component="span" className="font-bold uppercase tracking-(--title-letter-spacing)" style={{ fontSize: 16, fontFamily: 'Raleway, sans-serif', color: 'var(--colorTextWhite)', marginRight: 6 }}>
+                                            Personagens Principais
+                                        </Text>
+                                    }
+                                    labelPosition="center"
+                                />
+                                {mainCharacterRows.map((rowCharacters, rowIndex) => (
+                                    <Grid key={rowIndex} gutter={{ base: 'sm', sm: 'md' }} mb="md">
+                                        {rowCharacters.map((characterEntry: any, colIndex: number) => (
+                                            <Grid.Col span={{ base: 12, sm: 6 }} key={colIndex}>
+                                                <CharacterHoverCard characterEntry={characterEntry} nameColor="#E8D4B7" />
+                                            </Grid.Col>
+                                        ))}
+                                    </Grid>
+                                ))}
+                            </>
+                        )}
 
-                        {animeSelectedCharacters && Array.isArray(animeSelectedCharacters.data) &&
-                            animeSelectedCharacters.data.some((character: any) => character.role !== 'Main') && (
-                                <>
-                                    <Divider my="xl" label={<Text component="span" className="font-bold uppercase tracking-(--title-letter-spacing)" style={{ fontSize: 16, fontFamily: 'Raleway, sans-serif', color: 'var(--colorTextWhite)', marginRight: 6 }}>Outros Personagens</Text>} labelPosition="center" />
-                                    {Array.from({ length: Math.ceil(animeSelectedCharacters.data.filter((c: any) => c.role !== 'Main').length / 2) }, (_, rowIndex) => {
-                                        const others = animeSelectedCharacters.data.filter((c: any) => c.role !== 'Main');
-                                        const rowCharacters = others.slice(rowIndex * 2, rowIndex * 2 + 2);
-                                        return (
-                                            <Grid key={rowIndex} gutter="md" mb="md">
-                                                {rowCharacters.map((character: any, colIndex: number) => (
-                                                    <Grid.Col span={6} key={colIndex}>
-                                                        <Group>
-                                                            <Image src={character.character.images.jpg.image_url} radius="md" h={120} w={80} alt={character.character.name} />
-                                                            <Text style={{ color: 'var(--colorTextWhite)', fontWeight: 600 }}>{character.character.name}</Text>
-                                                        </Group>
-                                                    </Grid.Col>
-                                                ))}
-                                            </Grid>
-                                        );
-                                    })}
-                                </>
-                            )}
+                        {otherCharacters.length > 0 && (
+                            <>
+                                <Divider
+                                    my="xl"
+                                    label={
+                                        <Text component="span" className="font-bold uppercase tracking-(--title-letter-spacing)" style={{ fontSize: 16, fontFamily: 'Raleway, sans-serif', color: 'var(--colorTextWhite)', marginRight: 6 }}>
+                                            Outros Personagens
+                                        </Text>
+                                    }
+                                    labelPosition="center"
+                                />
+                                {otherCharacterRows.map((rowCharacters, rowIndex) => (
+                                    <Grid key={rowIndex} gutter={{ base: 'sm', sm: 'md' }} mb="md">
+                                        {rowCharacters.map((characterEntry: any, colIndex: number) => (
+                                            <Grid.Col span={{ base: 12, sm: 6 }} key={colIndex}>
+                                                <CharacterHoverCard characterEntry={characterEntry} />
+                                            </Grid.Col>
+                                        ))}
+                                    </Grid>
+                                ))}
+
+                                {hasMoreOtherCharacters && (
+                                    <Group justify="center" mt="md">
+                                        <Button
+                                            variant="light"
+                                            color="yellow"
+                                            onClick={handleShowMoreOtherCharacters}
+                                        >
+                                            Mostrar mais {nextOtherCharactersIncrement} personagens
+                                        </Button>
+                                    </Group>
+                                )}
+                            </>
+                        )}
                     </>
                 )}
             />

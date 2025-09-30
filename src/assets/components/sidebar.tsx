@@ -18,7 +18,7 @@ import { Tooltip } from '@mantine/core';
 import TooltipModule from '../inputInfos/Tooltip.module.css';
 
 // Importação dos icones do React-icons
-import { FaGithub, FaCalendarAlt } from "react-icons/fa";
+import { FaGithub, FaCalendarAlt, FaUser } from "react-icons/fa";
 import { FaInfo } from "react-icons/fa6";
 import { FaHome } from "react-icons/fa";
 import { IoSearch } from "react-icons/io5";
@@ -95,6 +95,7 @@ const Sidebar: React.FC = () => {
         { key: 'searchManga', label: 'Buscar Manga', icon: <MdMenuBook />, link: '/searchScreenManga' },
         { key: 'seasons', label: 'Explorar Temporadas', icon: <FaCalendarAlt />, link: '/seasonScreen' },
         { key: 'searchCharacters', label: 'Buscar Personagem', icon: <IoSearch />, link: '/searchScreenCharacters' },
+        { key: 'searchPeople', label: 'Buscar Pessoas', icon: <FaUser />, link: '/searchScreenPeople' },
         { key: 'searchProducers', label: 'Buscar Produtores', icon: <IoAccessibilityOutline />, link: '/searchScreenProducers' },
         { key: 'topAnimes', label: 'Top Animes', icon: <FaTrophy />, link: '/topAnimesScreen' },
 		{ key: 'randomAnime', label: 'Anime Aleatório', icon: <GiPerspectiveDiceSixFacesFive />, link: '/randomAnimeScreen' },

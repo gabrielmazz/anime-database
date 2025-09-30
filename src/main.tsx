@@ -20,6 +20,7 @@ import SearchScreenCharacters from './screens/searchScreenCharacters.tsx'
 import TopAnimesScreen from './screens/topAnimesScreen.tsx'
 import ExploreSeasonsScreen from './screens/exploreSeasonsScreen.tsx'
 import SearchScreenProducers from './screens/searchScreenProducers.tsx'
+import SearchScreenPeople from './screens/searchScreenPeople.tsx'
 import RandomAnimeScreen from './screens/randomAnimeScreen.tsx'
 import RandomMangaScreen from './screens/randomMangaScreen.tsx'
 
@@ -43,6 +44,7 @@ createRoot(document.getElementById('root')!).render(
             <Route path="/searchScreenManga" element={<SearchScreenManga />} />
             <Route path="/searchScreenCharacters" element={<SearchScreenCharacters />} />
             <Route path="/searchScreenProducers" element={<SearchScreenProducers />} />
+            <Route path="/searchScreenPeople" element={<SearchScreenPeople />} />
             <Route path="/topAnimesScreen" element={<TopAnimesScreen />} />
             <Route path="/seasonScreen" element={<ExploreSeasonsScreen />} />
             <Route path="/randomAnimeScreen" element={<RandomAnimeScreen />} />
